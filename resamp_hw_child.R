@@ -11,7 +11,7 @@ shp <- commandArgs()[3]
 indic <- commandArgs()[4]
 
 load(paste0("/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/", indic,"/subset_",shp,".RData"))
-load("/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/", indic, "/hh_vector.RData")
+load(paste0("/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/", indic, "/hh_vector.RData"))
 
 #### READ IN THE WORLDPOP RASTER AND CROP IT TO SHAPEFILE ####
 pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif')
