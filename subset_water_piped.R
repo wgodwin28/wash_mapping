@@ -39,7 +39,6 @@ for (i in unique(data$w_source_drink)) {
   data$w_source_sdg[which(data$w_source_drink == i)] <- w_def$sdg[which(w_def$x == i)]
 }
 
-
 data$w_other_sdg <- NA
 for (i in unique(data$w_source_other)) {
   data$w_other_sdg[which(data$w_source_other == i)] <- w_other_def$sdg[which(w_other_def$x == i)]

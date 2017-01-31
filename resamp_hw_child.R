@@ -63,4 +63,4 @@ for (loc in unique(subset$location_code)) {
 }
 generated_pts2 <- do.call(rbind, generated_pts)
 
-write.csv(generated_pts2, file = paste0("/home/j//WORK/11_geospatial/wash/resampling/hw/", indic,"/poly_df/", shp, Sys.Date(),".csv"))
+write.csv(generated_pts2, file = paste0("/home/j//WORK/11_geospatial/wash/resampling/hw/", indic,"/poly_df/", shp, "_", Sys.Date(),".csv"))
