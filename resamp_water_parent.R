@@ -14,7 +14,7 @@ for (indic in hw_indic) {
     mycores <- 5
     sys.sub <- paste0("qsub ",proj,paste0(" -e /share/temp/sgeoutput/",user,"/errors -o /share/temp/sgeoutput/",user,"/output "),
                       "-cwd -N ", jname, " ", "-pe multi_slot ", mycores, " ")
-    script <- "resamp_hw_child.R"
+    script <- "resamp_water_child.R"
     r_shell <- "r_shell.sh"
     args <- paste(shp, indic)
     system(paste(sys.sub, r_shell, script, args)) 
