@@ -8,8 +8,10 @@ for(package in package_list) {
 }
 
 shp <- commandArgs()[3]
-load(paste0("/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/sdg/subset_",shp,".RData"))
-load("/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/sdg/hh_vector.RData")
+indic <- commandArgs()[4]
+
+load(paste0("/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/", indic,"/subset_",shp,".RData"))
+load("/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/", indic, "/hh_vector.RData")
 
 #### READ IN THE WORLDPOP RASTER AND CROP IT TO SHAPEFILE ####
 pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif')
@@ -51,4 +53,4 @@ for (loc in unique(subset$location_code)) {
 }
 generated_pts2 <- do.call(rbind, generated_pts)
 
-write.csv(generated_pts2, file = paste0("/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/sdg/poly_df/", shp,".csv"))
+write.csv(generated_pts2, file = paste0("/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/", indic,"/poly_df/", shp,".csv"))
