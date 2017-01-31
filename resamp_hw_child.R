@@ -28,13 +28,13 @@ for (loc in unique(subset$location_code)) {
     
     year <- subset_loc2$year_start
     if (year <= 2000) {
-    raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 1)}
+      pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 1)}
     else if (year > 2000 & year <= 2005) {
-    raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 2)}
+      pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 2)}
     else if (year > 2005 & year <= 2010) {
-    raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 3)}
+      pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 3)}
     else if (year > 2010) {
-    raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 4)}
+      pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 4)}
     
     prop <- unique(subset_loc2$mbg_indic)
     samp_pts <- spsample(shape, unique(subset_loc2$weight), type = "random") 
