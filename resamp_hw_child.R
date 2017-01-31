@@ -10,8 +10,8 @@ for(package in package_list) {
 shp <- commandArgs()[3]
 indic <- commandArgs()[4]
 
-load(paste0("/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/", indic,"/subset_",shp,".RData"))
-load(paste0("/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/", indic, "/hh_vector.RData"))
+load(paste0("/home/j//WORK/11_geospatial/wash/resampling/hw/", indic,"/subset_",shp,".RData"))
+load(paste0("/home/j//WORK/11_geospatial/wash/resampling/hw/", indic, "/hh_vector.RData"))
 
 #### READ IN THE WORLDPOP RASTER AND CROP IT TO SHAPEFILE ####
 shape_master <- shapefile(paste0('/home/j//WORK/11_geospatial/05_survey shapefile library/Shapefile directory/',shp,'.shp'))
@@ -24,8 +24,9 @@ for (loc in unique(subset$location_code)) {
   subset_loc <- filter(subset, location_code == loc)
   
   for (pid in unique(subset_loc$poly_id)) {
-    samp_pts2$year <- subset_loc2$year_start
+    subset_loc2 <- filter(subset_loc, poly_id == pid)
     
+    samp_pts2$year <- subset_loc2$year_start
     if (samp_pts2$year <= 2000) {
     raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 1)}
     else if (samp_pts2$year > 2000 & samp_pts2$year <= 2005) {
@@ -35,7 +36,6 @@ for (loc in unique(subset$location_code)) {
     else if (samp_pts2$year > 2010) {
     raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 4)}
     
-    subset_loc2 <- filter(subset_loc, poly_id == pid)
     prop <- unique(subset_loc2$mbg_indic)
     samp_pts <- spsample(shape, unique(subset_loc2$weight), type = "random") 
     N <- extract(pop_raster, samp_pts)
@@ -62,4 +62,4 @@ for (loc in unique(subset$location_code)) {
 }
 generated_pts2 <- do.call(rbind, generated_pts)
 
-write.csv(generated_pts2, file = paste0("/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/", indic,"/poly_df/", shp,".csv"))
+write.csv(generated_pts2, file = paste0("/home/j//WORK/11_geospatial/wash/resampling/hw/", indic,"/poly_df/", shp, Sys.Date(),".csv"))

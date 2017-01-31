@@ -97,9 +97,9 @@ pop_raster <-  raster('J:/WORK/11_geospatial/01_covariates/09_MBG_covariates/Wor
 
 for (shp in unique(data_poly$shapefile)) {
   subset <- filter(data_poly, shapefile == shp)
-  save(subset, file = paste0("J:/WORK/11_geospatial/wash/resampling/1.30.17/hw/no_facility/subset_",shp,".RData"))
+  save(subset, file = paste0("J:/WORK/11_geospatial/wash/resampling/hw/no_facility/subset_",shp,".RData"))
  }
 
-save(data_pt, file = "J:/WORK/11_geospatial/wash/resampling/1.30.17/hw/no_facility/master_pt.RData")
-save(data_poly, file = "J:/WORK/11_geospatial/wash/resampling/1.30.17/hw/no_facility/master_poly.RData")
-save(hh_vector, file = "J:/WORK/11_geospatial/wash/resampling/1.30.17/hw/no_facility/hh_vector.RData")
+save(data_pt, file = "J:/WORK/11_geospatial/wash/resampling/hw/no_facility/master_pt.RData")
+save(data_poly, file = "J:/WORK/11_geospatial/wash/resampling/hw/no_facility/master_poly.RData")
+save(hh_vector, file = "J:/WORK/11_geospatial/wash/resampling/hw/no_facility/hh_vector.RData")
