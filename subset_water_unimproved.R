@@ -49,13 +49,13 @@ data$w_other_sdg[which(data$w_other_sdg == "")] <- NA
 
 data$w_master_sdg <- NA
 data$w_master_sdg <- ifelse(data$w_source_sdg == "piped", 3,
-                       ifelse(data$w_source_sdg == "improved", 2, 
-                         ifelse(data$w_source_sdg == "unimproved", 1, 
-                           ifelse(data$w_source_sdg == "surface", 0, NA)))) 
-                     
+                            ifelse(data$w_source_sdg == "improved", 2, 
+                                   ifelse(data$w_source_sdg == "unimproved", 1, 
+                                          ifelse(data$w_source_sdg == "surface", 0, NA)))) 
+
 data$w_master_sdg[which(data$w_source_sdg == "bottled")] <- 1
 data$w_master_sdg[which(data$w_source_sdg == "bottled" &
-                        (data$w_other_sdg == "piped"|data$w_other_sdg == "improved")  )] <- 2
+                          (data$w_other_sdg == "piped"|data$w_other_sdg == "improved")  )] <- 2
 
 # Determine which clusters to retain based on data requirements for point and poly data
 data <- data %>% group_by(cluster_id) %>% mutate(pt_drop = all(point == 1) & 
@@ -89,7 +89,7 @@ data_poly <- filter(data, poly_drop)
 
 # Aggregate to cluster level for points
 data_pt <- data_pt %>% group_by(cluster_id) %>% mutate(pweight_total = sum(pweight*hh_size))
-data_pt <- mutate(data_pt, wt_indic = (hh_size*pweight*w_piped)/pweight_total)
+data_pt <- mutate(data_pt, wt_indic = (hh_size*pweight*w_unimp)/pweight_total)
 data_pt <- data_pt %>% group_by(cluster_id, lat, long,
                                 year_start, ihme_loc_id) %>% summarize(mbg_indic = sum(wt_indic), weight = sum(hh_size))
 data_pt <- mutate(data_pt, mbg_indic_bin = floor(weight*mbg_indic))
@@ -103,7 +103,7 @@ data_pt$point <- 1
 
 # Aggregate to shapefile x location_id level for polygons
 data_poly <- data_poly %>% group_by(poly_id) %>% mutate(pweight_total = sum(pweight*hh_size))
-data_poly <- mutate(data_poly, wt_indic = (hh_size*pweight*w_piped)/pweight_total)
+data_poly <- mutate(data_poly, wt_indic = (hh_size*pweight*w_unimp)/pweight_total)
 data_poly <- data_poly %>% group_by(poly_id, shapefile, location_code, ihme_loc_id,
                                     year_start) %>% summarize(mbg_indic = sum(wt_indic), weight = length(unique(hh_size)))
 data_poly$latitude <- NA
@@ -115,9 +115,9 @@ data_poly <- mutate(data_poly, mbg_indic_bin = floor(weight*mbg_indic))
 # Save subsets
 for (shp in unique(data_poly$shapefile)) {
   subset <- filter(data_poly, shapefile == shp)
-  save(subset, file = paste0("J:/WORK/11_geospatial/wash/resampling/water/piped/subset_",shp,".RData"))
+  save(subset, file = paste0("J:/WORK/11_geospatial/wash/resampling/water/unimproved/subset_",shp,".RData"))
 }
 
-save(data_pt, file = "J:/WORK/11_geospatial/wash/resampling/water/piped/master_pt.RData")
-save(data_poly, file = "J:/WORK/11_geospatial/wash/resampling/water/piped/master_poly.RData")
-save(hh_vector, file = "J:/WORK/11_geospatial/wash/resampling/water/piped/hh_vector.RData")
+save(data_pt, file = "J:/WORK/11_geospatial/wash/resampling/water/unimproved/master_pt.RData")
+save(data_poly, file = "J:/WORK/11_geospatial/wash/resampling/water/unimproved/master_poly.RData")
+save(hh_vector, file = "J:/WORK/11_geospatial/wash/resampling/water/unimproved/hh_vector.RData")
