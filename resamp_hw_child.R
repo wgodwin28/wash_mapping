@@ -26,14 +26,14 @@ for (loc in unique(subset$location_code)) {
   for (pid in unique(subset_loc$poly_id)) {
     subset_loc2 <- filter(subset_loc, poly_id == pid)
     
-    samp_pts2$year <- subset_loc2$year_start
-    if (samp_pts2$year <= 2000) {
+    year <- subset_loc2$year_start
+    if (year <= 2000) {
     raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 1)}
-    else if (samp_pts2$year > 2000 & samp_pts2$year <= 2005) {
+    else if (year > 2000 & year <= 2005) {
     raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 2)}
-    else if (samp_pts2$year > 2005 & samp_pts2$year <= 2010) {
+    else if (year > 2005 & year <= 2010) {
     raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 3)}
-    else if (samp_pts2$year > 2010) {
+    else if (year > 2010) {
     raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 4)}
     
     prop <- unique(subset_loc2$mbg_indic)
@@ -43,6 +43,7 @@ for (loc in unique(subset$location_code)) {
     names(samp_pts2) <- c("long", "lat")
     samp_pts2$prop <- prop
     samp_pts2$N <- N
+    samp_pts2$year <- subset_loc2$year_start
     samp_pts2 <- mutate(samp_pts2, mbg_indic_bin = floor(prop * N))
     samp_pts2$N <- floor(samp_pts2$N)
     pop_cdf <- ecdf(samp_pts2$N)
