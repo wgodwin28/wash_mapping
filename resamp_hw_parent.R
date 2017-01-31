@@ -1,4 +1,3 @@
-load('/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/sdg/master_poly.RData')
 
 proj <- "-P proj_geospatial"
 user <- "adesh"
@@ -8,6 +7,8 @@ setwd('/homes/adesh/wash_code')
 hw_indic <- c("basic","unimproved","no_facility")
 
 for (indic in hw_indic) {
+  load(paste0('/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/',indic, 'sdg/master_poly.RData'))
+  
   for (shp in unique(data_poly$shapefile)) { 
     jname <- paste(indic, shp, sep = "_")
     mycores <- 5
