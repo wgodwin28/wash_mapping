@@ -100,5 +100,6 @@ for (shp in unique(data_poly$shapefile)) {
   save(subset, file = paste0("J:/WORK/11_geospatial/wash/resampling/1.30.17/hw/basic/subset_",shp,".RData"))
  }
 
+save(data_pt, file = "J:/WORK/11_geospatial/wash/resampling/1.30.17/hw/basic/master_pt.RData")
 save(data_poly, file = "J:/WORK/11_geospatial/wash/resampling/1.30.17/hw/basic/master_poly.RData")
 save(hh_vector, file = "J:/WORK/11_geospatial/wash/resampling/1.30.17/hw/basic/hh_vector.RData")

@@ -14,7 +14,6 @@ load(paste0("/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/", indic,"/s
 load(paste0("/home/j//WORK/11_geospatial/wash/resampling/1.30.17/hw/", indic, "/hh_vector.RData"))
 
 #### READ IN THE WORLDPOP RASTER AND CROP IT TO SHAPEFILE ####
-pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif')
 shape_master <- shapefile(paste0('/home/j//WORK/11_geospatial/05_survey shapefile library/Shapefile directory/',shp,'.shp'))
 
 
@@ -24,7 +23,18 @@ for (loc in unique(subset$location_code)) {
   shape <- shape_master[shape_master$GAUL_CODE == loc,]
   subset_loc <- filter(subset, location_code == loc)
   
-  for (pid in unique(subset_loc$poly_id)) {  
+  for (pid in unique(subset_loc$poly_id)) {
+    samp_pts2$year <- subset_loc2$year_start
+    
+    if (samp_pts2$year <= 2000) {
+    raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 1)}
+    else if (samp_pts2$year > 2000 & samp_pts2$year <= 2005) {
+    raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 2)}
+    else if (samp_pts2$year > 2005 & samp_pts2$year <= 2010) {
+    raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 3)}
+    else if (samp_pts2$year > 2010) {
+    raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 4)}
+    
     subset_loc2 <- filter(subset_loc, poly_id == pid)
     prop <- unique(subset_loc2$mbg_indic)
     samp_pts <- spsample(shape, unique(subset_loc2$weight), type = "random") 
@@ -40,7 +50,6 @@ for (loc in unique(subset$location_code)) {
     samp_pts2 <- mutate(samp_pts2, N_adj = floor(quantile(hh_vector, ntile)))
     samp_pts2 <- mutate(samp_pts2, mbg_indic_bin_adj = floor(prop*N_adj))
     samp_pts2$country <- subset_loc2$ihme_loc_id
-    samp_pts2$year <- subset_loc2$year_start
     samp_pts2$cluster_id <- pid
     samp_pts2 <- dplyr::select(samp_pts2, country, year, prop, N_adj, mbg_indic_bin_adj, lat,
                                long, cluster_id)
