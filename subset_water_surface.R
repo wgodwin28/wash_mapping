@@ -119,4 +119,4 @@ for (shp in unique(data_poly$shapefile)) {
 
 save(data_pt, file = "J:/WORK/11_geospatial/wash/resampling/water/surface/master_pt.RData")
 save(data_poly, file = "J:/WORK/11_geospatial/wash/resampling/water/surface/master_poly.RData")
-save(hh_vector, file = "J:/WORK/11_geospatial/wash/resampling/water/improved/hh_vector.RData")
+save(hh_vector, file = "J:/WORK/11_geospatial/wash/resampling/water/surface/hh_vector.RData")
