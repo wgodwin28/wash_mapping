@@ -3,7 +3,7 @@ library(dplyr)
 indic_list <- c("piped", "improved", "unimproved", "surface")
 indic2_list <- c("piped", "improved", "unimproved", "surface")
 
-for (i in 1:3) {
+for (i in 1:4) {
   
   setwd(paste0("J:/WORK/11_geospatial/wash/resampling/water/", indic_list[i], "/poly_df"))
   fake_pts <- lapply(list.files(), read.csv)
