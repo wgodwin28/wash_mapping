@@ -5,8 +5,10 @@ library(dplyr)
 library(raster)
 
 # Load data and add in unique cluster ID, and categorize as pt or poly data
-data2 <- read.csv('J:/WORK/11_geospatial/02_processed data/WASH/extractions_1_19_17/WaSH.csv', stringsAsFactors = F)
+# data2 <- read.csv('J:/WORK/11_geospatial/02_processed data/WASH/extractions_1_19_17/WaSH.csv', stringsAsFactors = F)
 # data3 <- fread('J:/WORK/11_geospatial/02_processed data/WASH/extractions_1_19_17/WaSH.csv', stringsAsFactors = F)
+data2 <- read.csv('C:/Users/adesh/Documents/WASH/working_extraction/WaSH.csv', stringsAsFactors = F)
+#data2 <- fread('C:/Users/adesh/Documents/WASH/working_extraction/WaSH.csv', stringsAsFactors = F)
 
 # writing variable values for categorization
 # w_source_val <- unique(data2$w_source_drink)
@@ -59,15 +61,15 @@ data$w_master_sdg[which(data$w_source_sdg == "bottled" &
 
 # Determine which clusters to retain based on data requirements for point and poly data
 data <- data %>% group_by(cluster_id) %>% mutate(pt_drop = all(point == 1) & 
-                                                   all(!is.na(hh_size)) &
-                                                   all(hh_size > 0) &
+                                                   #all(!is.na(hh_size)) &
+                                                   #all(hh_size > 0) &
                                                    all(!is.na(pweight)) &
                                                    all(!is.na(w_master_sdg)) &
                                                    all(length(unique(pweight)) == 1))
 
 data <- data %>% group_by(poly_id) %>% mutate(poly_drop = all(point == 0) & 
-                                                all(!is.na(hh_size)) &
-                                                all(hh_size > 0) &
+                                                #all(!is.na(hh_size)) &
+                                                #all(hh_size > 0) &
                                                 all(!is.na(pweight)) &
                                                 all(!is.na(shapefile)) &
                                                 all(!is.na(location_code)) &
