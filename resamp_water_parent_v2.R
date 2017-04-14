@@ -10,9 +10,9 @@ for(package in package_list) {
 shp <- commandArgs()[3]
 indic <- commandArgs()[4]
 
-load(paste0("/home/j//WORK/11_geospatial/wash/resampling/water/", indic,"/subset_",shp,".RData"))
+load(paste0("/home/j//WORK/11_geospatial/wash/resampling/water/", indic,"/water_poly_f.RData"))
 #load(paste0("/home/j//WORK/11_geospatial/wash/resampling/water/", indic, "/hh_vector.RData"))
-
+subset <- water_poly_f[which(shapefile == shp),]
 #### READ IN THE WORLDPOP RASTER AND CROP IT TO SHAPEFILE ####
 shape_master <- shapefile(paste0('/home/j//WORK/11_geospatial/05_survey shapefile library/Shapefile directory/',shp,'.shp'))
 

@@ -7,7 +7,7 @@ setwd('/homes/adesh/wash_code')
 hw_indic <- c("water")
 
 for (indic in hw_indic) {
-  load(paste0('/home/j//WORK/11_geospatial/wash/resampling/water/',indic, '/master_poly.RData'))
+  load(paste0('/home/j//WORK/11_geospatial/wash/resampling/water/',indic, '/water_poly_f.RData'))
   
   for (shp in unique(water_poly_f$shapefile)) { 
     jname <- paste(indic, shp, sep = "_")
