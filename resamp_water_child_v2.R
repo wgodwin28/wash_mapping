@@ -26,13 +26,18 @@ for (loc in unique(subset$location_code)) {
     
     year <- subset_loc2$year_start
     if (year <= 2000) {
-      pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 1)}
-    else if (year > 2000 & year <= 2005) {
-      pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 2)}
-    else if (year > 2005 & year <= 2010) {
-      pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 3)}
-    else if (year > 2010) {
-      pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 4)}
+      pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 1)
+    } else {
+      if (year > 2000 & year <= 2005) {
+        pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 2)
+        } else {
+                if (year > 2005 & year <= 2010) {
+                  pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 3)
+                  } else {
+                          pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 4)
+                    }
+      } 
+    } 
     
     raster_crop <- mask(crop(x = pop_raster, y = shape), shape)
     n_pts <- subset_loc2$n_pts
