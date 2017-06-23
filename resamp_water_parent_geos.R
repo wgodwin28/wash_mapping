@@ -11,7 +11,7 @@ for (indic in hw_indic) {
   
   for (shp in unique(water_poly_f$shapefile)) { 
     jname <- paste(indic, shp, sep = "_")
-    mycores <- 4
+    mycores <- 1
     sys.sub <- paste0("qsub ",proj,paste0(" -e /share/temp/sgeoutput/",user,"/errors -o /share/temp/sgeoutput/",user,"/output "),
                       "-cwd -N ", jname, " ", "-pe multi_slot ", mycores, " ")
     script <- "resamp_water_child_v2_geos.R"

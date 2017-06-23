@@ -244,7 +244,7 @@ water_pt_nocw <- filter(water_pt, !hh_miss)
 water_pt_nocw <- water_pt_nocw %>% group_by(cluster_id) %>% mutate(weight_total = sum(hhweight*hh_size), hh_total = sum(hh_size))
 water_pt_nocw <- mutate(water_pt_nocw, wt_indic = (hh_size*hhweight*w_piped)/weight_total)
 water_pt_agg_nocw <- water_pt_nocw %>% group_by(year_start, survey_name, ihme_loc_id, lat, long,
-                                                cluster_id, nid, hh_total, urban) %>% summarize(water = sum(wt_indic))
+                                                cluster_id, nid, hh_total) %>% summarize(water = sum(wt_indic))
 
 water_pt_cw <- filter(water_pt2, hh_miss)
 water_pt_cw$hh_size <- ifelse(water_pt_cw$urban == 1, hhcw_pt_u, hhcw_pt_r)
