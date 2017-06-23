@@ -14,6 +14,9 @@ indi_fam <- "water"
 # Define data type
 data_type <- 'poly'
 
+# Set repo path
+repo <- 'C:/Users/adesh/Documents/WASH/wash_code/'
+
 # Load data
 if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
 name <- load('J:/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_06_15.Rdata')
@@ -43,8 +46,6 @@ if (!("definitions" %in% ls())) {
 rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam')))
 
 #### Load functions ####
-# Set repo path
-repo <- 'C:/Users/adesh/Documents/WASH/wash_code/'
 setwd(repo)
 source('hh_cw.R')
 source('address_missing.R')
