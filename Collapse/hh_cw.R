@@ -26,7 +26,7 @@ cw <- function(data, debug = F, var_family = indi_family) {
   
   
   # Aggregate data into clusters
-  data <- data %>% mutate(wt_indi = indi*hh_size) %>% 
+  data <- data %>% mutate(wt_indi = hhweight*indi*hh_size) %>% 
           group_by(id_short, cw) %>% 
           summarize(wtavg_indi = sum(wt_indi, na.rm = T)/sum(hh_size, na.rm = T),
               total_hh = sum(hh_size)) 
