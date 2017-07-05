@@ -15,17 +15,18 @@ indi_fam <- "water"
 data_type <- 'poly'
 
 # Set repo path
-repo <- 'C:/Users/adesh/Documents/WASH/wash_code/'
+repo <- 'C:/Users/adesh/Documents/WASH/wash_code/Collapse/'
 
 # Load data
 if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-name <- load('J:/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_06_15.Rdata')
+name <- load('J:/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_06_23.Rdata')
 pt_collapse <- get(name)
 } 
 
 if (!("pt_collapse" %in% ls()) & data_type == 'poly') {
-  name <- load('J:/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_06_23.Rdata')
+  name <- load('J:/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_06_23.Rdata')
   pt_collapse <- get(name)
+  rm(poly_collapse)
   
 }
 
@@ -43,7 +44,7 @@ if (!("definitions" %in% ls())) {
   }
 }
 
-rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam')))
+rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam','repo','data_type')))
 
 #### Load functions ####
 setwd(repo)
@@ -52,7 +53,7 @@ source('address_missing.R')
 source('cw_indi.R')
 source('agg_wash.R')
 source('define_wash.R')
-
+rm(repo)
 #### Subset & Shape Data ####
 # Subset to relevant variables
 ptdat_0 <- dplyr::select(pt_collapse, nid, iso3, lat, long, survey_series, hhweight, urban, w_source_drink, w_source_other,
@@ -94,7 +95,7 @@ ptdat <- define_indi()
 ptdat <- rm_miss()
 
 # Remove cluster_ids with missing hhweight
-miss_wts <- unique(ptdat$id_short[which(is.na(hhweight))])
+miss_wts <- unique(ptdat$id_short[which(is.na(ptdat$hhweight))])
 ptdat <- filter(ptdat, !(id_short %in% miss_wts))
 
 # Crosswalk missing household size data
