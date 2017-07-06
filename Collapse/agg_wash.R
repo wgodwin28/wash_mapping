@@ -14,9 +14,9 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam) {
     message(paste("Aggregating",i))
     names(mydat)[which(names(mydat) == i)] <- 'indi'
     
-    mydatresults <- mydat %>% mutate(wt_indi = hhweight*indi*hh_size) %>% 
+    mydatresults <- mydat %>% mutate(wt_indi = hhweight*indi*hh_size, wt_denom = hhweight*hh_size) %>% 
       group_by(id_short, nid, iso3, lat, long, survey_series, urban, year_start, shapefile, location_code) %>% 
-      summarize(wtavg_indi = sum(wt_indi, na.rm = T)/sum(hh_size, na.rm = T),
+      summarize(wtavg_indi = sum(wt_indi, na.rm = T)/sum(wt_denom, na.rm = T),
                 total_hh = sum(hh_size))
     
     

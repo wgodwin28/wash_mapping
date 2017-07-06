@@ -26,9 +26,9 @@ cw <- function(data, debug = F, var_family = indi_family) {
   
   
   # Aggregate data into clusters
-  data <- data %>% mutate(wt_indi = hhweight*indi*hh_size) %>% 
+  data <- data %>% mutate(wt_indi = hhweight*indi*hh_size, wt_denom = hhweight*hh_size) %>% 
           group_by(id_short, cw) %>% 
-          summarize(wtavg_indi = sum(wt_indi, na.rm = T)/sum(hh_size, na.rm = T),
+          summarize(wtavg_indi = sum(wt_indi, na.rm = T)/sum(wt_denom, na.rm = T),
               total_hh = sum(hh_size)) 
   
   # Fit a binomial model and get a ratio estimate for crosswalking missing household sizes

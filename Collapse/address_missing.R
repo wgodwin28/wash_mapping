@@ -46,8 +46,8 @@ impute_indi <- function(mydat = ptdat, var_family = indi_fam) {
     names(mydat)[which(names(mydat) == i)] <- 'indi'
     
     # Calculated household size weighted means for all clusters
-    wtavg <-  mydat %>% mutate(wt_indi = hhweight*indi*hh_size) %>% group_by(id_short) %>% 
-      summarize(wtavg_indi = sum(wt_indi, na.rm = T)/sum(hh_size, na.rm = T))
+    wtavg <-  mydat %>% mutate(wt_indi = hhweight*indi*hh_size, wt_denom = hhweight*hh_size) %>% group_by(id_short) %>% 
+      summarize(wtavg_indi = sum(wt_indi, na.rm = T)/sum(wt_denom, na.rm = T))
     
     # Assign observations with NA indicator value the weighted average for the cluster
     mydat <- left_join(mydat, wtavg, by = "id_short")

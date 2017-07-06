@@ -15,16 +15,18 @@ indi_fam <- "water"
 data_type <- 'poly'
 
 # Set repo path
-repo <- 'C:/Users/adesh/Documents/WASH/wash_code/Collapse/'
+root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
+repo <- ifelse(Sys.info()[1]=="Windows", 'C:/Users/adesh/Documents/WASH/wash_code/Collapse/',
+               paste0(root,'/share/code/geospatial/adesh/wash_mapping/Collapse'))
 
 # Load data
 if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-name <- load('J:/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_06_23.Rdata')
+name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_06_23.Rdata'))
 pt_collapse <- get(name)
 } 
 
 if (!("pt_collapse" %in% ls()) & data_type == 'poly') {
-  name <- load('J:/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_06_23.Rdata')
+  name <- load(paste0(root,'J:/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_06_23.Rdata'))
   pt_collapse <- get(name)
   rm(poly_collapse)
   
@@ -32,13 +34,13 @@ if (!("pt_collapse" %in% ls()) & data_type == 'poly') {
 
 if (!("definitions" %in% ls())) {
   if (indi_fam == "sani") {
-  definitions <- read_csv("J:/WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_05_25.csv",
+  definitions <- read_csv(paste0(root,'J:/WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_05_25.csv'),
                          progress = T, col_types = 'cc_')
   
   } else {
-  definitions <- read_csv("J:/WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_05_24.csv",
+  definitions <- read_csv(paste0(root,'J:/WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_05_24.csv'),
                         progress = T, col_types = 'cc__') 
-  definitions2 <- read_csv("J:/WORK/11_geospatial/wash/definitions/2nd_w_other_defined_updated_2017_05_18.csv",
+  definitions2 <- read_csv(paste0(root,'J:/WORK/11_geospatial/wash/definitions/2nd_w_other_defined_updated_2017_05_18.csv'),
                           progress = T, col_types = 'cc_')
   definitions2 <- rename(definitions2, sdg2 = sdg)
   }
