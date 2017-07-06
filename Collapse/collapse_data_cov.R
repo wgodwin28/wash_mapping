@@ -18,15 +18,17 @@ data_type <- 'poly'
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
 repo <- ifelse(Sys.info()[1]=="Windows", 'C:/Users/adesh/Documents/WASH/wash_code/Collapse/',
                paste0(root,'/share/code/geospatial/adesh/wash_mapping/Collapse'))
+package_lib <- paste0(root,'/temp/geospatial/packages') 
+.libPaths(package_lib)     
 
 # Load data
 if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_06_23.Rdata'))
+name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_06_29.Rdata'))
 pt_collapse <- get(name)
 } 
 
 if (!("pt_collapse" %in% ls()) & data_type == 'poly') {
-  name <- load(paste0(root,'J:/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_06_23.Rdata'))
+  name <- load(paste0(root,'J:/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_06_29.Rdata'))
   pt_collapse <- get(name)
   rm(poly_collapse)
   
