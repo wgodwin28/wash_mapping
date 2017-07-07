@@ -11,7 +11,7 @@ cw_indi <- function(mydat = ptdat, var_family = indi_fam) {
                           well_unimp + unimp,
                   imp = bottled_sp*(ratio_sp) + bottled_wl*(ratio_wl) + well_imp + well_cw*(ratio_wl) +
                         spring_cw*(ratio_sp) + spring_imp + imp) %>%
-           select(id_short, nid, iso3, lat, long, survey_series, urban, year_start, total_hh,
+           select(id_short, nid, iso3, lat, long, shapefile, location_code, survey_series, urban, year_start, total_hh,
                   piped, surface, imp, unimp)
   return(mydat)
   

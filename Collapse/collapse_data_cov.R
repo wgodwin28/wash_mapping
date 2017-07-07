@@ -2,12 +2,6 @@
 # Clear environment
 rm(list = ls())
 
-# Load Packages
-library(pacman)
-packages <- c('tidyverse','tmap','sp')
-pacman::p_load(char = packages)
-rm(packages)
-
 # Define indicator family
 indi_fam <- "water"
 
@@ -17,9 +11,17 @@ data_type <- 'poly'
 # Set repo path
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
 repo <- ifelse(Sys.info()[1]=="Windows", 'C:/Users/adesh/Documents/WASH/wash_code/Collapse/',
-               paste0(root,'/share/code/geospatial/adesh/wash_mapping/Collapse'))
-package_lib <- paste0(root,'/temp/geospatial/packages') 
+               '/share/code/geospatial/adesh/wash_mapping/Collapse/')
+package_lib <- paste0(root,'temp/geospatial/packages') 
 .libPaths(package_lib)     
+
+# Load Packages
+library(pacman)
+package_list <- c('dplyr','readr')
+for(package in package_list) {
+  library(package, lib.loc = package_lib, character.only=TRUE)
+}
+rm(package_list)
 
 # Load data
 if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
@@ -28,7 +30,7 @@ pt_collapse <- get(name)
 } 
 
 if (!("pt_collapse" %in% ls()) & data_type == 'poly') {
-  name <- load(paste0(root,'J:/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_06_29.Rdata'))
+  name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_06_29.Rdata'))
   pt_collapse <- get(name)
   rm(poly_collapse)
   
@@ -36,13 +38,13 @@ if (!("pt_collapse" %in% ls()) & data_type == 'poly') {
 
 if (!("definitions" %in% ls())) {
   if (indi_fam == "sani") {
-  definitions <- read_csv(paste0(root,'J:/WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_05_25.csv'),
+  definitions <- read_csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_05_25.csv'),
                          progress = T, col_types = 'cc_')
   
   } else {
-  definitions <- read_csv(paste0(root,'J:/WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_05_24.csv'),
+  definitions <- read_csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_05_24.csv'),
                         progress = T, col_types = 'cc__') 
-  definitions2 <- read_csv(paste0(root,'J:/WORK/11_geospatial/wash/definitions/2nd_w_other_defined_updated_2017_05_18.csv'),
+  definitions2 <- read_csv(paste0(root,'WORK/11_geospatial/wash/definitions/2nd_w_other_defined_updated_2017_05_18.csv'),
                           progress = T, col_types = 'cc_')
   definitions2 <- rename(definitions2, sdg2 = sdg)
   }
