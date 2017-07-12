@@ -124,13 +124,13 @@ ptdat <- cw_indi()
 
 ### CHECK ALL COLUMNS FOR VALID VALUES BEFORE EXPORTING ###
 message('CHECK ALL COLUMNS FOR VALID VALUES BEFORE EXPORTING')
-message(unique(ptdat$iso3))
+print(unique(ptdat$iso3))
 
 ### Write file ###
 if (data_type == 'pt') {
-  write.csv(paste0('J:/WORK/11_geospatial/wash/data/agg/water_pt_agg_',Sys.Date(),'csv'))
+  write.csv(ptdat, paste0(root,'WORK/11_geospatial/wash/data/agg/water_pt_agg_',Sys.Date(),'.csv'))
 } else {
-  write.csv(paste0('J:/WORK/11_geospatial/wash/data/agg/water_poly_agg_',Sys.Date(),'csv'))
+  write.csv(ptdat, paste0(root, 'WORK/11_geospatial/wash/data/agg/water_poly_agg_',Sys.Date(),'.csv'))
 }
 
 # #### Plot Data ####

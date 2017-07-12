@@ -1,18 +1,23 @@
 # Set library and load packages
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
-package_lib <- paste0(root,'/temp/geospatial/packages')
-.libPaths(package_lib)
 package_list <- c('dplyr','raster', 'tiff', 'seegSDM','seegMBG')
-for(package in package_list) {
-  library(package, lib.loc = package_lib, character.only=TRUE)
+if(Sys.info()[1]=="Windows") {
+  for(package in package_list) {
+    library(package, character.only = T)
+  }
+} else {
+  package_lib <- paste0(root,'temp/geospatial/packages') 
+  .libPaths(package_lib)     
+  for(package in package_list) {
+    library(package, lib.loc = package_lib, character.only=TRUE)
+  }
 }
 
 shp <- commandArgs()[3]
 indic <- commandArgs()[4]
 
-load(paste0("/home/j//WORK/11_geospatial/wash/resampling/water/", indic,"/poly_df/water_poly_f.RData"))
-#load(paste0("/home/j//WORK/11_geospatial/wash/resampling/water/", indic, "/hh_vector.RData"))
-subset <- water_poly_f[which(water_poly_f$shapefile == shp),]
+polydat <- read.csv('/home/j/WORK/11_geospatial/wash/data/agg/water_poly_agg_2017-07-11.csv')
+subset <- polydat[which(polydat$shapefile == shp),]
 #### READ IN THE WORLDPOP RASTER AND CROP IT TO SHAPEFILE ####
 shape_master <- shapefile(paste0('/home/j//WORK/11_geospatial/05_survey shapefile library/Shapefile directory/',shp,'.shp'))
 
