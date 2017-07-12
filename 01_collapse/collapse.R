@@ -10,8 +10,8 @@ data_type <- 'poly'
 
 # Set repo path
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
-repo <- ifelse(Sys.info()[1]=="Windows", 'C:/Users/adesh/Documents/WASH/wash_code/collapse/',
-               '/share/code/geospatial/adesh/wash_mapping/collapse/')
+repo <- ifelse(Sys.info()[1]=="Windows", 'C:/Users/adesh/Documents/WASH/wash_code/01_collapse/',
+               '/share/code/geospatial/adesh/wash_mapping/01_collapse/')
 
 # Load Packages
 package_list <- c('dplyr','readr')
@@ -26,6 +26,7 @@ if(Sys.info()[1]=="Windows") {
     library(package, lib.loc = package_lib, character.only=TRUE)
   }
 }
+library(readr)
 rm(package_list)
 
 # Load data
@@ -55,7 +56,7 @@ if (!("definitions" %in% ls())) {
   }
 }
 
-rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam','repo','data_type','root','repo')))
+rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam','repo','data_type','root')))
 
 #### Load functions ####
 setwd(repo)
