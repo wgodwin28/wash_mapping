@@ -1,5 +1,5 @@
-
-proj <- ifelse(grepl("geos", Sys.info()[4]),
+nodes <- 'geos'
+proj <- ifelse(nodes == 'geos',
         '-P proj_geo_nodes -l gn = TRUE',                      		
         '-P proj_geospatial')
 proj <- "-P proj_geospatial"
@@ -18,7 +18,7 @@ for (indic in indicators) {
     sys.sub <- paste0("qsub ",proj,paste0(" -e /share/temp/sgeoutput/",user,"/errors -o /share/temp/sgeoutput/",user,"/output "),
                       "-cwd -N ", jname, " ", "-pe multi_slot ", mycores, " ")
     script <- "child.R"
-    r_shell <- ifelse(grepl("geos", Sys.info()[4]),
+    r_shell <- ifelse(nodes == 'geos',
                       'r_shell_geos.sh',                      		
                       'r_shell.sh')
     
