@@ -19,10 +19,10 @@ shape_master <- shapefile(paste0('/home/j//WORK/11_geospatial/05_survey shapefil
 generated_pts <- list()
 for (loc in unique(subset$location_code)) {
   shape <- shape_master[shape_master$GAUL_CODE == loc,]
-  subset_loc <- filter(subset, location_code == loc)
+  polydat_loc <- filter(polydat, location_code == loc)
   
-  for (pid in unique(subset_loc$poly_id)) {
-    subset_loc2 <- filter(subset_loc, poly_id == pid)
+  for (pid in unique(subset_loc$id_short)) {
+    polydat_loc2 <- filter(subset_loc, id_short == pid)
     
     year <- subset_loc2$year_start
     if (year <= 2000) {
@@ -40,23 +40,23 @@ for (loc in unique(subset$location_code)) {
     } 
     
     raster_crop <- mask(crop(x = pop_raster, y = shape), shape)
-    n_pts <- subset_loc2$n_pts
-    prop <- unique(subset_loc2$water)
-    samp_pts <- getPoints(shape = shape, raster = raster_crop, n = n_pts, perpixel = F)
-    samp_pts2 <- as.data.frame(samp_pts)
-    names(samp_pts2) <- c("long", "lat","weight")
-    if (n_pts < 5) {samp_pts2$weight <- 0.2}
     
-    samp_pts2$prop <- prop
-    samp_pts2$N <- subset_loc2$hh_total
-    samp_pts2$year <- subset_loc2$year_start
-    samp_pts2 <- mutate(samp_pts2, water_bin = floor(prop * N))
-    samp_pts2$country <- subset_loc2$ihme_loc_id
-    samp_pts2$cluster_id <- pid
-    samp_pts2 <- dplyr::select(samp_pts2, country, year, prop, N, water_bin, lat,
+    prop <- unique(polydat_loc2[,indic])
+    samp_pts <- getPoints(shape = shape, raster = raster_crop, n = 0.001, perpixel = T)
+    polydat_loc2 <- as.data.frame(samp_pts)
+    names(polydat_loc2) <- c("long", "lat","weight")
+    # if (n_pts < 5) {polydat_loc2$weight <- 0.2}
+    
+    polydat_loc2$prop <- prop
+    polydat_loc2$N <- polydat_loc2$total_hh
+    polydat_loc2$year <- polydat_loc2$year_start
+    polydat_loc2 <- mutate(polydat_loc2, water_bin = round(prop * N))
+    polydat_loc2$country <- subset_loc2$iso3
+    polydat_loc2$cluster_id <- id_short
+    polydat_loc2 <- dplyr::select(polydat_loc2, country, year, prop, N, water_bin, lat,
                                long, cluster_id, weight)
-    samp_pts2$point <- 0
-    generated_pts[[length(generated_pts) + 1]] <- samp_pts2
+    polydat_loc2$point <- 0
+    generated_pts[[length(generated_pts) + 1]] <- polydat_loc2
   }
   
 }

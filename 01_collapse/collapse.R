@@ -10,16 +10,21 @@ data_type <- 'poly'
 
 # Set repo path
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
-repo <- ifelse(Sys.info()[1]=="Windows", 'C:/Users/adesh/Documents/WASH/wash_code/Collapse/',
-               '/share/code/geospatial/adesh/wash_mapping/Collapse/')
-package_lib <- paste0(root,'temp/geospatial/packages') 
-.libPaths(package_lib)     
+repo <- ifelse(Sys.info()[1]=="Windows", 'C:/Users/adesh/Documents/WASH/wash_code/collapse/',
+               '/share/code/geospatial/adesh/wash_mapping/collapse/')
 
 # Load Packages
-library(pacman)
 package_list <- c('dplyr','readr')
-for(package in package_list) {
-  library(package, lib.loc = package_lib, character.only=TRUE)
+if(Sys.info()[1]=="Windows") {
+  for(package in package_list) {
+    library(package, character.only = T)
+  }
+} else {
+  package_lib <- paste0(root,'temp/geospatial/packages') 
+  .libPaths(package_lib)     
+  for(package in package_list) {
+    library(package, lib.loc = package_lib, character.only=TRUE)
+  }
 }
 rm(package_list)
 
@@ -50,16 +55,17 @@ if (!("definitions" %in% ls())) {
   }
 }
 
-rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam','repo','data_type')))
+rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam','repo','data_type','root','repo')))
 
 #### Load functions ####
 setwd(repo)
-source('hh_cw.R')
-source('address_missing.R')
-source('cw_indi.R')
-source('agg_wash.R')
-source('define_wash.R')
+source('functions/hh_cw.R')
+source('functions/address_missing.R')
+source('functions/cw_indi.R')
+source('functions/agg_wash.R')
+source('functions/define_wash.R')
 rm(repo)
+
 #### Subset & Shape Data ####
 # Subset to relevant variables
 ptdat_0 <- dplyr::select(pt_collapse, nid, iso3, lat, long, survey_series, hhweight, urban, w_source_drink, w_source_other,
@@ -74,10 +80,8 @@ if (data_type == "pt") {ptdat$shapefile <- NA; ptdat$location_code <- NA}
 # Create a unique cluster id
 if (data_type == 'pt') {
   ptdat <- mutate(ptdat_0, cluster_id = paste(iso3, lat, long, survey_series, year_start, sep = "_"))
-}
-
-if (data_type == 'poly') {
-  ptdat <- mutate(ptdat_0, cluster_id = paste(iso3, shapefile, location_code, survey_series, year_start, sep = "_"))
+} else {
+  ptdat <- mutate(ptdat_0, cluster_id = paste(iso3, shapefile, location_code, survey_series, year_start, sep = "_"))  
 }
 
 # Create a table which assigns numbers to unique IDs and merge it back to data to have shorter
@@ -87,7 +91,6 @@ short_id <- data.frame(cluster_id = unique(ptdat$cluster_id),
                        stringsAsFactors = F)
 ptdat <- left_join(ptdat, short_id, by = 'cluster_id')
 rm(short_id)
-
 
 # Remove longer cluster_ids
 ptdat <- dplyr::select(ptdat, -cluster_id)
@@ -120,6 +123,14 @@ ptdat <- cw_indi()
 
 ### CHECK ALL COLUMNS FOR VALID VALUES BEFORE EXPORTING ###
 message('CHECK ALL COLUMNS FOR VALID VALUES BEFORE EXPORTING')
+message(unique(ptdat$iso3))
+
+### Write file ###
+if (data_type == 'pt') {
+  write.csv(paste0('J:/WORK/11_geospatial/wash/data/agg/water_pt_agg_',Sys.Date(),'csv'))
+} else {
+  write.csv(paste0('J:/WORK/11_geospatial/wash/data/agg/water_poly_agg_',Sys.Date(),'csv'))
+}
 
 # #### Plot Data ####
 # plotdat <- ptdat
