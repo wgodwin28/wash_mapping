@@ -5,14 +5,14 @@ proj <- ifelse(nodes == 'geos',
 proj <- "-P proj_geospatial"
 user <- "adesh"
 
-setwd('/share/code/geospatial/adesh/wash_mapping/02_resampling/')
+setwd('/share/code/geospatial/adesh/wash_mapping/02_resample/')
 indicators <- c("water")
 run_date <- Sys.Date()
 
 for (indic in indicators) {
-  load(paste0('/home/j//WORK/11_geospatial/wash/resampling/water/',indic, '/poly_df/water_poly_f.RData'))
+  polydat <- read.csv('/home/j/WORK/11_geospatial/wash/data/agg/water_poly_agg_2017-07-11.csv')
   
-  for (shp in unique(water_poly_f$shapefile)) { 
+  for (shp in unique(polydat$shapefile)) { 
     jname <- paste(indic, shp, sep = "_")
     mycores <- 4
     sys.sub <- paste0("qsub ",proj,paste0(" -e /share/temp/sgeoutput/",user,"/errors -o /share/temp/sgeoutput/",user,"/output "),
