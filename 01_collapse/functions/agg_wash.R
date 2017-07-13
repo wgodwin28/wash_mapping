@@ -1,4 +1,4 @@
-agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type) {
+agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, agg = agg_level) {
   
   if (var_family == 'water') {
   levels <- c('piped', 'surface','imp','unimp','bottled','bottled_sp','bottled_wl','well_cw',
@@ -15,19 +15,41 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type) 
     names(mydat)[which(names(mydat) == i)] <- 'indi'
     
     if (dt_type == 'pt') {
-    mydatresults <- mydat %>% mutate(wt_indi = hhweight*indi*hh_size, wt_denom = hhweight*hh_size) %>% 
-      group_by(id_short, nid, iso3, lat, long, survey_series, urban, year_start, shapefile, location_code) %>% 
-      summarize(wtavg_indi = sum(wt_indi, na.rm = T)/sum(wt_denom, na.rm = T),
-                total_hh = sum(hh_size))
+      if(agg == 'country') {
+        
+        mydatresults <- mydat %>% mutate(wt_indi = hhweight*indi*hh_size, wt_denom = hhweight*hh_size) %>% 
+          group_by(nid, iso3, survey_series, year_start) %>% 
+          summarize(wtavg_indi = sum(wt_indi, na.rm = T)/sum(wt_denom, na.rm = T),
+                    total_hh = sum(hh_size)) %>%
+          mutate(urban = NA)
+        
+      } else {
+        
+          mydatresults <- mydat %>% mutate(wt_indi = hhweight*indi*hh_size, wt_denom = hhweight*hh_size) %>% 
+                          group_by(id_short, nid, iso3, lat, long, survey_series, urban, year_start, shapefile, location_code) %>% 
+                          summarize(wtavg_indi = sum(wt_indi, na.rm = T)/sum(wt_denom, na.rm = T),
+                          total_hh = sum(hh_size))
+      }
     }
     
     if (dt_type == 'poly') {
+      
+      if(agg == 'country') {
+        
+        mydatresults <- mydat %>% mutate(wt_indi = hhweight*indi*hh_size, wt_denom = hhweight*hh_size) %>% 
+          group_by(nid, iso3, survey_series, year_start) %>% 
+          summarize(wtavg_indi = sum(wt_indi, na.rm = T)/sum(wt_denom, na.rm = T),
+                    total_hh = sum(hh_size)) %>%
+          mutate(urban = NA)
+        
+      } else {
+      
       mydatresults <- mydat %>% mutate(wt_indi = hhweight*indi*hh_size, wt_denom = hhweight*hh_size) %>% 
                       group_by(id_short, nid, iso3, lat, long, survey_series, year_start, shapefile, location_code) %>% 
                       summarize(wtavg_indi = sum(wt_indi, na.rm = T)/sum(wt_denom, na.rm = T),
                       total_hh = sum(hh_size)) %>%
                       mutate(urban = NA)
-        
+      }
     }
     
     names(mydatresults)[which(names(mydatresults) == 'wtavg_indi')] <- paste0(i)

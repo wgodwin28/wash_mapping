@@ -2,11 +2,14 @@
 # Clear environment
 rm(list = ls())
 
-# Define indicator family
+# Define indicator family; can be water, sani, or hw
 indi_fam <- "water"
 
-# Define data type
+# Define data type; can be pt or poly
 data_type <- 'poly'
+
+# Define agg level; can be country or '' 
+agg_level <- 'country'
 
 # Set repo path
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
@@ -56,7 +59,7 @@ if (!("definitions" %in% ls())) {
   }
 }
 
-rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam','repo','data_type','root')))
+rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam','repo','data_type','root','agg_level')))
 
 #### Load functions ####
 setwd(repo)
@@ -71,12 +74,6 @@ rm(repo)
 # Subset to relevant variables
 ptdat_0 <- dplyr::select(pt_collapse, nid, iso3, lat, long, survey_series, hhweight, urban, w_source_drink, w_source_other,
                 hh_size, year_start,hhweight,shapefile,location_code)
-
-# Change weight to 1 if collapsing point data
-if (data_type == "pt") {ptdat$hhweight <- 1}
-
-# Change shapefile and location code to missing if collapsing point data
-if (data_type == "pt") {ptdat$shapefile <- NA; ptdat$location_code <- NA}
 
 # Create a unique cluster id
 if (data_type == 'pt') {
@@ -96,11 +93,16 @@ rm(short_id)
 # Remove longer cluster_ids
 ptdat <- dplyr::select(ptdat, -cluster_id)
 
+# Change weight to 1 if collapsing point data
+if (data_type == "pt" & agg_level != 'country') {ptdat$hhweight <- 1}
+
+# Change shapefile and location code to missing if collapsing point data
+if (data_type == "pt") {ptdat$shapefile <- NA; ptdat$location_code <- NA}
+
 #### Define Indicator ####
 ptdat <- define_indi()
 
 #### Address Missingness ####
-
 # Remove clusters with more than 20% weighted missingness
 ptdat <- rm_miss()
 
@@ -127,11 +129,21 @@ message('CHECK ALL COLUMNS FOR VALID VALUES BEFORE EXPORTING')
 print(unique(ptdat$iso3))
 
 ### Write file ###
-if (data_type == 'pt') {
-  write.csv(ptdat, paste0(root,'WORK/11_geospatial/wash/data/agg/water_pt_agg_',Sys.Date(),'.csv'))
+if (agg_level == 'country') {
+  if (data_type == 'pt') {
+    write.csv(ptdat, paste0(root,'WORK/11_geospatial/wash/data/agg/water_pt_agg_cntry_',Sys.Date(),'.csv'))
+  } else {
+    write.csv(ptdat, paste0(root, 'WORK/11_geospatial/wash/data/agg/water_poly_agg_cntry_',Sys.Date(),'.csv'))
+  }
+  
 } else {
-  write.csv(ptdat, paste0(root, 'WORK/11_geospatial/wash/data/agg/water_poly_agg_',Sys.Date(),'.csv'))
+  if (data_type == 'pt') {
+    write.csv(ptdat, paste0(root,'WORK/11_geospatial/wash/data/agg/water_pt_agg_',Sys.Date(),'.csv'))
+  } else {
+    write.csv(ptdat, paste0(root, 'WORK/11_geospatial/wash/data/agg/water_poly_agg_',Sys.Date(),'.csv'))
+  }
 }
+
 
 # #### Plot Data ####
 # plotdat <- ptdat

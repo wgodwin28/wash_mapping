@@ -1,5 +1,5 @@
 
-rm_miss <- function(mydat = ptdat, var_family = indi_fam) {
+rm_miss <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level, dt_type = data_type) {
   
   if (var_family == 'water') {
     mydat <- rename(mydat, indi = piped)
@@ -17,6 +17,16 @@ rm_miss <- function(mydat = ptdat, var_family = indi_fam) {
   # Remove clusters with more than 20% weighted missingness
   miss_clusters <- select(filter(missing, pct_miss > 0.2), id_short)
   mydat <- filter(mydat, !(id_short %in% miss_clusters$id_short))
+  
+  if(agg == 'country' & dt_type == 'pt') {
+    # Calculate weight missingness by cluster for country agg & pts
+    missing <- mutate(mydat, miss = ifelse(is.na(mydat$hhweight), 1, 0))
+    missing <- mutate(missing, miss_wt = miss*hh_size)
+    missing <- missing %>% group_by(id_short) %>% summarise(pct_miss = sum(miss_wt)/sum(hh_size))
+  
+    miss_clusters <- select(filter(missing, pct_miss > 0.2), id_short)
+    mydat <- filter(mydat, !(id_short %in% miss_clusters$id_short))
+  }
   
   if (var_family == 'water') {
     mydat <- rename(mydat, piped = indi)
