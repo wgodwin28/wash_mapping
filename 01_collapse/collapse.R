@@ -8,7 +8,7 @@ indi_fam <- "water"
 # Define data type; can be pt or poly
 data_type <- 'poly'
 
-# Define agg level; can be country or '' 
+# Define agg level; can be country or '' [use '' for default]
 agg_level <- 'country'
 
 # Set repo path
