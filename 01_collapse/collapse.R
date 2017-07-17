@@ -9,7 +9,10 @@ indi_fam <- "water"
 data_type <- 'poly'
 
 # Define agg level; can be country or '' [use '' for default]
-agg_level <- 'country'
+agg_level <- ''
+
+# Define indicator era
+sdg <- T
 
 # Set repo path
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
@@ -34,12 +37,12 @@ rm(package_list)
 
 # Load data
 if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_06_29.Rdata'))
+name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_07_11.Rdata'))
 pt_collapse <- get(name)
 } 
 
 if (!("pt_collapse" %in% ls()) & data_type == 'poly') {
-  name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_06_29.Rdata'))
+  name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_07_11.Rdata'))
   pt_collapse <- get(name)
   rm(poly_collapse)
   
@@ -123,6 +126,11 @@ ptdat <- agg_indi()
 
 # Crosswalk indicator data
 ptdat <- cw_indi()
+
+# create sdg improved for sdg era
+if (sdg) {
+  ptdat$sdg_imp <- ptdat$piped + ptdat$imp
+}
 
 ### CHECK ALL COLUMNS FOR VALID VALUES BEFORE EXPORTING ###
 message('CHECK ALL COLUMNS FOR VALID VALUES BEFORE EXPORTING')
