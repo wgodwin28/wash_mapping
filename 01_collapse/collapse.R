@@ -1,4 +1,5 @@
 #### Set Up Environment ####
+#source("/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/01_collapse/collapse.R")
 # Clear environment
 rm(list = ls())
 
@@ -11,38 +12,30 @@ data_type <- 'poly'
 # Define agg level; can be country or '' [use '' for default]
 agg_level <- ''
 
-# Define indicator era
-sdg <- T
-
 # Set repo path
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
 repo <- ifelse(Sys.info()[1]=="Windows", 'C:/Users/adesh/Documents/WASH/wash_code/01_collapse/',
                '/share/code/geospatial/adesh/wash_mapping/01_collapse/')
 
 # Load Packages
-package_list <- c('dplyr','readr')
 if(Sys.info()[1]=="Windows") {
-  for(package in package_list) {
-    library(package, character.only = T)
-  }
 } else {
   package_lib <- paste0(root,'temp/geospatial/packages') 
-  .libPaths(package_lib)     
-  for(package in package_list) {
-    library(package, lib.loc = package_lib, character.only=TRUE)
-  }
+  .libPaths(package_lib)
 }
-library(readr)
-rm(package_list)
+if(!require(pacman)) {
+  install.packages("pacman"); require(pacman)}
+p_load(dplyr, readr)
+
 
 # Load data
 if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_07_11.Rdata'))
+name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_07_14.Rdata'))
 pt_collapse <- get(name)
 } 
 
-if (!("pt_collapse" %in% ls()) & data_type == 'poly') {
-  name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_07_11.Rdata'))
+if (!("poly_collapse" %in% ls()) & data_type == 'poly') {
+  name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_07_14.Rdata'))
   pt_collapse <- get(name)
   rm(poly_collapse)
   
@@ -127,30 +120,33 @@ ptdat <- agg_indi()
 # Crosswalk indicator data
 ptdat <- cw_indi()
 
+# Define indicator era
+sdg <- T
+
 # create sdg improved for sdg era
 if (sdg) {
-  ptdat$sdg_imp <- ptdat$piped + ptdat$imp
+  ptdat$sdg_imp <- sum(ptdat$piped, ptdat$imp, na.rm=T)
 }
 
 ### CHECK ALL COLUMNS FOR VALID VALUES BEFORE EXPORTING ###
 message('CHECK ALL COLUMNS FOR VALID VALUES BEFORE EXPORTING')
-print(unique(ptdat$iso3))
+#print(unique(ptdat$iso3))
 
 ### Write file ###
-if (agg_level == 'country') {
-  if (data_type == 'pt') {
-    write.csv(ptdat, paste0(root,'WORK/11_geospatial/wash/data/agg/water_pt_agg_cntry_',Sys.Date(),'.csv'))
-  } else {
-    write.csv(ptdat, paste0(root, 'WORK/11_geospatial/wash/data/agg/water_poly_agg_cntry_',Sys.Date(),'.csv'))
-  }
-  
-} else {
-  if (data_type == 'pt') {
-    write.csv(ptdat, paste0(root,'WORK/11_geospatial/wash/data/agg/water_pt_agg_',Sys.Date(),'.csv'))
-  } else {
-    write.csv(ptdat, paste0(root, 'WORK/11_geospatial/wash/data/agg/water_poly_agg_',Sys.Date(),'.csv'))
-  }
-}
+# if (agg_level == 'country') {
+#   if (data_type == 'pt') {
+#     write.csv(ptdat, paste0(root,'WORK/11_geospatial/wash/data/agg/water_pt_agg_cntry_',Sys.Date(),'.csv'))
+#   } else {
+#     write.csv(ptdat, paste0(root, 'WORK/11_geospatial/wash/data/agg/water_poly_agg_cntry_',Sys.Date(),'.csv'))
+#   }
+#   
+# } else {
+#   if (data_type == 'pt') {
+#     write.csv(ptdat, paste0(root,'WORK/11_geospatial/wash/data/agg/water_pt_agg_',Sys.Date(),'.csv'))
+#   } else {
+#     write.csv(ptdat, paste0(root, 'WORK/11_geospatial/wash/data/agg/water_poly_agg_',Sys.Date(),'.csv'))
+#   }
+# }
 
 
 # #### Plot Data ####
