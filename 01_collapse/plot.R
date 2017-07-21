@@ -1,13 +1,24 @@
 #source("/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/01_collapse/plot.R")
 
-#Run Ani's Collapse Code
-source("/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/01_collapse/collapse.R")
+message('loading collapsed points')
+#ptdat
+load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_7_20_2017.RData")
+
+message('loading collapsed polygons')
+#polydat
+load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_7_20_2017.RData")
+
+message("rbinding points and polys together")
+ptdat <- rbind(polydat, ptdat, fill=T)
 #returns ptdat data frame with data from non-IPUMS or AHS extractions
 # names(ptdat)
 # "id_short"      "nid"           "iso3"          "lat"
 # "long"          "shapefile"     "location_code" "survey_series"
 # "urban"         "year_start"    "total_hh"      "piped"
 # "surface"       "imp"           "unimp"         "sdg_imp"
+
+
+message("cleaning data for plot code")
 ptdat <- data.table(ptdat)
 ptdat[, water := piped]
 ptdat_drop <- c("id_short", "piped", "surface", "imp", "unimp", "sdg_imp")
@@ -73,6 +84,7 @@ IND_AHS_collapse <- IND_AHS_collapse[, water := runif(nrow(IND_AHS_collapse))*3]
 #IND_AHS_collapse <- IND_AHS_collapse[, keep_poly, with=F]
 
 w_collapsed <- rbind(ptdat, ipums, IND_AHS_collapse, fill=T) %>% data.table()
+
 setnames(w_collapsed, "nid", "svy_id")
 setnames(w_collapsed, "year_start", "start_year")
 setnames(w_collapsed, "survey_series", "source")
@@ -80,9 +92,19 @@ setnames(w_collapsed, "iso3", "country")
 setnames(w_collapsed, "lat", "latitude")
 setnames(w_collapsed, "long", "longitude")
 
+srvys <- c("MACRO_DHS", "MACRO_AIS", "MACRO_MIS", "UNICEF_MICS", "IPUMS_CENSUS", "WB_LSMS", "WB_CWIQ", "CDC_RHS", "PMA2020")
+w_collapsed[!grepl(paste0(srvys, collapse="|"), source), source:="COUNTRY_SPECIFIC"]
+for (survey in srvys){
+  w_collapsed[grepl(survey, source), source:=survey]
+}
+
+message("Saving collapsed and rbound datatable")
+save(w_collapsed, file="/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/7_19.RData")
+#load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/7_19.RData")
+
 # prep for data coverage plotting
 repo <- '/share/code/geospatial/ngraetz/mbg/'
-setwd(rep)
+setwd(repo)
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
 j <- root
 j_root <- j
@@ -107,6 +129,9 @@ package_list <- c('survey', 'foreign', 'rgeos', 'data.table','raster','rgdal','I
 for(package in package_list) {
   library(package, lib.loc = package_lib, character.only=TRUE)
 }
+
+w_collapsed[, country := substr(country, 1, 3)]
+w_collapsed[country == "KOS", country := "SRB"]
 
 # start data coverage plotting
 source('/snfs2/HOME/gmanny/backups/Documents/Repos/mbg/mbg_central/graph_data_coverage.R')
