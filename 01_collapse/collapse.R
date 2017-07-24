@@ -14,43 +14,47 @@ agg_level <- ''
 sdg <- T
 
 # Set repo path
-root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
+root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/snfs1/")
 repo <- ifelse(Sys.info()[1]=="Windows", 'C:/Users/adesh/Documents/WASH/wash_code/01_collapse/',
                '/share/code/geospatial/adesh/wash_mapping/01_collapse/')
 
-for (data_type in c("pt, poly")){
-  # Load Packages
-  if(Sys.info()[1]=="Windows") {
-  } else {
-    package_lib <- paste0(root,'temp/geospatial/packages') 
-    .libPaths(package_lib)
-  }
-  if(!require(pacman)) {
-    install.packages("pacman"); require(pacman)}
-  p_load(dplyr, readr)
-  
-  
+# Load Packages
+if(Sys.info()[1]!="Windows") {
+  package_lib <- paste0(root,'temp/geospatial/packages') 
+  .libPaths(package_lib)
+}
+if(!require(pacman)) {
+  install.packages("pacman"); require(pacman)}
+p_load(dplyr, readr)
+
+for (data_type in c("pt", "poly")){
   # Load data
   if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_07_19.Rdata'))
+    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_07_20.Rdata'))
+    Encoding(pt_collapse$w_source_drink) <- "windows-1252"
+    Encoding(pt_collapse$w_source_other) <- "windows-1252"
+    Encoding(pt_collapse$t_type) <- "windows-1252"
     pt_collapse <- get(name)
   } 
   
   if (!("poly_collapse" %in% ls()) & data_type == 'poly') {
-    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_07_19.Rdata'))
+    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_07_20.Rdata'))
+    Encoding(poly_collapse$w_source_drink) <- "windows-1252"
+    Encoding(poly_collapse$w_source_other) <- "windows-1252"
+    Encoding(poly_collapse$t_type) <- "windows-1252"
     pt_collapse <- get(name)
     rm(poly_collapse)
   }
   
   if (!("definitions" %in% ls())) {
     if (indi_fam == "sani") {
-      definitions <- read_csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_05_25.csv'),
-                              progress = T, col_types = 'cc_')
+      definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_07_21.csv'),
+                              encoding="windows-1252", stringsAsFactors = F)
     } else {
-      definitions <- read_csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_05_24.csv'),
-                              progress = T, col_types = 'cc__') 
-      definitions2 <- read_csv(paste0(root,'WORK/11_geospatial/wash/definitions/2nd_w_other_defined_updated_2017_05_18.csv'),
-                               progress = T, col_types = 'cc_')
+      definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_07_21.csv'),
+                              encoding="windows-1252", stringsAsFactors = F) 
+      definitions2 <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_other_defined_updated_2017_07_21.csv'),
+                               encoding="windows-1252", stringsAsFactors = F)
       definitions2 <- rename(definitions2, sdg2 = sdg)
     }
   }
