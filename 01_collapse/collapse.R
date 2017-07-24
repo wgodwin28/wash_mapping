@@ -68,7 +68,6 @@ for (data_type in c("pt", "poly")){
   source('functions/cw_indi.R')
   source('functions/agg_wash.R')
   source('functions/define_wash.R')
-  rm(repo)
   
   #### Subset & Shape Data ####
   # Subset to relevant variables
