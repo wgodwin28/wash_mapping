@@ -1,9 +1,21 @@
 cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level) {
   if (var_family == 'water') {
-  attach(mydat)
-  ratio_sp <- mean(spring_imp)/(mean(spring_imp) + mean(spring_unimp))
-  ratio_wl <- mean(well_imp)/(mean(well_imp) + mean(well_unimp)) 
-  detach(mydat)
+  
+    attach(mydat)
+    if ((mean(spring_imp, na.rm = T) + mean(spring_unimp, na.rm = T)) == 0) {
+      mydat$spring_cw <- 0
+      ratio_sp <- 1
+    } else {
+      ratio_sp <- mean(spring_imp, na.rm = T)/(mean(spring_imp, na.rm = T) + mean(spring_unimp, na.rm = T))
+    }
+    
+    if ((mean(well_imp, na.rm = T) + mean(well_unimp, na.rm = T)) == 0) {
+      mydat$well_cw <- 0
+      ratio_wl <- 1
+    } else {
+      ratio_wl <- mean(well_imp, na.rm = T)/(mean(well_imp, na.rm = T) + mean(well_unimp, na.rm = T)) 
+    }
+    detach(mydat)
   
   if (agg == 'country') {
     mydat <- mydat %>%

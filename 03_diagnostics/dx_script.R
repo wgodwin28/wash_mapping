@@ -1,8 +1,8 @@
 library(tidyverse)
 library(raster)
-
+library(tmap)
 # Define gaul list
-gaul_list <- c(8,49,59,68,76,89)
+gaul_list <- c(195)
 
 # Read in iso to gaul converters
 iso_gaul <- read_csv('J:/WORK/11_geospatial/pandemic_indicator/data/raw/geographies/id_convert_ammended.csv')
@@ -17,7 +17,7 @@ cntry_dat[which(cntry_dat$iso3 %in% c('KEN_44798', 'KEN_35619',
 
 cntry_dat[which(cntry_dat$iso3 %in% c('IDN_4741', 'IDN_4742')),] <- 'IDN'
 cntry_dat_reg <- filter(cntry_dat, iso3 %in% iso_list)
-cntry_dat_reg <- rename(cntry_dat_reg, cntry_est = imp)
+cntry_dat_reg <- rename(cntry_dat_reg, cntry_est = piped)
 cntry_dat_reg$cntry_est <- as.numeric(cntry_dat_reg$cntry_est)
 cntry_dat_reg$year_start <- as.numeric(cntry_dat_reg$year_start)
 
@@ -27,7 +27,7 @@ cntry_dat_reg$year_start <- as.numeric(cntry_dat_reg$year_start)
 # Africa country shapefile
 ad0 <- shapefile('J:/WORK/11_geospatial/09_MBG_maps/misc_files/africa_ad0.shp')
 ad0_reg <- ad0[which(ad0$ADM0_CODE %in% gaul_list),]
-  
+
 # Population raster
 pop_00 <- raster('J:/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 1)
 pop_05 <- raster('J:/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 2)
@@ -39,17 +39,17 @@ pop_list <- list(pop_00,
                  pop_15, pop_15, pop_15, pop_15, pop_15)
 
 # Read in mbg input data
-input_data <- read_csv('J:/WORK/11_geospatial/10_mbg/input_data/w_imp.csv', col_types = 'dddcddcdccdddddd')
+input_data <- read_csv('J:/WORK/11_geospatial/10_mbg/input_data/w_piped.csv', col_types = 'dddcddcdccdddddd')
 input_data <- rename(input_data, MBG_raw = prop)
 id_reg <- filter(input_data, country %in% iso_list)
 id_reg$year <- as.numeric(id_reg$year)
 id_reg <- rename(id_reg, MBG_raw_dat = N)
 
 # Read in mbg results
-mbg_results <- brick('J:/WORK/11_geospatial/wash/results/water/2017_07_16_11_54_51/w_imp_prediction_eb_bin0_cssa_0.grd')
+mbg_results <- brick('J:/WORK/11_geospatial/wash/results/water/2017_08_07_12_34_56/w_piped_prediction_eb_bin0_195_0.grd')
 
 # Read in mbg covariates
-load('J:/WORK/11_geospatial/wash/results/water/2017_07_16_11_54_51/2017_07_16_11_54_51_bin0_cssa_0.RData')
+load('J:/WORK/11_geospatial/wash/results/water/2017_08_07_12_34_56/2017_08_07_12_34_56_bin0_195_0.RData')
 
 ## Process mbg results & covariates
 # Aggregate population
@@ -80,8 +80,8 @@ for (i in 1:16) {
   }
   
   est <- (num2)/mod
-  country <- ad0_reg$ADM0_CODE
-  year <- rep(2000 + (i-1), length(ad0_reg$ADM0_CODE))
+  country <- 
+  year <- rep(2000 + (i-1), length())
   mbg_agg[[i]] <- data_frame(year = year, mbg = est, country = country)
 }
 mbg_agg_plot <- do.call(rbind, mbg_agg)
@@ -90,7 +90,7 @@ mbg_agg_plot <- left_join(mbg_agg_plot, iso_gaul, by = 'GAUL')
 
 # Aggregate covariates
 cov_list_agg <- list()
-for (j in 1:length(cov_list)) {
+for (j in 1:5) {
   cov <- cov_list[[j]]
   cov_agg <- list()
   for (i in 1:dim(cov)[3]) {
@@ -117,15 +117,15 @@ for (j in 1:length(cov_list)) {
     }
   
     est <- (num2)/mod
-    country <- ad0_reg$ADM0_CODE
-    year <- rep(2000 + (i-1), length(ad0_reg$ADM0_CODE))
+    country <- 
+    year <- rep(2000 + (i-1), length())
     cov_agg[[i]] <- data_frame(year = year, mbg = est, country = country)
   }
   cov_list_agg[[j]] <- do.call(rbind, cov_agg)
   names(cov_list_agg)[j] <- names(cov_list)[j]
 }
 
-# stackers_list <- cov_list_agg
+ stackers_list <- cov_list_agg
 # Plot
 for (i in 1:5) {
   stackers_list[[i]] <- rename(stackers_list[[i]], GAUL = country)
@@ -133,7 +133,7 @@ for (i in 1:5) {
   
 }
 
-pdf('exp1_without_child_fes.pdf')
+pdf('peru_run1_no_input.pdf')
 for (i in iso_list) {
 
   id_reg2 <- filter(id_reg, country == i)
@@ -149,7 +149,7 @@ for (i in iso_list) {
   print(
   ggplot() + 
   #input data
-  geom_point(data = id_reg2, aes(x = year, y = MBG_raw, size = MBG_raw_dat), col = 'blue') + 
+  # geom_point(data = id_reg2, aes(x = year, y = MBG_raw, size = MBG_raw_dat), col = 'blue') + 
   
   # country estimates
   geom_point(data = cntry_dat_reg2, aes(x = year_start, y = cntry_est, col = 'cntry_est'), 
@@ -172,7 +172,7 @@ for (i in iso_list) {
   
   # making it clean
   ylab('Prevalence') + xlab('Year') + 
-  ggtitle(paste0('Non Piped Improved Water Prevalence, ',i)) + 
+  ggtitle(paste0('Piped Water Prevalence, ',i)) + 
   theme_bw()
   )
 }

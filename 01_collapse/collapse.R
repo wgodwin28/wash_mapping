@@ -11,7 +11,7 @@ indi_fam <- "water"
 agg_level <- ''
 
 # Define indicator era
-sdg <- T
+sdg <- F
 
 # Set repo path
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/snfs1/")
@@ -27,10 +27,12 @@ if(!require(pacman)) {
   install.packages("pacman"); require(pacman)}
 p_load(dplyr, readr)
 
-for (data_type in c("pt", "poly")){
+# for (data_type in c("pt", "poly")){
+  
+  data_type <- 'poly'
   # Load data
   if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_07_20.Rdata'))
+    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_08_01.Rdata'))
     Encoding(pt_collapse$w_source_drink) <- "windows-1252"
     Encoding(pt_collapse$w_source_other) <- "windows-1252"
     Encoding(pt_collapse$t_type) <- "windows-1252"
@@ -38,14 +40,14 @@ for (data_type in c("pt", "poly")){
   } 
   
   if (!("poly_collapse" %in% ls()) & data_type == 'poly') {
-    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_07_20.Rdata'))
+    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/polys_collapsed_2017_08_01.Rdata'))
     Encoding(poly_collapse$w_source_drink) <- "windows-1252"
     Encoding(poly_collapse$w_source_other) <- "windows-1252"
     Encoding(poly_collapse$t_type) <- "windows-1252"
     pt_collapse <- get(name)
     rm(poly_collapse)
   }
-  
+   # pt_collapse <- filter(pt_collapse, iso3 == 'PER')
   if (!("definitions" %in% ls())) {
     if (indi_fam == "sani") {
       definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_07_21.csv'),
@@ -58,6 +60,9 @@ for (data_type in c("pt", "poly")){
       definitions2 <- rename(definitions2, sdg2 = sdg)
     }
   }
+  
+  definitions <- distinct(definitions)
+  if (exists('definitions2')) {definitions2 <- distinct(definitions2)}
   
   rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam','repo','data_type','root','agg_level', 'sdg')))
   
@@ -73,6 +78,12 @@ for (data_type in c("pt", "poly")){
   # Subset to relevant variables
   ptdat_0 <- dplyr::select(pt_collapse, nid, iso3, lat, long, survey_series, hhweight, urban, w_source_drink, w_source_other,
                            hh_size, year_start,hhweight,shapefile,location_code)
+  
+  problem_list <- filter(ptdat_0, hh_size <= 0)
+  setwd('C:/Users/adesh/Desktop')
+  write.csv(problem_list %>% group_by(nid, iso3, survey_series, year_start) %>% summarize(obs = n(), min_hhs = min(hh_size)),
+            file = paste0(data_type,"_problems.csv"))
+  setwd(repo)
   
   # Create a unique cluster id
   if (data_type == 'pt') {
@@ -105,9 +116,12 @@ for (data_type in c("pt", "poly")){
   # Remove clusters with more than 20% weighted missingness
   ptdat <- rm_miss()
   
-  # Remove cluster_ids with missing hhweight
+  # Remove cluster_ids with missing hhweight or invalid hhs
   miss_wts <- unique(ptdat$id_short[which(is.na(ptdat$hhweight))])
   ptdat <- filter(ptdat, !(id_short %in% miss_wts))
+  
+  invalid_hhs <- unique(ptdat$id_short[which(ptdat$hh_size <= 0)])
+  ptdat <- filter(ptdat, !(id_short %in% invalid_hhs))
   
   # Crosswalk missing household size data
   ptdat <- hh_cw(data = ptdat)
@@ -138,7 +152,7 @@ for (data_type in c("pt", "poly")){
   } else{
     save(ptdat, file=paste0("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_", today, ".RData"))
   }  
-}
+# }
 
 
 ### CHECK ALL COLUMNS FOR VALID VALUES BEFORE EXPORTING ###

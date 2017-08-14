@@ -3,11 +3,11 @@ ptdat$iso3[grep(pattern = "KEN",x = ptdat$iso3)] <- 'KEN'
 
 if (indi_fam == 'water') {
   w_piped <- ptdat
-  w_piped <- select(w_piped, -surface, -imp, -unimp)
+  w_piped <- dplyr::select(w_piped, -surface, -imp, -unimp)
   w_piped <- mutate(w_piped, point = 1, weight = 1, w_piped = round(piped*total_hh))
   w_piped <- rename(w_piped, country = iso3, year = year_start, prop = piped, N = total_hh, latitude = lat,
                   longitude = long)
-  write.csv(w_piped, file = 'J:/WORK/11_geospatial/10_mbg/input_data/w_piped.csv')
+  write.csv(w_piped, file = 'J:/WORK/11_geospatial/10_mbg/input_data/w_piped_peru.csv')
 
   w_imp <- ptdat
   w_imp <- select(w_imp, -surface, -piped, -unimp)

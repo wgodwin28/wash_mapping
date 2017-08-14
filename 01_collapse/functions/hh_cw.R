@@ -1,7 +1,7 @@
 ######################################################
 ##### HOUSEHOLD SIZE CROSSWALKING CODE ###############
 
-cw <- function(data, debug = F, var_family = indi_family) {
+cw <- function(data, debug = F, var_family = indi_fam) {
   
   if (debug) {broswer()}
   library(dplyr)
@@ -19,10 +19,10 @@ cw <- function(data, debug = F, var_family = indi_family) {
   data <- rbind(data_1, data_2)
   
   if (var_family == 'water') {
-    data <- rename(mydat, indi = piped) }
+    data <- rename(data, indi = piped) }
   
   if (var_family == 'sani') {
-    data <- rename(mydat, indi = od) }
+    data <- rename(data, indi = od) }
   
   
   # Aggregate data into clusters
@@ -39,9 +39,9 @@ cw <- function(data, debug = F, var_family = indi_family) {
   return(ratio)
 }
 
-hh_cw <- function(data, debug = F, var_family = indi_family) {
+hh_cw <- function(data, debug = F, var_family = indi_fam) {
   
-  if (debug) {broswer()}
+  if (debug) {browser()}
   
   if (length(data[which(is.na(data$hh_size)),1]) < 1) {
     print("No missing hh_sizes!")
@@ -63,12 +63,12 @@ hh_cw <- function(data, debug = F, var_family = indi_family) {
   
   # Plug in ratios into hh_sizes based on urban-rural specificity
   results <- data.frame(urban = c(1,0,2), ratio = c(u_ratio,r_ratio,o_ratio))
-  data$hh_size[which(is.na(data$hh_size)) &
-                 which(data$urban == 1)] <- u_ratio
-  data$hh_size[which(is.na(data$hh_size)) &
-                 which(data$urban == 0)] <- r_ratio
-  data$hh_size[which(is.na(data$hh_size)) &
-                 which(is.na(data$urban))] <- o_ratio
+  data$hh_size[which(is.na(data$hh_size) &
+                 data$urban == 1)] <- u_ratio
+  data$hh_size[which(is.na(data$hh_size) &
+                 data$urban == 0)] <- r_ratio
+  data$hh_size[which(is.na(data$hh_size) &
+                 is.na(data$urban))] <- o_ratio
   
   # Print ratios
   print(results)
