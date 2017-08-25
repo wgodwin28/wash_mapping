@@ -112,3 +112,6 @@ plot <- ggplot(filter(alldat, name == i)) +
   ggtitle(aes(name)) + ggtitle(i)
   print(plot)
 }
+
+
+
