@@ -1,6 +1,8 @@
 #### Set Up Environment ####
 #source("/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/01_collapse/collapse.R")
 
+library(dplyr)
+
 # Clear environment
 rm(list = ls())
 
@@ -27,12 +29,12 @@ if(!require(pacman)) {
   install.packages("pacman"); require(pacman)}
 p_load(dplyr, readr)
 
-# for (data_type in c("pt", "poly")){
+for (data_type in c("pt", "poly")){
   
-  data_type <- 'pt'
+  #data_type <- 'pt'
   # Load data
   if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_08_16.RData'))
+    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_08_16.Rdata'))
     Encoding(pt_collapse$w_source_drink) <- "windows-1252"
     Encoding(pt_collapse$w_source_other) <- "windows-1252"
     Encoding(pt_collapse$t_type) <- "windows-1252"
@@ -80,10 +82,10 @@ p_load(dplyr, readr)
                            hh_size, year_start,hhweight,shapefile,location_code)
   
   problem_list <- filter(ptdat_0, hh_size <= 0)
-  setwd('C:/Users/adesh/Desktop')
-  write.csv(problem_list %>% group_by(nid, iso3, survey_series, year_start) %>% summarize(obs = n(), min_hhs = min(hh_size)),
-            file = paste0(data_type,"_problems.csv"))
-  setwd(repo)
+  #setwd('C:/Users/adesh/Desktop')
+  #write.csv(problem_list %>% group_by(nid, iso3, survey_series, year_start) %>% summarize(obs = n(), min_hhs = min(hh_size)),
+  #          file = paste0(data_type,"_problems.csv"))
+  #setwd(repo)
   
   # Create a unique cluster id
   if (data_type == 'pt') {
@@ -110,10 +112,12 @@ p_load(dplyr, readr)
   if (data_type == "pt") {ptdat$shapefile <- NA; ptdat$location_code <- NA}
   
   #### Define Indicator ####
+  message("define indicator")
   ptdat <- define_indi()
   
   #### Address Missingness ####
   # Remove clusters with more than 20% weighted missingness
+  message("remove missing")
   ptdat <- rm_miss()
   
   # Remove cluster_ids with missing hhweight or invalid hhs
@@ -124,17 +128,21 @@ p_load(dplyr, readr)
   ptdat <- filter(ptdat, !(id_short %in% invalid_hhs))
   
   # Crosswalk missing household size data
+  message("crosswalk household sizes")
   ptdat <- hh_cw(data = ptdat)
   
   # Calculated household size weighted means for all clusters
   # Assign observations with NA indicator value the weighted average for the cluster
+  message("impute indi")
   ptdat <- impute_indi()
   
   #### Aggregate Data ####
   # Aggregate indicator to cluster level
+  message("aggregate to cluster")
   ptdat <- agg_indi()
   
   # Crosswalk indicator data
+  message("crosswalk indicator")
   ptdat <- cw_indi()
   
   # create sdg improved for sdg era
@@ -152,7 +160,7 @@ p_load(dplyr, readr)
   } else{
     save(ptdat, file=paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_", today, ".RData"))
   }  
-# }
+}
 
 
 ### CHECK ALL COLUMNS FOR VALID VALUES BEFORE EXPORTING ###
