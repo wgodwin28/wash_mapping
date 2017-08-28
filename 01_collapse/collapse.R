@@ -29,10 +29,10 @@ p_load(dplyr, readr)
 
 # for (data_type in c("pt", "poly")){
   
-  data_type <- 'poly'
+  data_type <- 'pt'
   # Load data
   if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_collapsed_2017_08_01.Rdata'))
+    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_08_16.RData'))
     Encoding(pt_collapse$w_source_drink) <- "windows-1252"
     Encoding(pt_collapse$w_source_other) <- "windows-1252"
     Encoding(pt_collapse$t_type) <- "windows-1252"
@@ -50,12 +50,12 @@ p_load(dplyr, readr)
    # pt_collapse <- filter(pt_collapse, iso3 == 'PER')
   if (!("definitions" %in% ls())) {
     if (indi_fam == "sani") {
-      definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_07_21.csv'),
+      definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_2017_08_16.csv'),
                               encoding="windows-1252", stringsAsFactors = F)
     } else {
-      definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_07_21.csv'),
+      definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_2017_08_16.csv'),
                               encoding="windows-1252", stringsAsFactors = F) 
-      definitions2 <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_other_defined_updated_2017_07_21.csv'),
+      definitions2 <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_other_defined_2017_08_14.csv'),
                                encoding="windows-1252", stringsAsFactors = F)
       definitions2 <- rename(definitions2, sdg2 = sdg)
     }
@@ -148,9 +148,9 @@ p_load(dplyr, readr)
   if (data_type == "poly") {
     polydat <- ptdat
     rm(ptdat)
-    save(polydat, file=paste0("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_", today, ".RData"))
+    save(polydat, file=paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_", today, ".RData"))
   } else{
-    save(ptdat, file=paste0("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_", today, ".RData"))
+    save(ptdat, file=paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_", today, ".RData"))
   }  
 # }
 
