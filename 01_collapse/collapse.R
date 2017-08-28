@@ -1,8 +1,6 @@
 #### Set Up Environment ####
 #source("/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/01_collapse/collapse.R")
 
-library(dplyr)
-
 # Clear environment
 rm(list = ls())
 
