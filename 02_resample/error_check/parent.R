@@ -23,6 +23,11 @@ user <- "adesh"
 setwd('/share/code/geospatial/adesh/wash_mapping/02_resample/error_check')
 run_date <- Sys.Date()
 
+dir.create(paste0('/home/j/WORK/11_geospatial/wash/data/resamp/error_log/', run_date))
+write.csv(data.frame(shp = wrong_shp), file = paste0('/home/j/WORK/11_geospatial/wash/data/resamp/error_log/', run_date,
+                                                     'shapefile_error.csv'))
+
+
 for (shp in unique(mydat$shapefile)) { 
   jname <- paste(shp, sep = "_")
   mycores <- 4
@@ -34,5 +39,5 @@ for (shp in unique(mydat$shapefile)) {
                     'r_shell.sh')
   
   args <- paste(shp, run_date)
-  # system(paste(sys.sub, r_shell, script, args)) 
+  system(paste(sys.sub, r_shell, script, args)) 
 }
