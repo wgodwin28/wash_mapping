@@ -2,11 +2,10 @@
 rm(list = ls())
 
 # Input filepath for collapsed polydata
-load('J:/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_2017_08_30.RData')
+load('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_2017_08_30.RData')
 
 # Input survey shapefile library
-shp_dir <- 'J:/WORK/11_geospatial/05_survey shapefile library/Shapefile directory/'
-
+shp_dir <- '/home/j/WORK/11_geospatial/05_survey shapefile library/Shapefile directory/'
 
 # 1. Check if all shapefile names are valid
 setwd(shp_dir)
