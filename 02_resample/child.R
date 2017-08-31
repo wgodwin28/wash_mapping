@@ -26,7 +26,6 @@ if (indic == 'water') {
 } else {levels <- c('imp','unimp','shared','open')}
 
 load('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_2017_08_30.RData')
-polydat <- dplyr::select(polydat, -X, -lat, -long)
 subset <- polydat[which(polydat$shapefile == shp),]
 
 shape_master <- shapefile(paste0('/home/j//WORK/11_geospatial/05_survey shapefile library/Shapefile directory/',shp,'.shp'))
