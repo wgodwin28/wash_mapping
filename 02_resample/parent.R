@@ -7,7 +7,7 @@ user <- "adesh"
 setwd('/share/code/geospatial/adesh/wash_mapping/02_resample/')
 indicators <- c("water")
 run_date <- Sys.Date()
-polydat <- read.csv('/home/j/WORK/11_geospatial/wash/data/agg/water_poly_agg_2017-07-11.csv')
+load('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_2017_08_30.RData')
 
 
 for (indic in indicators) {
