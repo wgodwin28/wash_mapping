@@ -56,9 +56,19 @@ for (pid in levels) {
       } 
     } 
     
+    
+    
     raster_crop <- mask(crop(x = pop_raster, y = shape), shape)
-    samp_pts <- getPoints(shape = shape, raster = raster_crop, n = 0.001, perpixel = T)
-    samp_pts <- as.data.frame(samp_pts)
+    if (length(unique(raster_crop)) < 1) {
+      samp_pts <- gCentroid(shape)@coords
+      samp_pts <- as.data.frame(samp_pts)
+      samp_pts$weight <- 1
+      
+    } else {
+      samp_pts <- getPoints(shape = shape, raster = raster_crop, n = 0.01, perpixel = T)  
+      samp_pts <- as.data.frame(samp_pts)
+    }
+    
     names(samp_pts) <- c("long", "lat","weight")
     samp_pts$shapefile <- shp
     
