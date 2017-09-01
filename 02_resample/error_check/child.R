@@ -16,8 +16,8 @@ if(Sys.info()[1]=="Windows") {
   }
 }
 
-shp <- commandArgs()[3]
-run_date <- commandArgs()[4]
+shp <- unique(polydat$shapefile)[1]
+run_date <- 'test'
 
 load('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_2017_08_30.RData')
 subset <- polydat[which(polydat$shapefile == shp),]
@@ -28,9 +28,9 @@ setwd(paste0('/home/j/WORK/11_geospatial/wash/data/resamp/error_log/', run_date)
 
 loc_errors <- c()
 for (loc in unique(subset$location_code)) {
-  shape <- shape_master[shape_master$GAUL_CODE == loc,]
-  if (length(shape) == 0) {
+  val <- loc %in% shape_master$GAUL_CODE
+  if (!val) {
     loc_errors[length(loc_errors)+1] <- loc
-  }
+  } else {loc_errors[length(loc_errors)+1] <- 'present'}
 }
 write.csv(data.frame(loc = loc_errors, shp = shp), file = paste0('loc_code_error','_',shp,'.csv'))
