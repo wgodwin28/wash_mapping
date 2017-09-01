@@ -16,8 +16,8 @@ if(Sys.info()[1]=="Windows") {
   }
 }
 
-shp <- unique(polydat$shapefile)[1]
-run_date <- 'test'
+shp <- commandArgs()[3]
+run_date <- commandArgs()[4]
 
 load('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_2017_08_30.RData')
 subset <- polydat[which(polydat$shapefile == shp),]
