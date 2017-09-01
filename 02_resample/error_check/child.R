@@ -33,4 +33,4 @@ for (loc in unique(subset$location_code)) {
     loc_errors[length(loc_errors)+1] <- loc
   }
 }
-write.csv(data.frame(loc = loc_erros, shp = shp), file = paste0('loc_code_error','_',shp,'.csv'))
+write.csv(data.frame(loc = loc_errors, shp = shp), file = paste0('loc_code_error','_',shp,'.csv'))
