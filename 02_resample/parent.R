@@ -7,7 +7,7 @@ user <- "adesh"
 setwd('/share/code/geospatial/adesh/wash_mapping/02_resample/')
 indicators <- c("water")
 run_date <- Sys.Date()
-load('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_2017_08_30_temp.RData')
+load('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_2017_09_06_clean.RData')
 
 
 for (indic in indicators) {
