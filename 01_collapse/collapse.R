@@ -32,7 +32,7 @@ p_load(dplyr, readr)
   data_type <- 'poly'
   # Load data
   if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_08_16.RData'))
+    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_09_05.Rdata'))
     Encoding(pt_collapse$w_source_drink) <- "windows-1252"
     Encoding(pt_collapse$w_source_other) <- "windows-1252"
     Encoding(pt_collapse$t_type) <- "windows-1252"
@@ -40,7 +40,7 @@ p_load(dplyr, readr)
   } 
   
   if (!("poly_collapse" %in% ls()) & data_type == 'poly') {
-    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_08_16.Rdata'))
+    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_09_05.Rdata'))
     Encoding(poly_collapse$w_source_drink) <- "windows-1252"
     Encoding(poly_collapse$w_source_other) <- "windows-1252"
     Encoding(poly_collapse$t_type) <- "windows-1252"
