@@ -25,8 +25,7 @@ if (indic == 'water') {
   levels <- c('piped','imp','unimp','surface')
 } else {levels <- c('imp','unimp','shared','open')}
 
-polydat <- read.csv('/home/j/WORK/11_geospatial/wash/data/agg/water_poly_agg_2017-07-11.csv')
-polydat <- dplyr::select(polydat, -X, -lat, -long)
+load('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_2017_09_06_clean.RData')
 subset <- polydat[which(polydat$shapefile == shp),]
 
 shape_master <- shapefile(paste0('/home/j//WORK/11_geospatial/05_survey shapefile library/Shapefile directory/',shp,'.shp'))
@@ -41,32 +40,45 @@ for (pid in levels) {
     shape <- shape_master[shape_master$GAUL_CODE == loc,]
     subset_loc2 <- filter(subset_loc, location_code == loc)
     
-    
-    year <- subset_loc2$year_start
-    if (year <= 2000) {
-      pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 1)
-    } else {
-      if (year > 2000 & year <= 2005) {
-        pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 2)
+    for (q in 1:nrow(subset_loc2)) {
+      
+      subset_loc3 <- subset_loc2[q,]
+      
+      year <- subset_loc3$year_start
+      if (year <= 2000) {
+        pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 1)
       } else {
-        if (year > 2005 & year <= 2010) {
-          pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 3)
+        if (year > 2000 & year <= 2005) {
+          pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 2)
         } else {
-          pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 4)
-        }
-      } 
-    } 
-    
-    raster_crop <- mask(crop(x = pop_raster, y = shape), shape)
-    samp_pts <- getPoints(shape = shape, raster = raster_crop, n = 0.001, perpixel = T)
-    samp_pts <- as.data.frame(samp_pts)
-    names(samp_pts) <- c("long", "lat","weight")
-    samp_pts$shapefile <- shp
-    
-    subset_loc2 <- left_join(samp_pts, subset_loc2, by = 'shapefile')
-    subset_loc2$point <- 0
-    
-    generated_pts[[length(generated_pts) + 1]] <- subset_loc2
+          if (year > 2005 & year <= 2010) {
+            pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 3)
+          } else {
+            pop_raster <- raster('/snfs1/WORK/11_geospatial/01_covariates/09_MBG_covariates/WorldPop_total_global_stack.tif', band = 4)
+          }
+        } 
+      }
+      
+      raster_crop <- mask(crop(x = pop_raster, y = shape), shape)
+      if (length(unique(raster_crop)) < 1) {
+        samp_pts <- gCentroid(shape)@coords
+        samp_pts <- as.data.frame(samp_pts)
+        samp_pts$weight <- 1
+        
+      } else {
+        samp_pts <- getPoints(shape = shape, raster = raster_crop, n = 0.01, perpixel = T)  
+        samp_pts <- as.data.frame(samp_pts)
+      }
+      
+      names(samp_pts) <- c("long", "lat","weight")
+      samp_pts$shapefile <- shp
+      
+      subset_loc3 <- left_join(samp_pts, subset_loc3, by = 'shapefile')
+      subset_loc3$point <- 0
+      
+      generated_pts[[length(generated_pts) + 1]] <- subset_loc3
+    }
+      
   }
   
   generated_pts2 <- do.call(rbind, generated_pts)
