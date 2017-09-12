@@ -13,9 +13,8 @@ rm_miss <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level, dt_ty
   missing <- mutate(mydat, miss = ifelse(is.na(mydat$indi), 1, 0))
   missing <- mutate(missing, miss_wt = miss*hh_size)
   missing <- missing %>% group_by(id_short) %>% summarise(pct_miss = sum(miss_wt)/sum(hh_size))
-  
   # Remove clusters with more than 20% weighted missingness
-  miss_clusters <- select(filter(missing, pct_miss > 0.2), id_short)
+  miss_clusters <- dplyr::select(filter(missing, pct_miss > 0.2), id_short)
   mydat <- filter(mydat, !(id_short %in% miss_clusters$id_short))
   
   if(agg == 'country' & dt_type == 'pt') {
