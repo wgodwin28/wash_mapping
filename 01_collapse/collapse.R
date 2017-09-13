@@ -12,17 +12,20 @@ agg_level <- ''
 # Define indicator era
 sdg <- F
 
-# Set repo path
-root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/snfs1/")
+# Set repo & library path 
+if(Sys.info()[1]!="Windows") {
+  root <- "/home/j/"
+  package_lib <- ifelse(grepl("geos", Sys.info()[4]),
+                        paste0(root,'temp/geospatial/geos_packages'),
+                        paste0(root,'temp/geospatial/packages'))
+  .libPaths(package_lib)
+} else {
+  package_lib <- .libPaths()
+  root <- 'J:/'
+}
+
 repo <- ifelse(Sys.info()[1]=="Windows", 'C:/Users/adesh/Documents/WASH/wash_code/01_collapse/',
                '/share/code/geospatial/adesh/wash_mapping/01_collapse/')
-
-# Load Packages
-# Set package library
-if(Sys.info()[1]!="Windows") {
-  package_lib <- paste0(root,'temp/geospatial/packages') 
-  .libPaths(package_lib)
-}
 
 # Detach all but base packages
 detachAllPackages <- function() {
@@ -43,6 +46,9 @@ if(length(new.packages)) install.packages(new.packages)
 lapply(packages, library, character.only = T)
 
 for (data_type in c("pt", "poly")){
+  message(data_type)
+  
+  message('Loading Data...')
   # Load data
   if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
     name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_09_06.Rdata'))
@@ -53,7 +59,7 @@ for (data_type in c("pt", "poly")){
   } 
     
   if (!("poly_collapse" %in% ls()) & data_type == 'poly') {
-    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_09_05.Rdata'))
+    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_09_06.Rdata'))
     Encoding(poly_collapse$w_source_drink) <- "windows-1252"
     Encoding(poly_collapse$w_source_other) <- "windows-1252"
     Encoding(poly_collapse$t_type) <- "windows-1252"
@@ -61,6 +67,8 @@ for (data_type in c("pt", "poly")){
     rm(poly_collapse)
   }
 
+  message('Loading Definitions...')
+  
   if (!("definitions" %in% ls())) {
     if (indi_fam == "sani") {
       definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_09_07.csv'),
@@ -79,6 +87,7 @@ for (data_type in c("pt", "poly")){
 
   rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam','repo','data_type','root','agg_level', 'sdg')))
 
+  message("Importing functions...")
   #### Load functions ####
   setwd(repo)
   source('functions/hh_cw.R')
@@ -88,6 +97,7 @@ for (data_type in c("pt", "poly")){
   source('functions/define_wash.R')
 
   #### Subset & Shape Data ####
+  message("Initial Cleaning...")
   # Subset to relevant variables
   ptdat_0 <- dplyr::select(pt_collapse, nid, iso3, lat, long, survey_series, hhweight, urban, w_source_drink, w_source_other,
                            hh_size, year_start,hhweight,shapefile,location_code)
@@ -123,9 +133,12 @@ for (data_type in c("pt", "poly")){
   if (data_type == "pt") {ptdat$shapefile <- NA; ptdat$location_code <- NA}
 
   #### Define Indicator ####
+  message("Defining Indicator...")
   ptdat <- define_indi()
 
   #### Address Missingness ####
+  message("Addressing Missingness...")
+  
   # Remove clusters with more than 20% weighted missingness
   ptdat <- rm_miss()
 
@@ -137,17 +150,21 @@ for (data_type in c("pt", "poly")){
   ptdat <- filter(ptdat, !(id_short %in% invalid_hhs))
 
   # Crosswalk missing household size data
+  message("Crosswalking HH Sizes...")
   ptdat <- hh_cw(data = ptdat)
 
   # Calculated household size weighted means for all clusters
   # Assign observations with NA indicator value the weighted average for the cluster
+  message("Imputing indicator...")
   ptdat <- impute_indi()
 
   #### Aggregate Data ####
   # Aggregate indicator to cluster level
+  message("Aggregating Data...")
   ptdat <- agg_indi()
 
   # Crosswalk indicator data
+  message("Crosswalking Indicators...")
   ptdat <- cw_indi()
 
   # create sdg improved for sdg era
@@ -156,6 +173,7 @@ for (data_type in c("pt", "poly")){
   }
 
   #save poly and point collapses
+  message("Saving Collapsed Data...")
   today <- gsub("-", "_", Sys.Date())
     
   if (data_type == "poly") {
