@@ -97,24 +97,34 @@ hh_cw_reg <- function(data, var_family = indi_fam) {
   
   message('sssa_hi')
   mydat <- filter(data, iso3 %in% sssa_hi)
-  results[[1]] <- hh_cw(data = mydat, var_family = var_family)
+  if (nrow(mydat)>0) {
+    results[[1]] <- hh_cw(data = mydat, var_family = var_family)
+  }
 
   message('wssa')
   mydat <- filter(data, iso3 %in% wssa)
-  results[[2]] <- hh_cw(data = mydat, var_family = var_family)
-
+  if (nrow(mydat)>0) {
+    results[[2]] <- hh_cw(data = mydat, var_family = var_family)
+  }
+  
   message('cssa')
   mydat <- filter(data, iso3 %in% cssa)
-  results[[3]] <- hh_cw(data = mydat, var_family = var_family)
+  if (nrow(mydat)>0) {
+    results[[3]] <- hh_cw(data = mydat, var_family = var_family)
+  }
 
   message('essa_hilo')
   mydat <- filter(data, iso3 %in% essa_hilo)
-  results[[4]] <- hh_cw(data = mydat, var_family = var_family)
-  
+  if (nrow(mydat)>0) {
+    results[[4]] <- hh_cw(data = mydat, var_family = var_family)
+  }
+
   message('name_hi')
   mydat <- filter(data, iso3 %in% name_hi)
-  results[[5]] <- hh_cw(data = mydat, var_family = var_family)
-
+  if (nrow(mydat)>0) {
+    results[[5]] <- hh_cw(data = mydat, var_family = var_family)
+  }
+  
   results <- do.call(rbind, results)
   return(results)
 }

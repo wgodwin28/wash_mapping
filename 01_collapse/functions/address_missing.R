@@ -91,24 +91,34 @@ impute_indi_reg <- function(data, var_family = indi_fam) {
   
   message('sssa_hi')
   mydat <- filter(data, iso3 %in% sssa_hi)
-  results[[1]] <- impute_indi(mydat = mydat, var_family = var_family)
+  if (nrow(mydat)>0) {
+    results[[1]] <- impute_indi(mydat = mydat, var_family = var_family)
+  }
 
   message('wssa')
   mydat <- filter(data, iso3 %in% wssa)
-  results[[2]] <- impute_indi(mydat = mydat, var_family = var_family)
+  if (nrow(mydat)>0) {
+    results[[2]] <- impute_indi(mydat = mydat, var_family = var_family)
+  }
 
   message('cssa')
   mydat <- filter(data, iso3 %in% cssa)
-  results[[3]] <- impute_indi(mydat = mydat, var_family = var_family)
+  if (nrow(mydat)>0) {
+    results[[3]] <- impute_indi(mydat = mydat, var_family = var_family)
+  }
 
   message('essa_hilo')
   mydat <- filter(data, iso3 %in% essa_hilo)
-  results[[4]] <- impute_indi(mydat = mydat, var_family = var_family)
-  
+  if (nrow(mydat)>0) {
+    results[[4]] <- impute_indi(mydat = mydat, var_family = var_family)
+  }
+
   message('name_hi')
   mydat <- filter(data, iso3 %in% name_hi)
-  results[[5]] <- impute_indi(mydat = mydat, var_family = var_family)
-
+  if (nrow(mydat)>0) {
+    results[[5]] <- impute_indi(mydat = mydat, var_family = var_family)
+  }
+  
   results <- do.call(rbind, results)
   return(results)
 }
@@ -123,20 +133,28 @@ impute_indi_reg_time <- function(data = ptdat) {
   library(dplyr)
   message('Period: pre-2000')
   mydat <- filter(data, year_start < 2000)
-  results[[1]] <- impute_indi_reg(mydat)
+  if (nrow(mydat)>0) {
+    results[[1]] <- impute_indi_reg(mydat)
+  }
 
-    message('Period: 00-04')
+  message('Period: 00-04')
   mydat <- filter(data, year_start <= 20004 & year_start >= 2000)
-  results[[2]] <- impute_indi_reg(mydat)
+  if (nrow(mydat)>0) {
+    results[[2]] <- impute_indi_reg(mydat)
+  }
 
-    message('Period: 05-09')
+  message('Period: 05-09')
   mydat <- filter(data, year_start <= 2009 & year_start >= 2005)
-  results[[3]] <- impute_indi_reg(mydat)
+  if (nrow(mydat)>0) {
+    results[[3]] <- impute_indi_reg(mydat)
+  }
 
-    message('Period: 10-15')
+  message('Period: 10-15')
   mydat <- filter(data, year_start >= 2010)
-  results[[4]] <- impute_indi_reg(mydat)
+  if (nrow(mydat)>0) {
+    results[[4]] <- impute_indi_reg(mydat)
+  }
 
- results <- do.call(rbind, results)
- return(results)
+  results <- do.call(rbind, results)
+  return(results)
 }
