@@ -70,3 +70,73 @@ impute_indi <- function(mydat = ptdat, var_family = indi_fam) {
   return(mydat)
   
 }
+
+impute_indi_reg <- function(data, var_family = indi_fam) {
+
+  library(dplyr)
+
+  message('Only African Data is currently CWed by reg')
+  message('The regs are sssa_hi, cssa, wsssa, name_hi, and essa_hilo')
+  sssa_hi <- c('NAM','BWA','ZAF')
+  cssa <- c('CAF','GAB','GNQ','COD','COG','AGO','STP')
+  name_hi <- c('MAR','DZA','TUN','LBY','EGY')
+  essa_hilo <- c('SDN','ERI','DJI','SOM','ETH','SSD',
+                 'SSD','UGA','KEN','RWA','BDI','TZA',
+                 'MWI','MOZ','ZMB','MDG','ZWE','SWZ','LSO',
+                 'COM')
+  wssa <- c('CPV','SEN','GMB','GIN','GNB','SLE','MLI','LBR',
+            'CIV','GHA','TGO','BEN','NGA','NER','TCD','CMR',
+            'BFA','MRT')
+  results <- list()
+  
+  message('sssa_hi')
+  mydat <- filter(data, iso3 %in% sssa_hi)
+  results[[1]] <- impute_indi(mydat = mydat, var_family = var_family)
+
+  message('wssa')
+  mydat <- filter(data, iso3 %in% wssa)
+  results[[2]] <- impute_indi(mydat = mydat, var_family = var_family)
+
+  message('cssa')
+  mydat <- filter(data, iso3 %in% cssa)
+  results[[3]] <- impute_indi(mydat = mydat, var_family = var_family)
+
+  message('essa_hilo')
+  mydat <- filter(data, iso3 %in% essa_hilo)
+  results[[4]] <- impute_indi(mydat = mydat, var_family = var_family)
+  
+  message('name_hi')
+  mydat <- filter(data, iso3 %in% name_hi)
+  results[[5]] <- impute_indi(mydat = mydat, var_family = var_family)
+
+  results <- do.call(rbind, results)
+  return(results)
+}
+
+impute_indi_reg_time <- function(data = ptdat) {
+  message('The periods are pre-2000,00-04,05-09,10-15')
+
+  period1 <- 2000:2004
+  period2 <- 2005:2009
+  results <- list()
+
+  library(dplyr)
+  message('Period: pre-2000')
+  mydat <- filter(data, year_start < 2000)
+  results[[1]] <- impute_indi_reg(mydat)
+
+    message('Period: 00-04')
+  mydat <- filter(data, year_start <= 20004 & year_start >= 2000)
+  results[[2]] <- impute_indi_reg(mydat)
+
+    message('Period: 05-09')
+  mydat <- filter(data, year_start <= 2009 & year_start >= 2005)
+  results[[3]] <- impute_indi_reg(mydat)
+
+    message('Period: 10-15')
+  mydat <- filter(data, year_start >= 2010)
+  results[[4]] <- impute_indi_reg(mydat)
+
+ results <- do.call(rbind, results)
+ return(results)
+}

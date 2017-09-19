@@ -76,3 +76,45 @@ hh_cw <- function(data, debug = F, var_family = indi_fam) {
   
   }
 }
+
+hh_cw_reg <- function(data, var_family = indi_fam) {
+
+  library(dplyr)
+
+  message('Only African Data is currently CWed by reg')
+  message('The regs are sssa_hi, cssa, wsssa, name_hi, and essa_hilo')
+  sssa_hi <- c('NAM','BWA','ZAF')
+  cssa <- c('CAF','GAB','GNQ','COD','COG','AGO','STP')
+  name_hi <- c('MAR','DZA','TUN','LBY','EGY')
+  essa_hilo <- c('SDN','ERI','DJI','SOM','ETH','SSD',
+                 'SSD','UGA','KEN','RWA','BDI','TZA',
+                 'MWI','MOZ','ZMB','MDG','ZWE','SWZ','LSO',
+                 'COM')
+  wssa <- c('CPV','SEN','GMB','GIN','GNB','SLE','MLI','LBR',
+            'CIV','GHA','TGO','BEN','NGA','NER','TCD','CMR',
+            'BFA','MRT')
+  results <- list()
+  
+  message('sssa_hi')
+  mydat <- filter(data, iso3 %in% sssa_hi)
+  results[[1]] <- hh_cw(data = mydat, var_family = var_family)
+
+  message('wssa')
+  mydat <- filter(data, iso3 %in% wssa)
+  results[[2]] <- hh_cw(data = mydat, var_family = var_family)
+
+  message('cssa')
+  mydat <- filter(data, iso3 %in% cssa)
+  results[[3]] <- hh_cw(data = mydat, var_family = var_family)
+
+  message('essa_hilo')
+  mydat <- filter(data, iso3 %in% essa_hilo)
+  results[[4]] <- hh_cw(data = mydat, var_family = var_family)
+  
+  message('name_hi')
+  mydat <- filter(data, iso3 %in% name_hi)
+  results[[5]] <- hh_cw(data = mydat, var_family = var_family)
+
+  results <- do.call(rbind, results)
+  return(results)
+}

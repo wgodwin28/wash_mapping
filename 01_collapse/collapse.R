@@ -1,5 +1,4 @@
 #### Set Up Environment ####
-# source("/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/01_collapse/collapse.R")
 # Clear environment
 rm(list = ls())
 
@@ -12,20 +11,29 @@ agg_level <- ''
 # Define indicator era
 sdg <- F
 
+# Define if you are running code loally
+local <- T
+
 # Set repo & library path 
 if(Sys.info()[1]!="Windows") {
-  root <- "/home/j/"
-  package_lib <- ifelse(grepl("geos", Sys.info()[4]),
-                        paste0(root,'temp/geospatial/geos_packages'),
-                        paste0(root,'temp/geospatial/packages'))
-  .libPaths(package_lib)
+  if(!local) {
+    root <- "/home/j/"
+    package_lib <- ifelse(grepl("geos", Sys.info()[4]),
+                          paste0(root,'temp/geospatial/geos_packages'),
+                          paste0(root,'temp/geospatial/packages'))
+    .libPaths(package_lib)
+  } else {
+    package_lib <- .libPaths()
+    root <- '/home/j/'
+  }
 } else {
   package_lib <- .libPaths()
   root <- 'J:/'
 }
 
 repo <- ifelse(Sys.info()[1]=="Windows", 'C:/Users/adesh/Documents/WASH/wash_code/01_collapse/',
-               '/share/code/geospatial/adesh/wash_mapping/01_collapse/')
+               ifelse(local, '/home/adesh/Documents/wash_mapping/01_collapse',
+                '/share/code/geospatial/adesh/wash_mapping/01_collapse/'))
 
 # Detach all but base packages
 detachAllPackages <- function() {
@@ -40,7 +48,7 @@ detachAllPackages <- function() {
 detachAllPackages()
 
 # Load and install, if necessary, needed packages
-packages <- c('dplyr')
+packages <- c('dplyr', 'feather')
 new.packages <- packages[!(packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 lapply(packages, library, character.only = T)
@@ -110,9 +118,9 @@ for (data_type in c("pt", "poly")){
 
   # Create a unique cluster id
   if (data_type == 'pt') {
-    ptdat <- mutate(ptdat_0, cluster_id = paste(iso3, lat, long, survey_series, year_start, sep = "_"))
+    ptdat <- mutate(ptdat_0, cluster_id = paste(iso3, lat, long, nid, year_start, sep = "_"))
   } else {
-    ptdat <- mutate(ptdat_0, cluster_id = paste(iso3, shapefile, location_code, survey_series, year_start, sep = "_"))  
+    ptdat <- mutate(ptdat_0, cluster_id = paste(iso3, shapefile, location_code, nid, year_start, sep = "_"))  
   }
 
   # Create a table which assigns numbers to unique IDs and merge it back to data to have shorter
@@ -151,12 +159,12 @@ for (data_type in c("pt", "poly")){
 
   # Crosswalk missing household size data
   message("Crosswalking HH Sizes...")
-  ptdat <- hh_cw(data = ptdat)
+  ptdat <- hh_cw_reg(data = ptdat)
 
   # Calculated household size weighted means for all clusters
   # Assign observations with NA indicator value the weighted average for the cluster
   message("Imputing indicator...")
-  ptdat <- impute_indi()
+  ptdat <- impute_indi_reg_time(data = ptdat)
 
   #### Aggregate Data ####
   # Aggregate indicator to cluster level
@@ -165,7 +173,7 @@ for (data_type in c("pt", "poly")){
 
   # Crosswalk indicator data
   message("Crosswalking Indicators...")
-  ptdat <- cw_indi()
+  ptdat <- cw_indi_reg_time(data = ptdat)
 
   # create sdg improved for sdg era
   if (sdg) {
@@ -179,8 +187,8 @@ for (data_type in c("pt", "poly")){
   if (data_type == "poly") {
     polydat <- ptdat
     rm(ptdat)
-    save(polydat, file=paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_", today, ".RData"))
+    write_feather(polydat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_", today, ".feather"))
   } else{
-    save(ptdat, file=paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_", today, ".RData"))
+    write_feather(ptdat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_", today, ".feather"))
   }
 }
