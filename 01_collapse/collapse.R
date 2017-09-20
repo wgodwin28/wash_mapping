@@ -12,7 +12,7 @@ agg_level <- ''
 sdg <- F
 
 # Define if you are running code loally
-local <- T
+local <- F
 
 # Set repo & library path 
 if(Sys.info()[1]!="Windows") {
@@ -55,7 +55,7 @@ lapply(packages, library, character.only = T)
 
 for (data_type in c("pt", "poly")){
   message(data_type)
-  
+  rm(pt_collapse)
   message('Loading Data...')
   # Load data
   if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
@@ -187,8 +187,10 @@ for (data_type in c("pt", "poly")){
   if (data_type == "poly") {
     polydat <- ptdat
     rm(ptdat)
-    write_feather(polydat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_", today, ".feather"))
+    write_feather(polydat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_", agg_level,
+                  today, ".feather"))
   } else{
-    write_feather(ptdat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_", today, ".feather"))
+    write_feather(ptdat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_", agg_level,
+                  today, ".feather"))
   }
 }
