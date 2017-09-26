@@ -7,7 +7,7 @@ define_indi <- function(mydat = ptdat, var_family = indi_fam, define = definitio
     define <- rename(define, w_source_drink = string) 
     mydat <- left_join(mydat, define, by = "w_source_drink")
     
-    define2 <- rename(define2, w_source_other = string) 
+    define2 <- rename(define2, w_source_other = string)
     mydat <- left_join(mydat, define2, by = "w_source_other")
   }  else {
     rename(define, t_type = string) 

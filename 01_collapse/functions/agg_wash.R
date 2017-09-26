@@ -1,4 +1,4 @@
-agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, agg = agg_level) {
+agg_indi <- function(mydat, var_family, dt_type, agg, proj) {
   
   if (var_family == 'water') {
   levels <- c('piped', 'surface','imp','unimp','bottled','bottled_sp','bottled_wl','well_cw',
@@ -8,7 +8,8 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
   if (var_family == 'sani') {
     levels <- levels <- c('imp', 'imp_cw','shared','unimp','od','latrine_cw','latrine_imp','latrine_unimp')
   }
-  
+
+if(proj != "gbd"){
   results <- list()
   for (i in levels) {
     message(paste("Aggregating",i))
@@ -31,6 +32,7 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
                           total_hh = sum(hh_size))
       }
     }
+
     
     if (dt_type == 'poly') {
       
@@ -61,7 +63,29 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
   
   message("Merging all results...")
   mydat <- Reduce(function(x,y) merge(x,y,all = T),results)
-  
   return(mydat)
-  
+}  
+
+  if(proj == "gbd"){
+    collapsed_gbd <- data.frame()
+    mydat <- as.data.table(mydat)
+    #levels <- c("piped", "surface")
+    for (ind in levels) {
+      message(paste("Aggregating",ind))
+      surveys <- unique(mydat$nid, na.rm = T)
+      surveys <- setdiff(surveys, c(93806, 235215, 286657)) ## problem surveys to debug
+      for(id in surveys){
+        temp_dat <- filter(mydat, nid == id)
+        temp_dat <- as.data.table(temp_dat)
+        #setup_design(df = temp_dat, var = ind)
+        by_vars <- c('year_start', 'iso3', 'survey_series','nid')
+        temp <- collapse_by(df = temp_dat,
+                            var = ind,
+                            by_vars = by_vars)
+        print(paste(id, ind))
+        collapsed_gbd <- rbind(collapsed_gbd, temp[, c(by_vars, 'mean', 'se', 'var', 'deff')])
+      }  
+    }
+    return(collapsed_gbd)
+  }
 }

@@ -19,7 +19,7 @@ if(Sys.info()[1]=="Windows") {
 shp <- commandArgs()[3]
 run_date <- commandArgs()[4]
 
-load('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_2017_09_13.RData')
+load('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_2017_08_30.RData')
 subset <- polydat[which(polydat$shapefile == shp),]
 shape_master <- shapefile(paste0('/home/j//WORK/11_geospatial/05_survey shapefile library/Shapefile directory/',shp,'.shp'))
 

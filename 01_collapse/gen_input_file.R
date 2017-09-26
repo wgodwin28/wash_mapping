@@ -1,7 +1,6 @@
 # Fix kenya iso3
-load('J:/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_2017_09_13.RData')
-library(dplyr)
-indi_fam <- 'water'
+load('J:/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_2017_09_06.RData')
+
 if (indi_fam == 'water') {
   w_piped <- ptdat
   w_piped <- dplyr::select(w_piped, -surface, -imp, -unimp)
@@ -35,5 +34,3 @@ if (indi_fam == 'water') {
   w_surface <- mutate(w_surface, N = round(N))
   write.csv(w_surface, 'J:/WORK/11_geospatial/10_mbg/input_data/w_surface.csv')
 }
-rm(list = ls())
-  
