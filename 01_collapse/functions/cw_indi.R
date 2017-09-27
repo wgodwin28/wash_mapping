@@ -55,7 +55,7 @@ cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level) {
     if (agg == 'country') {
       mydat <- mydat %>%
         mutate(unimp = unimp + latrine_unimp + latrine_cw*(1-ratio_lt),
-               imp = imp + latrine_imp + latrince_cw*(ratio_lt) %>%
+               imp = imp + latrine_imp + latrince_cw*(ratio_lt)) %>%
         dplyr::select(nid, iso3, survey_series, year_start, total_hh,
                piped, surface, imp, unimp)
     } else {
