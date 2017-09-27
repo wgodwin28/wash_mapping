@@ -50,10 +50,9 @@ cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level) {
      
       # sdg way
        mydat <- mydat %>%
-         mutate(unimp = bottled + bottled_sp*(1 - ratio_sp) + bottled_wl*(1 - ratio_wl) +
-                        spring_unimp + spring_cw*(1 - ratio_sp) + well_cw*(1 - ratio_wl) +
+         mutate(unimp = spring_unimp + spring_cw*(1 - ratio_sp) + well_cw*(1 - ratio_wl) +
                         well_unimp + unimp,
-                imp = bottled_sp*(ratio_sp) + bottled_wl*(ratio_wl) + well_imp + well_cw*(ratio_wl) +
+                imp = well_imp + well_cw*(ratio_wl) +
                       spring_cw*(ratio_sp) + spring_imp + imp) %>%
          dplyr::select(id_short, nid, iso3, lat, long, shapefile, location_code, survey_series, urban, year_start, total_hh,
                 piped, surface, imp, unimp)
