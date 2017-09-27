@@ -59,14 +59,14 @@ for (data_type in c("pt", "poly")){
   message('Loading Data...')
   # Load data
   if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_09_06.feather'))
+    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_09_26.feather'))
     Encoding(pt_collapse$w_source_drink) <- "windows-1252"
     Encoding(pt_collapse$w_source_other) <- "windows-1252"
     Encoding(pt_collapse$t_type) <- "windows-1252"
   } 
     
   if (!("poly_collapse" %in% ls()) & data_type == 'poly') {
-    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_09_06.feather'))
+    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_09_26.feather'))
     Encoding(pt_collapse$w_source_drink) <- "windows-1252"
     Encoding(pt_collapse$w_source_other) <- "windows-1252"
     Encoding(pt_collapse$t_type) <- "windows-1252"
@@ -154,10 +154,10 @@ for (data_type in c("pt", "poly")){
   if (data_type == "poly") {
     polydat <- ptdat
     rm(ptdat)
-    write_feather(polydat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_", agg_level, 
-                  '_', today, ".feather"))
+    write_feather(polydat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_", 
+                  indi_fam, '_' agg_level, '_', today, ".feather"))
   } else{
-    write_feather(ptdat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_", agg_level,
-                  '_', today, ".feather"))
+    write_feather(ptdat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_",
+                  indi_fam, '_' agg_level, '_', today, ".feather"))
   }
 }
