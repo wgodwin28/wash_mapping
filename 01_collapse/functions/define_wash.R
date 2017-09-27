@@ -1,14 +1,19 @@
 define_indi <- function(mydat = ptdat, var_family = indi_fam, define = definitions,
-                        define2 = definitions2,debug = F) {
+                        define2 = definitions2,debug = F, sdg_indi = sdg) {
   if (debug) {browser()}
   if (var_family == 'water') {
     # Rename string to indicator name to merge on and merge
     # definition file to mydatset
+    if (sdg_indi) {
+      define$sdg <- ifelse(define$jmp == 'basic' & define$sdg != 'imp', 'imp', define$sdg)
+    }
     define <- rename(define, w_source_drink = string) 
     mydat <- left_join(mydat, define, by = "w_source_drink")
     
-    define2 <- rename(define2, w_source_other = string) 
-    mydat <- left_join(mydat, define2, by = "w_source_other")
+    if (!sdg_indi) {
+      define2 <- rename(define2, w_source_other = string) 
+      mydat <- left_join(mydat, define2, by = "w_source_other")
+    }
   }  else {
     define <- rename(define, t_type = string) 
     mydat <- left_join(mydat, define, by = "t_type")
