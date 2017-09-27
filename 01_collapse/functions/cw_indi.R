@@ -61,7 +61,7 @@ cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level) {
     } else {
       mydat <- mydat %>%
            mutate(unimp = unimp + latrine_unimp + latrine_cw*(1-ratio_lt),
-                  imp = imp + latrine_imp + latrince_cw*(ratio_lt) %>%
+                  imp = imp + latrine_imp + latrince_cw*(ratio_lt)) %>%
            dplyr::select(id_short, nid, iso3, lat, long, shapefile, location_code, survey_series, urban, year_start, total_hh,
                   piped, surface, imp, unimp)
     }
