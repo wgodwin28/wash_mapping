@@ -6,7 +6,7 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
   }
   
   if (var_family == 'sani') {
-    levels <- levels <- c('imp', 'imp_cw','shared','unimp','od','latrine_cw','latrine_imp','latrine_unimp')
+    levels <- levels <- c('imp', 'unimp','od','latrine_cw','latrine_imp','latrine_unimp')
   }
   
   results <- list()
