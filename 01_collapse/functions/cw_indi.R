@@ -138,7 +138,7 @@ cw_indi_reg_time <- function(data = ptdat) {
   }
 
   message('Period: 00-04')
-  mydat <- filter(data, year_start <= 20004 & year_start >= 2000)
+  mydat <- filter(data, year_start <= 2004 & year_start >= 2000)
   if (nrow(mydat)>0) {
     results[[2]] <- cw_indi_reg(mydat)
   }

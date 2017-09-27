@@ -3,7 +3,7 @@
 
 cw <- function(data, debug = F, var_family = indi_fam) {
   
-  if (debug) {broswer()}
+  if (debug) {browser()}
   library(dplyr)
   
   # Remove all missing hh_size obs
