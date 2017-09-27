@@ -60,7 +60,7 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
   }
   
   message("Merging all results...")
-  mydat <- do.call(rbind, results)
+  mydat <- Reduce(function(x,y) merge(x,y,all = T),results)
   
   return(mydat)
   
