@@ -42,8 +42,14 @@ rm_miss <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level, dt_ty
 impute_indi <- function(mydat = ptdat, var_family = indi_fam) {
   
   if (var_family == 'water') {
-  levels <- c('piped', 'surface','imp','unimp','bottled','bottled_sp','bottled_wl','well_cw',
-             'well_imp','well_unimp','spring_cw','spring_imp','spring_unimp')
+
+  # mdg way  
+  #levels <- c('piped', 'surface','imp','unimp','bottled','bottled_sp','bottled_wl','well_cw',
+  #           'well_imp','well_unimp','spring_cw','spring_imp','spring_unimp')
+
+  # sdg way
+  levels <- c('piped', 'surface','imp','unimp','well_cw','well_imp','well_unimp',
+              'spring_cw','spring_imp','spring_unimp')
   }
   
   if (var_family == 'sani') {

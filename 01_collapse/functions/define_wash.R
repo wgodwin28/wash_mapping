@@ -27,14 +27,14 @@ define_indi <- function(mydat = ptdat, var_family = indi_fam, define = definitio
                    imp = ifelse(mydat$sdg == "imp", 1, ifelse(is.na(mydat$sdg), NA, 0)),
                    unimp = ifelse(mydat$sdg == "unimp", 1, ifelse(is.na(mydat$sdg), NA, 0)),
                    
-                   # Define bottled and bottled crosswalks
-                   bottled = ifelse(mydat$sdg == "bottled" &
-                                    !(mydat$sdg2 %in% c('imp','spring_imp','well_imp')), 1, 
-                                    ifelse(is.na(mydat$sdg), NA, 0)),
-                   bottled_sp = ifelse(mydat$sdg == "bottled" & mydat$sdg2 == 'spring_cw', 1, 
-                                       ifelse(is.na(mydat$sdg), NA, 0)),
-                   bottled_wl = ifelse(mydat$sdg == "bottled" & mydat$sdg2 == 'well_cw', 1, 
-                                       ifelse(is.na(mydat$sdg), NA, 0)),
+                   #Define bottled and bottled crosswalks (REMOVED DUE TO SDGs)
+                   #bottled = ifelse(mydat$sdg == "bottled" &
+                   #                 !(mydat$sdg2 %in% c('imp','spring_imp','well_imp')), 1, 
+                   #                 ifelse(is.na(mydat$sdg), NA, 0)),
+                   #bottled_sp = ifelse(mydat$sdg == "bottled" & mydat$sdg2 == 'spring_cw', 1, 
+                   #                    ifelse(is.na(mydat$sdg), NA, 0)),
+                   #bottled_wl = ifelse(mydat$sdg == "bottled" & mydat$sdg2 == 'well_cw', 1, 
+                   #                    ifelse(is.na(mydat$sdg), NA, 0)),
                    
                    # Define crosswalking indicators
                    well_cw = ifelse(mydat$sdg == "well_cw", 1, ifelse(is.na(mydat$sdg), NA, 0)),

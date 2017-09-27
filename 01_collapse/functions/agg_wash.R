@@ -1,8 +1,13 @@
 agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, agg = agg_level) {
   
   if (var_family == 'water') {
-  levels <- c('piped', 'surface','imp','unimp','bottled','bottled_sp','bottled_wl','well_cw',
-             'well_imp','well_unimp','spring_cw','spring_imp','spring_unimp')
+  # mdg methods
+  #levels <- c('piped', 'surface','imp','unimp','bottled','bottled_sp','bottled_wl','well_cw',
+  #           'well_imp','well_unimp','spring_cw','spring_imp','spring_unimp')
+
+  # sdg way
+  levels <- c('piped', 'surface','imp','unimp','well_cw','well_imp','well_unimp',
+              'spring_cw','spring_imp','spring_unimp')
   }
   
   if (var_family == 'sani') {
