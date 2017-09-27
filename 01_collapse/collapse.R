@@ -154,10 +154,10 @@ for (data_type in c("pt", "poly")){
   if (data_type == "poly") {
     polydat <- ptdat
     rm(ptdat)
-    write_feather(polydat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_", 
-                  indi_fam, '_' agg_level, '_', today, ".feather"))
+    write_feather(polydat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_",
+                  indi_fam, '_', agg_level, '_', today, ".feather"))
   } else{
     write_feather(ptdat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_",
-                  indi_fam, '_' agg_level, '_', today, ".feather"))
+                  indi_fam, '_', agg_level, '_', today, ".feather"))
   }
 }
