@@ -3,10 +3,10 @@
 rm(list = ls())
 
 # Define indicator family; can be water, sani, or hw
-indi_fam <- "water"
+indi_fam <- "sani"
 
 # Define agg level; can be country or '' [use '' for default]
-agg_level <- ''
+agg_level <- 'country'
 
 # Define indicator era
 sdg <- F
@@ -59,20 +59,17 @@ for (data_type in c("pt", "poly")){
   message('Loading Data...')
   # Load data
   if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_09_06.Rdata'))
+    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_09_06.feather'))
     Encoding(pt_collapse$w_source_drink) <- "windows-1252"
     Encoding(pt_collapse$w_source_other) <- "windows-1252"
     Encoding(pt_collapse$t_type) <- "windows-1252"
-    pt_collapse <- get(name)
   } 
     
   if (!("poly_collapse" %in% ls()) & data_type == 'poly') {
-    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_09_06.Rdata'))
-    Encoding(poly_collapse$w_source_drink) <- "windows-1252"
-    Encoding(poly_collapse$w_source_other) <- "windows-1252"
-    Encoding(poly_collapse$t_type) <- "windows-1252"
-    pt_collapse <- get(name)
-    rm(poly_collapse)
+    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_09_06.feather'))
+    Encoding(pt_collapse$w_source_drink) <- "windows-1252"
+    Encoding(pt_collapse$w_source_other) <- "windows-1252"
+    Encoding(pt_collapse$t_type) <- "windows-1252"
   }
 
   message('Loading Definitions...')
@@ -98,6 +95,7 @@ for (data_type in c("pt", "poly")){
   message("Importing functions...")
   #### Load functions ####
   setwd(repo)
+  source('functions/initial_cleaning.R')
   source('functions/hh_cw.R')
   source('functions/address_missing.R')
   source('functions/cw_indi.R')
@@ -106,39 +104,8 @@ for (data_type in c("pt", "poly")){
 
   #### Subset & Shape Data ####
   message("Initial Cleaning...")
-  # Subset to relevant variables
-  ptdat_0 <- dplyr::select(pt_collapse, nid, iso3, lat, long, survey_series, hhweight, urban, w_source_drink, w_source_other,
-                           hh_size, year_start,hhweight,shapefile,location_code)
-
-  problem_list <- filter(ptdat_0, hh_size <= 0)
-  #setwd('C:/Users/adesh/Desktop')
-  #write.csv(problem_list %>% group_by(nid, iso3, survey_series, year_start) %>% summarize(obs = n(), min_hhs = min(hh_size)),
-  #          file = paste0(data_type,"_problems.csv"))
-  setwd(repo)
-
-  # Create a unique cluster id
-  if (data_type == 'pt') {
-    ptdat <- mutate(ptdat_0, cluster_id = paste(iso3, lat, long, nid, year_start, sep = "_"))
-  } else {
-    ptdat <- mutate(ptdat_0, cluster_id = paste(iso3, shapefile, location_code, nid, year_start, sep = "_"))  
-  }
-
-  # Create a table which assigns numbers to unique IDs and merge it back to data to have shorter
-  # unique IDs
-  short_id <- data.frame(cluster_id = unique(ptdat$cluster_id), 
-                         id_short = seq(1:length(unique(ptdat$cluster_id))),
-                         stringsAsFactors = F)
-  ptdat <- left_join(ptdat, short_id, by = 'cluster_id')
-  rm(short_id)
-
-  # Remove longer cluster_ids
-  ptdat <- dplyr::select(ptdat, -cluster_id)
-
-  # Change weight to 1 if collapsing point data
-  if (data_type == "pt" & agg_level != 'country') {ptdat$hhweight <- 1}
-
-  # Change shapefile and location code to missing if collapsing point data
-  if (data_type == "pt") {ptdat$shapefile <- NA; ptdat$location_code <- NA}
+  temp_list <- initial_cleaning()
+  ptdat <- temp_list[[1]]; ptdat_0 <- temp_list[[2]]; rm(temp_list)
 
   #### Define Indicator ####
   message("Defining Indicator...")
@@ -187,10 +154,10 @@ for (data_type in c("pt", "poly")){
   if (data_type == "poly") {
     polydat <- ptdat
     rm(ptdat)
-    write_feather(polydat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_", agg_level,
-                  today, ".feather"))
+    write_feather(polydat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_", agg_level, 
+                  '_', today, ".feather"))
   } else{
     write_feather(ptdat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_", agg_level,
-                  today, ".feather"))
+                  '_', today, ".feather"))
   }
 }

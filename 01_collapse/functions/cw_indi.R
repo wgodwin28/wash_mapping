@@ -2,34 +2,33 @@ cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level) {
   if (var_family == 'water') {
   
     attach(mydat)
-    if ((mean(spring_imp, na.rm = T) + mean(spring_unimp, na.rm = T)) == 0) {
-      mydat$spring_cw <- 0
-      ratio_sp <- 1
-    } else {
-      ratio_sp <- mean(spring_imp, na.rm = T)/(mean(spring_imp, na.rm = T) + mean(spring_unimp, na.rm = T))
-    }
-    
-    if ((mean(well_imp, na.rm = T) + mean(well_unimp, na.rm = T)) == 0) {
-      mydat$well_cw <- 0
-      ratio_wl <- 1
-    } else {
-      ratio_wl <- mean(well_imp, na.rm = T)/(mean(well_imp, na.rm = T) + mean(well_unimp, na.rm = T)) 
-    }
+      if ((mean(spring_imp, na.rm = T) + mean(spring_unimp, na.rm = T)) == 0) {
+        mydat$spring_cw <- 0
+        ratio_sp <- 1
+      } else {
+        ratio_sp <- mean(spring_imp, na.rm = T)/(mean(spring_imp, na.rm = T) + mean(spring_unimp, na.rm = T))
+      }
+      
+      if ((mean(well_imp, na.rm = T) + mean(well_unimp, na.rm = T)) == 0) {
+        mydat$well_cw <- 0
+        ratio_wl <- 1
+      } else {
+        ratio_wl <- mean(well_imp, na.rm = T)/(mean(well_imp, na.rm = T) + mean(well_unimp, na.rm = T)) 
+      }
     detach(mydat)
   
-  if (agg == 'country') {
-    mydat <- mydat %>%
-      mutate(unimp = bottled + bottled_sp*(1 - ratio_sp) + bottled_wl*(1 - ratio_wl) +
-               spring_unimp + spring_cw*(1 - ratio_sp) + well_cw*(1 - ratio_wl) +
-               well_unimp + unimp,
-             imp = bottled_sp*(ratio_sp) + bottled_wl*(ratio_wl) + well_imp + well_cw*(ratio_wl) +
-               spring_cw*(ratio_sp) + spring_imp + imp) %>%
-      dplyr::select(nid, iso3, survey_series, year_start, total_hh,
-             piped, surface, imp, unimp)
-  } else {
+    if (agg == 'country') {
+      mydat <- mydat %>%
+        mutate(unimp = bottled + bottled_sp*(1 - ratio_sp) + bottled_wl*(1 - ratio_wl) +
+                 spring_unimp + spring_cw*(1 - ratio_sp) + well_cw*(1 - ratio_wl) +
+                 well_unimp + unimp,
+               imp = bottled_sp*(ratio_sp) + bottled_wl*(ratio_wl) + well_imp + well_cw*(ratio_wl) +
+                 spring_cw*(ratio_sp) + spring_imp + imp) %>%
+        dplyr::select(nid, iso3, survey_series, year_start, total_hh,
+               piped, surface, imp, unimp)
+    } else {
   
-  
-  mydat <- mydat %>%
+      mydat <- mydat %>%
            mutate(unimp = bottled + bottled_sp*(1 - ratio_sp) + bottled_wl*(1 - ratio_wl) +
                           spring_unimp + spring_cw*(1 - ratio_sp) + well_cw*(1 - ratio_wl) +
                           well_unimp + unimp,
@@ -37,10 +36,37 @@ cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level) {
                         spring_cw*(ratio_sp) + spring_imp + imp) %>%
            dplyr::select(id_short, nid, iso3, lat, long, shapefile, location_code, survey_series, urban, year_start, total_hh,
                   piped, surface, imp, unimp)
+    }
+    return(mydat)
+  } 
+
+  if (var_family == 'sani') {
+
+    attach(mydat)
+      if ((mean(latrine_imp, na.rm = T) + mean(latrine_unimp, na.rm = T)) == 0) {
+          mydat$latrine_cw <- 0
+          ratio_lt <- 1
+        } else {
+          ratio_lt <- mean(latrine_imp, na.rm = T)/(mean(latrine_imp, na.rm = T) + mean(latrine_unimp, na.rm = T))
+        }
+
+    detach(mydat)
+
+    if (agg == 'country') {
+      mydat <- mydat %>%
+        mutate(unimp = unimp + latrine_unimp + latrine_cw*(1-ratio_lt),
+               imp = imp + latrine_imp + latrince_cw*(ratio_lt) %>%
+        dplyr::select(nid, iso3, survey_series, year_start, total_hh,
+               piped, surface, imp, unimp)
+    } else {
+      mydat <- mydat %>%
+           mutate(unimp = unimp + latrine_unimp + latrine_cw*(1-ratio_lt),
+                  imp = imp + latrine_imp + latrince_cw*(ratio_lt) %>%
+           dplyr::select(id_short, nid, iso3, lat, long, shapefile, location_code, survey_series, urban, year_start, total_hh,
+                  piped, surface, imp, unimp)
+    }
   }
-  return(mydat)
-  
-  } else {message("Other indicator families coming soon...")}
+  else {message("Other indicator families coming soon...")}
   
   
 }
