@@ -44,8 +44,10 @@ define_indi <- function(mydat = ptdat, var_family = indi_fam, define = definitio
                    spring_cw = ifelse(mydat$sdg == "spring_cw", 1, ifelse(is.na(mydat$sdg), NA, 0)),
                    spring_imp = ifelse(mydat$sdg == "spring_imp", 1, ifelse(is.na(mydat$sdg), NA, 0)),
                    spring_unimp = ifelse(mydat$sdg == "spring_unimp", 1, ifelse(is.na(mydat$sdg), NA, 0)))
-    mydat <- mutate(mydat, imp = ifelse(mydat$imp == 1 | (mydat$sdg == "bottled" & (mydat$sdg2 %in% c('imp','spring_imp','well_imp'))),
-                                 1, ifelse(is.na(mydat$sdg), NA, 0)))
+    
+    # relic of mdg era
+    #mydat <- mutate(mydat, imp = ifelse(mydat$imp == 1 | (mydat$sdg == "bottled" & (mydat$sdg2 %in% c('imp','spring_imp','well_imp'))),
+    #                             1, ifelse(is.na(mydat$sdg), NA, 0)))
   }
   
   if (var_family == 'hw') {
