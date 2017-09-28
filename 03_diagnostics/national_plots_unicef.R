@@ -4,19 +4,19 @@ library(feather)
 library(dplyr)
 library(ggplot2)
 
-ptdat <- read_feather('ptdat_sani_country_2017_09_27.feather')
+ptdat <- read_feather('ptdat_sani_country_2017_09_28.feather')
 ptdat$point <- 'pt'
-polydat <- read_feather('polydat_sani_country_2017_09_27.feather')
+polydat <- read_feather('polydat_sani_country_2017_09_28.feather')
 polydat$point <- 'poly'
 alldat <- rbind(ptdat, polydat)
 
-unicef <- read.csv('/home/j/WORK/11_geospatial/wash/unicef/unicef_data.csv',
-				   stringsAsFactors = F)
-unicef$year <- as.numeric(unicef$year)
-unicef$piped <- as.numeric(unicef$piped)
-unicef$piped <- (unicef$piped)/100
-unicef$improved <- as.numeric(unicef$improved)
-unicef$improved <- (unicef$improved)/100
+#unicef <- read.csv('/home/j/WORK/11_geospatial/wash/unicef/unicef_data.csv',
+#				   stringsAsFactors = F)
+#unicef$year <- as.numeric(unicef$year)
+#unicef$piped <- as.numeric(unicef$piped)
+#unicef$piped <- (unicef$piped)/100
+#unicef$improved <- as.numeric(unicef$improved)
+#unicef$improved <- (unicef$improved)/100
 
 sssa_hi <- c('NAM','BWA','ZAF')
 cssa <- c('CAF','GAB','GNQ','COD','COG','AGO','STP')
@@ -31,10 +31,12 @@ wssa <- c('CPV','SEN','GMB','GIN','GNB','SLE','MLI','LBR',
 africa <- c(sssa_hi, cssa, name_hi, essa_hilo)
 
 pdf('/home/adesh/Documents/wash_dx.pdf')
-for (i in 'ZAF') {
+for (i in africa) {
 	message(i)
+	plotdat <- filter(alldat, iso3 == i)
+	if (nrow(plotdat) > 0) {
 	print(
-		ggplot(filter(alldat, iso3 == i)) + 
+		ggplot(plotdat) + 
 			geom_point(aes(x = year_start, y = imp, shape = point, size = total_hh,
 						   col = 'MBG Imp')) +
 			geom_smooth(aes(x = year_start, y = imp, col = 'MBG imp', weight = total_hh),
@@ -49,5 +51,6 @@ for (i in 'ZAF') {
 			ggtitle(i) + ylim(0,1) + xlim(1998,2015) + 
 			xlab('Year') + ylab('Prevalence') + theme_bw()
 		)
+	}
 }
 dev.off()

@@ -1,4 +1,5 @@
-agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, agg = agg_level) {
+agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, agg = agg_level,
+                     condition = conditional) {
   
   if (var_family == 'water') {
   # mdg methods
@@ -15,16 +16,17 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
   }
   
   if (var_family == 'hw') {
+    if (condition == 'conditional') {
+      levels <- c('hw_station', 'hw_unimp','hw_basic')
+      mydat <- filter(mydat, hw_station != 0)
+    }
     levels <- c('hw_station','hw_unimp','hw_basic')
   }
 
+  mydat_0 <- mydat
   results <- list()
   for (i in levels) {
-    
-    # Subsetting data for hw_basic and hw_unimp to include obs with hw_stations
-    if (i %in% c('hw_basic','hw_unimp')) {
-      mydat <- filter(mydat, hw_station != 0)
-    }
+    mydat <- mydat_0
 
     message(paste("Aggregating",i))
     names(mydat)[which(names(mydat) == i)] <- 'indi'
@@ -79,7 +81,7 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
   }
   
   message("Merging all results...")
-  mydat <- Reduce(function(x,y) merge(x,y,all = T),results)
+  mydat2 <- Reduce(function(x,y) merge(x,y,all = T),results)
   
   return(mydat)
   

@@ -45,7 +45,7 @@ if(length(new.packages)) install.packages(new.packages)
 lapply(packages, library, character.only = T)
 
 #### Load functions ####
-for (data_type in c("pt", "poly")){
+for (data_type in c("pt")){
   message(paste("Loading",data_type, "data"))
   rm(pt_collapse)
   message('Loading Data...')
@@ -70,12 +70,15 @@ for (data_type in c("pt", "poly")){
     pt_collapse$t_type <- tolower(pt_collapse$t_type)
   }
 
-  for (indi_fam in c('water','sani')) {
+  for (indi_fam in c('hw')) {
     rm(definitions)
-    
-    for (agg_level in c('','country')) {
+
+    for (agg_level in c('country')) {
       message(paste("Collapsing",indi_fam, "with", agg_level, "agg_level"))
 
+      for (conditional in c('unconditional','conditional')) {
+        message(paste("Conditional variables status:",conditional))
+      }
       message('Loading Definitions...')
       if (!("definitions" %in% ls())) {
         if (indi_fam == "sani") {
@@ -162,10 +165,10 @@ for (data_type in c("pt", "poly")){
         polydat <- ptdat
         rm(ptdat)
         write_feather(polydat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_",
-                      indi_fam, '_', agg_level, '_', today, ".feather"))
+                      indi_fam, '_', conditional, '_', agg_level, agg_level, '_', today, ".feather"))
       } else{
         write_feather(ptdat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_",
-                      indi_fam, '_', agg_level, '_', today, ".feather"))
+                      indi_fam, '_', conditional, '_', agg_level, '_', today, ".feather"))
       }
     }
   }
