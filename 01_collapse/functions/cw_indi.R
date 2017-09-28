@@ -1,6 +1,7 @@
 cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level) {
   if (var_family == 'hw') {
     message('No indi to CW!')
+    return(mydat)
   }
 
   if (var_family == 'water') {
@@ -91,7 +92,7 @@ cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level) {
     }
   }
 }
-  
+
 
 cw_indi_reg <- function(data, var_family = indi_fam) {
 
