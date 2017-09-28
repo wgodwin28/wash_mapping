@@ -3,7 +3,7 @@ define_indi <- function(mydat = ptdat, var_family = indi_fam, define = definitio
   if (debug) {browser()}
   
   if (var_family == 'hw') {
-    message('Nothing to defin! HW is numeric!')
+    message('Nothing to define! HW is numeric!')
   }
 
   if (var_family == 'water') {
