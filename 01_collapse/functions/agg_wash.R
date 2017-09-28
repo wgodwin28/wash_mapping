@@ -22,7 +22,7 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
   for (i in levels) {
     
     # Subsetting data for hw_basic and hw_unimp to include obs with hw_stations
-    if (i %in% c('hw_basic','hw_unimp') {
+    if (i %in% c('hw_basic','hw_unimp')) {
       mydat <- filter(mydat, hw_station != 0)
     }
 
