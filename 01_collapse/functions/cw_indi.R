@@ -90,10 +90,8 @@ cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level) {
                   imp, unimp, od)
     }
   }
-  else {message("Other indicator families coming soon...")}
-  
-  
 }
+  
 
 cw_indi_reg <- function(data, var_family = indi_fam) {
 

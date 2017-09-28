@@ -5,7 +5,7 @@ define_indi <- function(mydat = ptdat, var_family = indi_fam, define = definitio
   if (var_family == 'hw') {
     message('Nothing to defin! HW is numeric!')
   }
-  
+
   if (var_family == 'water') {
     # Rename string to indicator name to merge on and merge
     # definition file to mydatset
@@ -19,7 +19,9 @@ define_indi <- function(mydat = ptdat, var_family = indi_fam, define = definitio
       define2 <- rename(define2, w_source_other = string) 
       mydat <- left_join(mydat, define2, by = "w_source_other")
     }
-  }  else {
+  }  
+
+  if (var_family == 'sani') {
     define <- rename(define, t_type = string) 
     mydat <- left_join(mydat, define, by = "t_type")
   }
