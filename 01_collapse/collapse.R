@@ -71,12 +71,12 @@ for (data_type in c("pt", "poly")){
       message('Loading Definitions...')
       if (!("definitions" %in% ls())) {
         if (indi_fam == "sani") {
-          definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_09_07.csv'),
+          definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_09_27.csv'),
                                   encoding="windows-1252", stringsAsFactors = F)
         } else {
-          definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_09_07.csv'),
+          definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_09_27.csv'),
                                   encoding="windows-1252", stringsAsFactors = F) 
-          definitions2 <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_other_defined_updated_2017_09_07.csv'),
+          definitions2 <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_other_defined_updated_2017_09_27.csv'),
                                    encoding="windows-1252", stringsAsFactors = F)
           definitions2 <- rename(definitions2, sdg2 = sdg)
         }
@@ -137,9 +137,8 @@ for (data_type in c("pt", "poly")){
       ptdat <- cw_indi_reg_time(data = ptdat)
 
       # create sdg improved for sdg era
-      if (sdg) {
-        ptdat$sdg_imp <- ptdat$piped + ptdat$imp
-      }
+      ptdat$sdg_imp <- ptdat$piped + ptdat$imp
+      
 
       #save poly and point collapses
       message("Saving Collapsed Data...")
