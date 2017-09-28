@@ -58,16 +58,16 @@ define_indi <- function(mydat = ptdat, var_family = indi_fam, define = definitio
   }
   
   if (var_family == 'hw') {
-    mutate(hw_unimp = ifelse(is.na(hw_soap) & is.na(hw_water), NA,
-            ifelse((is.na(hw_soap)|is.na(hw_water)),
-              ifelse(hw_soap == 1|hw_water == 1, 1, NA),
-              ifelse(hw_soap == 1|hw_water == 1, 1, 0)
+    mutate(hw_unimp = ifelse(is.na(mydat$hw_soap) & is.na(mydat$hw_water), NA,
+            ifelse((is.na(mydat$hw_soap)|is.na(mydat$hw_water)),
+              ifelse(mydat$hw_soap == 1|mydat$hw_water == 1, 1, NA),
+              ifelse(mydat$hw_soap == 1|mydat$hw_water == 1, 1, 0)
               )
             ),
-           hw_basic = ifelse(is.na(hw_soap) & is.na(hw_water), NA,
-            ifelse((is.na(hw_soap)|is.na(hw_water)),
-              ifelse(hw_soap == 0|hw_water == 0, 0, NA),
-              ifelse(hw_soap == 0|hw_water == 0, 0, 1)
+           hw_basic = ifelse(is.na(mydat$hw_soap) & is.na(mydat$hw_water), NA,
+            ifelse((is.na(mydat$hw_soap)|is.na(mydat$hw_water)),
+              ifelse(mydat$hw_soap == 0|mydat$hw_water == 0, 0, NA),
+              ifelse(mydat$hw_soap == 0|mydat$hw_water == 0, 0, 1)
               )
             ))
   }
