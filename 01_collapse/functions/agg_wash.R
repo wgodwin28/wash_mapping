@@ -19,8 +19,9 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
     if (condition == 'conditional') {
       levels <- c('hw_unimp','hw_basic')
       mydat <- filter(mydat, hw_station != 0)
+    } else {
+      levels <- c('hw_station')
     }
-    levels <- c('hw_station')
   }
 
   mydat_0 <- mydat
@@ -85,4 +86,4 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
   
   return(mydat)
 }
-  
+
