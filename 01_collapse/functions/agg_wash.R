@@ -17,10 +17,10 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
   
   if (var_family == 'hw') {
     if (condition == 'conditional') {
-      levels <- c('hw_station', 'hw_unimp','hw_basic')
+      levels <- c('hw_unimp','hw_basic')
       mydat <- filter(mydat, hw_station != 0)
     }
-    levels <- c('hw_station','hw_unimp','hw_basic')
+    levels <- c('hw_station')
   }
 
   mydat_0 <- mydat
@@ -81,8 +81,8 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
   }
   
   message("Merging all results...")
-  mydat2 <- Reduce(function(x,y) merge(x,y,all = T),results)
+  mydat <- Reduce(function(x,y) merge(x,y,all = T),results)
   
   return(mydat)
-  
 }
+  
