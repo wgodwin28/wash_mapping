@@ -8,6 +8,10 @@ rm_miss <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level, dt_ty
   if (var_family == 'sani') {
     mydat <- rename(mydat, indi = od)
   }
+
+  if (var_family == 'hw') {
+    mydat <- rename(mydat, indi = hw_station)
+  }
   
   # Calculate data missingness by cluster
   missing <- mutate(mydat, miss = ifelse(is.na(mydat$indi), 1, 0))
@@ -56,6 +60,10 @@ impute_indi <- function(mydat = ptdat, var_family = indi_fam) {
     levels <- c('imp','unimp','od','latrine_cw','latrine_imp','latrine_unimp')
   }
   
+  if (var_family == 'hw') {
+    levels <- c('hw_station','hw_unimp','hw_basic')
+  }
+
   for (i in levels) {
     message(paste("Imputing",i))
     names(mydat)[which(names(mydat) == i)] <- 'indi'

@@ -51,14 +51,18 @@ define_indi <- function(mydat = ptdat, var_family = indi_fam, define = definitio
   }
   
   if (var_family == 'hw') {
-    mutate(st_so = ifelse(ptdat$hw_soap == 1 & ptdat$hw_station == 1, 1,
-            ifelse(is.na(ptdat$hw_soap)|is.na(ptdat$hw_station), NA, 0)),
-           st_wa = ifelse(ptdat$hw_water == 1 & ptdat$hw_station == 1, 1,
-            ifelse(is.na(ptdat$hw_water)|is.na(ptdat$hw_station), NA, 0)),
-           so_wa = ifelse(ptdat$hw_soap == 1 & ptdat$hw_water == 1, 1,
-            ifelse(is.na(ptdat$hw_soap)|is.na(ptdat$hw_water), NA, 0)),
-           st_wa_so = ifelse(ptdat$hw_soap == 1 & ptdat$hw_station == 1 & ptdat$hw_water == 1, 1,
-            ifelse(is.na(ptdat$hw_soap)|is.na(ptdat$hw_station)|is.na(ptdat$hw_water), NA, 0)))
+    mutate(hw_unimp = ifelse(is.na(hw_soap) & is.na(hw_water), NA,
+            ifelse((is.na(hw_soap)|is.na(hw_water)),
+              ifelse(hw_soap == 1|hw_water == 1, 1, NA),
+              ifelse(hw_soap == 1|hw_water == 1, 1, 0)
+              )
+            ),
+           hw_basic = ifelse(is.na(hw_soap) & is.na(hw_water), NA,
+            ifelse((is.na(hw_soap)|is.na(hw_water)),
+              ifelse(hw_soap == 0|hw_water == 0, 0, NA),
+              ifelse(hw_soap == 0|hw_water == 0, 0, 1)
+              )
+            ))
   }
   
   if (var_family == 'sani') {

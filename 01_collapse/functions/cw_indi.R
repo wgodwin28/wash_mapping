@@ -1,4 +1,8 @@
 cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level) {
+  if (var_family == 'hw') {
+    message('No indi to CW!')
+  }
+
   if (var_family == 'water') {
   
     attach(mydat)

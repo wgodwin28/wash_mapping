@@ -71,6 +71,8 @@ for (data_type in c("pt", "poly")){
   }
 
   for (indi_fam in c('water','sani')) {
+    rm(definitions)
+    
     for (agg_level in c('','country')) {
       message(paste("Collapsing",indi_fam, "with", agg_level, "agg_level"))
 

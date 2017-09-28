@@ -11,11 +11,21 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
   }
   
   if (var_family == 'sani') {
-    levels <- levels <- c('imp', 'unimp','od','latrine_cw','latrine_imp','latrine_unimp')
+    levels <- c('imp', 'unimp','od','latrine_cw','latrine_imp','latrine_unimp')
   }
   
+  if (var_family == 'hw') {
+    levels <- c('hw_station','hw_unimp','hw_basic')
+  }
+
   results <- list()
   for (i in levels) {
+    
+    # Subsetting data for hw_basic and hw_unimp to include obs with hw_stations
+    if (i %in% c('hw_basic','hw_unimp') {
+      mydat <- filter(mydat, hw_station != 0)
+    }
+
     message(paste("Aggregating",i))
     names(mydat)[which(names(mydat) == i)] <- 'indi'
     
