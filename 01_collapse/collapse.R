@@ -45,7 +45,7 @@ if(length(new.packages)) install.packages(new.packages)
 lapply(packages, library, character.only = T)
 
 #### Load functions ####
-for (data_type in c("pt")){
+for (data_type in c("pt","poly")){
   message(paste("Loading",data_type, "data"))
   rm(pt_collapse)
   message('Loading Data...')
@@ -73,79 +73,78 @@ for (data_type in c("pt")){
   for (indi_fam in c('hw')) {
     rm(definitions)
 
-    for (agg_level in c('country')) {
+    for (agg_level in c('country','')) {
       message(paste("Collapsing",indi_fam, "with", agg_level, "agg_level"))
+      message('Loading Definitions...')
+      if (!("definitions" %in% ls())) {
+        if (indi_fam == "sani") {
+          definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_09_27.csv'),
+                                  encoding="windows-1252", stringsAsFactors = F)
+        } else {
+          definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_09_27.csv'),
+                                  encoding="windows-1252", stringsAsFactors = F) 
+          definitions2 <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_other_defined_updated_2017_09_27.csv'),
+                                   encoding="windows-1252", stringsAsFactors = F)
+          definitions2 <- rename(definitions2, sdg2 = sdg)
+        }
+      }
 
-      for (conditional in c('unconditional','conditional')) {
+      definitions$string <- iconv(definitions$string, 'windows-1252', 'UTF-8')
+      definitions$string <- tolower(definitions$string)
+      definitions <- distinct(definitions)
+      
+      if (exists('definitions2')) {
+        definitions2$string <- iconv(definitions2$string, 'windows-1252', 'UTF-8')
+        definitions2$string <- tolower(definitions2$string)
+        definitions2 <- distinct(definitions2)
+      }
+
+      rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam',
+        'repo','data_type','root','agg_level', 'sdg','conditional')))
+
+      message("Importing functions...")
+      setwd(repo)
+      source('functions/initial_cleaning.R')
+      source('functions/hh_cw.R')
+      source('functions/address_missing.R')
+      source('functions/cw_indi.R')
+      source('functions/agg_wash.R')
+      source('functions/define_wash.R')
+
+      #### Subset & Shape Data ####
+      message("Initial Cleaning...")
+      temp_list <- initial_cleaning()
+      ptdat <- temp_list[[1]]; ptdat_0 <- temp_list[[2]]; rm(temp_list)
+
+      #### Define Indicator ####
+      message("Defining Indicator...")
+      ptdat <- define_indi(sdg_indi = T)
+
+      #### Address Missingness ####
+      message("Addressing Missingness...")
+      
+      # Remove clusters with more than 20% weighted missingness
+      ptdat <- rm_miss()
+
+      # Remove cluster_ids with missing hhweight or invalid hhs
+      miss_wts <- unique(ptdat$id_short[which(is.na(ptdat$hhweight))])
+      ptdat <- filter(ptdat, !(id_short %in% miss_wts))
+
+      invalid_hhs <- unique(ptdat$id_short[which(ptdat$hh_size <= 0)])
+      ptdat <- filter(ptdat, !(id_short %in% invalid_hhs))
+
+      # Crosswalk missing household size data
+      message("Crosswalking HH Sizes...")
+      ptdat <- hh_cw_reg(data = ptdat)
+
+      # Calculated household size weighted means for all clusters
+      # Assign observations with NA indicator value the weighted average for the cluster
+      message("Imputing indicator...")
+      ptdat <- impute_indi_reg_time(data = ptdat)
+
+      #### Aggregate Data ####
+      for (conditional in c('conditional','unconditional')) {
         message(paste("Conditional variables status:",conditional))
-        message('Loading Definitions...')
-        if (!("definitions" %in% ls())) {
-          if (indi_fam == "sani") {
-            definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_09_27.csv'),
-                                    encoding="windows-1252", stringsAsFactors = F)
-          } else {
-            definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_09_27.csv'),
-                                    encoding="windows-1252", stringsAsFactors = F) 
-            definitions2 <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_other_defined_updated_2017_09_27.csv'),
-                                     encoding="windows-1252", stringsAsFactors = F)
-            definitions2 <- rename(definitions2, sdg2 = sdg)
-          }
-        }
-
-        definitions$string <- iconv(definitions$string, 'windows-1252', 'UTF-8')
-        definitions$string <- tolower(definitions$string)
-        definitions <- distinct(definitions)
-        
-        if (exists('definitions2')) {
-          definitions2$string <- iconv(definitions2$string, 'windows-1252', 'UTF-8')
-          definitions2$string <- tolower(definitions2$string)
-          definitions2 <- distinct(definitions2)
-        }
-
-        rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam',
-          'repo','data_type','root','agg_level', 'sdg','conditional')))
-
-        message("Importing functions...")
-        setwd(repo)
-        source('functions/initial_cleaning.R')
-        source('functions/hh_cw.R')
-        source('functions/address_missing.R')
-        source('functions/cw_indi.R')
-        source('functions/agg_wash.R')
-        source('functions/define_wash.R')
-
-        #### Subset & Shape Data ####
-        message("Initial Cleaning...")
-        temp_list <- initial_cleaning()
-        ptdat <- temp_list[[1]]; ptdat_0 <- temp_list[[2]]; rm(temp_list)
-
-        #### Define Indicator ####
-        message("Defining Indicator...")
-        ptdat <- define_indi(sdg_indi = T)
-
-        #### Address Missingness ####
-        message("Addressing Missingness...")
-        
-        # Remove clusters with more than 20% weighted missingness
-        ptdat <- rm_miss()
-
-        # Remove cluster_ids with missing hhweight or invalid hhs
-        miss_wts <- unique(ptdat$id_short[which(is.na(ptdat$hhweight))])
-        ptdat <- filter(ptdat, !(id_short %in% miss_wts))
-
-        invalid_hhs <- unique(ptdat$id_short[which(ptdat$hh_size <= 0)])
-        ptdat <- filter(ptdat, !(id_short %in% invalid_hhs))
-
-        # Crosswalk missing household size data
-        message("Crosswalking HH Sizes...")
-        ptdat <- hh_cw_reg(data = ptdat)
-
-        # Calculated household size weighted means for all clusters
-        # Assign observations with NA indicator value the weighted average for the cluster
-        message("Imputing indicator...")
-        ptdat <- impute_indi_reg_time(data = ptdat)
-
-        #### Aggregate Data ####
         # Aggregate indicator to cluster level
         message("Aggregating Data...")
         ptdat <- agg_indi()
