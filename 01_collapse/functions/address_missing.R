@@ -39,7 +39,7 @@ rm_miss <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level, dt_ty
     mydat <- rename(mydat, od = indi)
   }
  
-  if (var_family == 'sani') {
+  if (var_family == 'hw') {
     mydat <- rename(mydat, hw_station = indi)
   }
   return(mydat)

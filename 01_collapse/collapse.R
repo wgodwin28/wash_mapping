@@ -70,7 +70,7 @@ for (data_type in c("pt","poly")){
     pt_collapse$t_type <- tolower(pt_collapse$t_type)
   }
 
-  for (indi_fam in c('hw')) {
+  for (indi_fam in c('water','sani','hw')) {
     rm(definitions)
 
     for (agg_level in c('country','')) {
@@ -78,12 +78,12 @@ for (data_type in c("pt","poly")){
       message('Loading Definitions...')
       if (!("definitions" %in% ls())) {
         if (indi_fam == "sani") {
-          definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_09_27.csv'),
+          definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_09_28.csv'),
                                   encoding="windows-1252", stringsAsFactors = F)
         } else {
-          definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_09_27.csv'),
+          definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_09_28.csv'),
                                   encoding="windows-1252", stringsAsFactors = F) 
-          definitions2 <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_other_defined_updated_2017_09_27.csv'),
+          definitions2 <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_other_defined_updated_2017_09_28.csv'),
                                    encoding="windows-1252", stringsAsFactors = F)
           definitions2 <- rename(definitions2, sdg2 = sdg)
         }
@@ -143,7 +143,13 @@ for (data_type in c("pt","poly")){
       ptdat <- impute_indi_reg_time(data = ptdat)
 
       #### Aggregate Data ####
+      # Bookmarking dataset so it can be looped over for conditional switch
+      ptdat_preagg <- ptdat
+      
+      # Conditional switch is to switch collapsing for conditional vs unconditional indicators
       for (conditional in c('conditional','unconditional')) {
+        # Reseting the dataset to preagregate
+        ptdat <- ptdat_preagg
         message(paste("Conditional variables status:",conditional))
         # Aggregate indicator to cluster level
         message("Aggregating Data...")
@@ -164,7 +170,7 @@ for (data_type in c("pt","poly")){
           polydat <- ptdat
           rm(ptdat)
           write_feather(polydat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_",
-                        indi_fam, '_', conditional, '_', agg_level, agg_level, '_', today, ".feather"))
+                        indi_fam, '_', conditional, '_', agg_level, '_', today, ".feather"))
         } else{
           write_feather(ptdat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_",
                         indi_fam, '_', conditional, '_', agg_level, '_', today, ".feather"))
