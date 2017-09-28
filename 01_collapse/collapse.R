@@ -52,16 +52,22 @@ for (data_type in c("pt", "poly")){
   # Load data
   if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
     pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_09_26.feather'))
-    Encoding(pt_collapse$w_source_drink) <- "windows-1252"
-    Encoding(pt_collapse$w_source_other) <- "windows-1252"
-    Encoding(pt_collapse$t_type) <- "windows-1252"
+    Encoding(pt_collapse$w_source_drink) <- "UTF-8"
+    Encoding(pt_collapse$w_source_other) <- "UTF-8"
+    Encoding(pt_collapse$t_type) <- "UTF-8"
+    pt_collapse$w_source_drink <- tolower(pt_collapse$w_source_drink)
+    pt_collapse$w_source_other <- tolower(pt_collapse$w_source_other)
+    pt_collapse$t_type <- tolower(pt_collapse$t_type)
   } 
     
   if (!("pt_collapse" %in% ls()) & data_type == 'poly') {
     pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_09_26.feather'))
-    Encoding(pt_collapse$w_source_drink) <- "windows-1252"
-    Encoding(pt_collapse$w_source_other) <- "windows-1252"
-    Encoding(pt_collapse$t_type) <- "windows-1252"
+    Encoding(pt_collapse$w_source_drink) <- "UTF-8"
+    Encoding(pt_collapse$w_source_other) <- "UTF-8"
+    Encoding(pt_collapse$t_type) <- "UTF-8"
+    pt_collapse$w_source_drink <- tolower(pt_collapse$w_source_drink)
+    pt_collapse$w_source_other <- tolower(pt_collapse$w_source_other)
+    pt_collapse$t_type <- tolower(pt_collapse$t_type)
   }
 
   for (indi_fam in c('water','sani')) {
@@ -82,8 +88,15 @@ for (data_type in c("pt", "poly")){
         }
       }
 
+      definitions$string <- iconv(definitions$string, 'windows-1252', 'UTF-8')
+      definitions$string <- tolower(definitions$string)
       definitions <- distinct(definitions)
-      if (exists('definitions2')) {definitions2 <- distinct(definitions2)}
+      
+      if (exists('definitions2')) {
+        definitions2$string <- iconv(definitions2$string, 'windows-1252', 'UTF-8')
+        definitions2$string <- tolower(definitions2$string)
+        definitions2 <- distinct(definitions2)
+      }
 
       rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam','repo','data_type','root','agg_level', 'sdg')))
 
@@ -137,9 +150,8 @@ for (data_type in c("pt", "poly")){
       ptdat <- cw_indi_reg_time(data = ptdat)
 
       # create sdg improved for sdg era
-      ptdat$sdg_imp <- ptdat$piped + ptdat$imp
+      if(indi_fam == 'water') {ptdat$sdg_imp <- ptdat$piped + ptdat$imp}
       
-
       #save poly and point collapses
       message("Saving Collapsed Data...")
       today <- gsub("-", "_", Sys.Date())
