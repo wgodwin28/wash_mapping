@@ -1,5 +1,5 @@
 define_indi <- function(mydat = ptdat, var_family = indi_fam, define = definitions,
-                        define2 = definitions2,debug = F, sdg_indi = sdg) {
+                        define2 = definitions2,debug = F, sdg_indi = T) {
   if (debug) {browser()}
   if (var_family == 'water') {
     # Rename string to indicator name to merge on and merge
