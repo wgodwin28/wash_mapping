@@ -4,9 +4,9 @@ library(feather)
 library(dplyr)
 library(ggplot2)
 
-ptdat <- read_feather('ptdat_hw_unconditional_country_2017_09_28.feather')
+ptdat <- read_feather('ptdat_hw_unconditional_country_2017_09_29.feather')
 ptdat$point <- 'pt'
-polydat <- read_feather('polydat_hw_unconditional_countrycountry_2017_09_28.feather')
+polydat <- read_feather('polydat_hw_unconditional_country_2017_09_29.feather')
 polydat$point <- 'poly'
 alldat <- rbind(ptdat, polydat)
 

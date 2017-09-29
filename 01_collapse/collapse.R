@@ -70,7 +70,7 @@ for (data_type in c("pt","poly")){
     pt_collapse$t_type <- tolower(pt_collapse$t_type)
   }
 
-  for (indi_fam in c('sani','hw')) {
+  for (indi_fam in c('water')) {
     rm(definitions)
 
     for (agg_level in c('country','')) {
@@ -147,7 +147,7 @@ for (data_type in c("pt","poly")){
       ptdat_preagg <- ptdat
       
       # Conditional switch is to switch collapsing for conditional vs unconditional indicators
-      for (conditional in c('conditional','unconditional')) {
+      for (conditional in c('unconditional')) {
         # Reseting the dataset to preagregate
         ptdat <- ptdat_preagg
         message(paste("Conditional variables status:",conditional))
