@@ -140,7 +140,7 @@ for (data_type in c("pt","poly")){
       # Calculated household size weighted means for all clusters
       # Assign observations with NA indicator value the weighted average for the cluster
       message("Imputing indicator...")
-      ptdat <- impute_indi_reg_time(data = ptdat)
+      ptdat <- impute_indi(data = ptdat)
 
       #### Aggregate Data ####
       # Bookmarking dataset so it can be looped over for conditional switch

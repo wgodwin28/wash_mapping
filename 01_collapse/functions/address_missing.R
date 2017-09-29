@@ -88,6 +88,8 @@ impute_indi <- function(mydat = ptdat, var_family = indi_fam) {
   
 }
 
+### UNNECESSARY CODE BELOW ###
+
 impute_indi_reg <- function(data, var_family = indi_fam) {
 
   library(dplyr)
