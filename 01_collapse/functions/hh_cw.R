@@ -24,6 +24,8 @@ cw <- function(data, debug = F, var_family = indi_fam) {
   if (var_family == 'sani') {
     data <- rename(data, indi = od) }
   
+  if (var_family == 'hw') {
+    data <- rename(data, indi = hw_station) }
   
   # Aggregate data into clusters
   data <- data %>% mutate(wt_indi = hhweight*indi*hh_size, wt_denom = hhweight*hh_size) %>% 
