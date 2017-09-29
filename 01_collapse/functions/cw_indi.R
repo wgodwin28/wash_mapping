@@ -94,7 +94,7 @@ cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level, condi
 
     if (condition == 'conditional') {
       message('No indi to CW!')
-      return()
+      return(mydat)
     }
   }
 }

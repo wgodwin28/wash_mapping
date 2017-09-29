@@ -100,7 +100,7 @@ for (data_type in c("pt","poly")){
       }
 
       rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam',
-        'repo','data_type','root','agg_level', 'sdg','conditional')))
+        'repo','data_type','root','agg_level', 'sdg')))
 
       message("Importing functions...")
       setwd(repo)
