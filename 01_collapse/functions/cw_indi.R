@@ -90,6 +90,7 @@ cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level, condi
              dplyr::select(id_short, nid, iso3, lat, long, shapefile, location_code, survey_series, urban, year_start, total_hh,
                     imp, unimp, od)
       }
+      return(mydat)
     }
 
     if (condition == 'conditional') {
