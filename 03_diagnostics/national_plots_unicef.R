@@ -4,9 +4,9 @@ library(feather)
 library(dplyr)
 library(ggplot2)
 
-ptdat <- read_feather('ptdat_sani_country_2017_09_28.feather')
+ptdat <- read_feather('ptdat_hw_unconditional_country_2017_09_28.feather')
 ptdat$point <- 'pt'
-polydat <- read_feather('polydat_sani_country_2017_09_28.feather')
+polydat <- read_feather('polydat_hw_unconditional_countrycountry_2017_09_28.feather')
 polydat$point <- 'poly'
 alldat <- rbind(ptdat, polydat)
 
@@ -30,18 +30,18 @@ wssa <- c('CPV','SEN','GMB','GIN','GNB','SLE','MLI','LBR',
           'BFA','MRT')
 africa <- c(sssa_hi, cssa, name_hi, essa_hilo)
 
-pdf('/home/adesh/Documents/wash_dx.pdf')
+pdf('/home/adesh/Documents/wash/plots/wash_dx_hw.pdf')
 for (i in africa) {
 	message(i)
 	plotdat <- filter(alldat, iso3 == i)
 	if (nrow(plotdat) > 0) {
 	print(
 		ggplot(plotdat) + 
-			geom_point(aes(x = year_start, y = imp, shape = point, size = total_hh,
-						   col = 'MBG Imp')) +
-			geom_smooth(aes(x = year_start, y = imp, col = 'MBG imp', weight = total_hh),
+			geom_point(aes(x = year_start, y = hw_station, shape = point, size = total_hh,
+						   col = 'HW Station')) +
+			geom_smooth(aes(x = year_start, y = hw_station, col = 'HW Station', weight = total_hh),
 							size = 0.5, se = F, fullrange = F) +
-			geom_text(aes(x = year_start, y = imp, label = nid)) +
+			geom_text(aes(x = year_start, y = hw_station, label = nid)) +
 			#geom_point(aes(x = year_start, y = imp, shape = point, size = total_hh,
 			#			   col = 'MBG Imp.')) +
 			#geom_smooth(aes(x = year_start, y = imp, col = 'MBG Imp.', weight = total_hh),

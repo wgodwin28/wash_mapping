@@ -9,7 +9,7 @@ initial_cleaning <- function(mydat = pt_collapse, var_family = indi_fam, dat_typ
 
   if (var_family == 'sani') {
     ptdat_0 <- dplyr::select(mydat, nid, iso3, lat, long, survey_series, hhweight, urban, 
-                             t_type, hh_size, year_start,hhweight,
+                             t_type, shared_san, hh_size, year_start,hhweight,
                              shapefile,location_code)
 
   }

@@ -7,12 +7,23 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
   #           'well_imp','well_unimp','spring_cw','spring_imp','spring_unimp')
 
   # sdg way
-  levels <- c('piped', 'surface','imp','unimp','well_cw','well_imp','well_unimp',
+    #if (condition == 'conditional') {
+    #  levels <- c('water_dist')
+    #  mydat <- filter(mydat, piped == 1|imp == 1|well_imp == 1|spring_imp == 1)
+    #} else {
+      levels <- c('piped', 'surface','imp','unimp','well_cw','well_imp','well_unimp',
               'spring_cw','spring_imp','spring_unimp')
+    #}
   }
   
   if (var_family == 'sani') {
-    levels <- c('imp', 'unimp','od','latrine_cw','latrine_imp','latrine_unimp')
+    if (condition == 'conditional') {
+      levels <- c('shared')
+      mydat <- filter(mydat, imp == 1|latrine_imp == 1)
+    } else {
+      levels <- c('imp', 'unimp','od','latrine_cw','latrine_imp','latrine_unimp')
+    }
+    
   }
   
   if (var_family == 'hw') {

@@ -60,7 +60,7 @@ impute_indi <- function(mydat = ptdat, var_family = indi_fam) {
   }
   
   if (var_family == 'sani') {
-    levels <- c('imp','unimp','od','latrine_cw','latrine_imp','latrine_unimp')
+    levels <- c('imp','unimp','od','latrine_cw','latrine_imp','latrine_unimp','shared')
   }
   
   if (var_family == 'hw') {

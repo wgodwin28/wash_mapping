@@ -87,7 +87,9 @@ define_indi <- function(mydat = ptdat, var_family = indi_fam, define = definitio
            imp = ifelse(mydat$sdg == "imp", 1, ifelse(is.na(mydat$sdg), NA, 0)),
            unimp = ifelse(mydat$sdg == "unimp", 1, ifelse(is.na(mydat$sdg), NA, 0)),
            od = ifelse(mydat$sdg == "open", 1, ifelse(is.na(mydat$sdg), NA, 0)),
-           
+           shared = ifelse((mydat$sdg %in% c('imp','latrine_imp')),
+                      ifelse(mydat$shared_san == 1, 1, ifelse(is.na(mydat$shared_san), NA, 0)), 0),
+
            # Define crosswalking indicators
            latrine_cw = ifelse(mydat$sdg == "latrine_cw", 1, ifelse(is.na(mydat$sdg), NA, 0)),
            latrine_imp = ifelse(mydat$sdg == "latrine_imp", 1, ifelse(is.na(mydat$sdg), NA, 0)),

@@ -1,4 +1,4 @@
-cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level) {
+cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level, condition = conditional) {
   if (var_family == 'hw') {
     message('No indi to CW!')
     return(mydat)
@@ -66,29 +66,35 @@ cw_indi <- function(mydat = ptdat, var_family = indi_fam, agg = agg_level) {
   } 
 
   if (var_family == 'sani') {
+    if (condition == 'unconditional') {
+      attach(mydat)
+        if ((mean(latrine_imp, na.rm = T) + mean(latrine_unimp, na.rm = T)) == 0) {
+            mydat$latrine_cw <- 0
+            ratio_lt <- 1
+          } else {
+            ratio_lt <- mean(latrine_imp, na.rm = T)/(mean(latrine_imp, na.rm = T) + mean(latrine_unimp, na.rm = T))
+          }
 
-    attach(mydat)
-      if ((mean(latrine_imp, na.rm = T) + mean(latrine_unimp, na.rm = T)) == 0) {
-          mydat$latrine_cw <- 0
-          ratio_lt <- 1
-        } else {
-          ratio_lt <- mean(latrine_imp, na.rm = T)/(mean(latrine_imp, na.rm = T) + mean(latrine_unimp, na.rm = T))
-        }
+      detach(mydat)
 
-    detach(mydat)
+      if (agg == 'country') {
+        mydat <- mydat %>%
+          mutate(unimp = unimp + latrine_unimp + latrine_cw*(1-ratio_lt),
+                 imp = imp + latrine_imp + latrine_cw*(ratio_lt)) %>%
+          dplyr::select(nid, iso3, survey_series, year_start, total_hh,
+                 imp, unimp, od)
+      } else {
+        mydat <- mydat %>%
+             mutate(unimp = unimp + latrine_unimp + latrine_cw*(1-ratio_lt),
+                    imp = imp + latrine_imp + latrine_cw*(ratio_lt)) %>%
+             dplyr::select(id_short, nid, iso3, lat, long, shapefile, location_code, survey_series, urban, year_start, total_hh,
+                    imp, unimp, od)
+      }
+    }
 
-    if (agg == 'country') {
-      mydat <- mydat %>%
-        mutate(unimp = unimp + latrine_unimp + latrine_cw*(1-ratio_lt),
-               imp = imp + latrine_imp + latrine_cw*(ratio_lt)) %>%
-        dplyr::select(nid, iso3, survey_series, year_start, total_hh,
-               imp, unimp, od)
-    } else {
-      mydat <- mydat %>%
-           mutate(unimp = unimp + latrine_unimp + latrine_cw*(1-ratio_lt),
-                  imp = imp + latrine_imp + latrine_cw*(ratio_lt)) %>%
-           dplyr::select(id_short, nid, iso3, lat, long, shapefile, location_code, survey_series, urban, year_start, total_hh,
-                  imp, unimp, od)
+    if (condition == 'conditional') {
+      message('No indi to CW!')
+      return()
     }
   }
 }
