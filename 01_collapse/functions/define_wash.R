@@ -10,7 +10,7 @@ define_indi <- function(mydat = ptdat, var_family = indi_fam, define = definitio
     # Rename string to indicator name to merge on and merge
     # definition file to mydatset
     if (sdg_indi) {
-      define$sdg <- ifelse(define$jmp == 'basic' & !(define$sdg %in% c('piped','imp'), 
+      define$sdg <- ifelse(define$jmp == 'basic' & !(define$sdg %in% c('piped','imp')), 
                       'imp', define$sdg)
     }
     define <- rename(define, w_source_drink = string) 
