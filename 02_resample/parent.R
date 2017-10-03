@@ -1,4 +1,4 @@
-nodes <- 'geos'
+nodes <- ''
 proj <- ifelse(nodes == 'geos',
         '-P proj_geo_nodes -l gn=TRUE',                      		
         '-P proj_geospatial')
