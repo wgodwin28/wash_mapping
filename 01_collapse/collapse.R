@@ -1,5 +1,5 @@
 #### Set Up Environment ####
-# source("/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/01_collapse/collapse.R")
+# source("/snfs2/HOME/wgodwin/wash_mapping/01_collapse/collapse.R")
 # Clear environment
 rm(list = ls())
 
@@ -20,14 +20,15 @@ project <- ifelse(user == "wgodwin", "gbd", "geo")
 # Set repo path
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/snfs1/")
 if(project == "gbd") repo <- ifelse(Sys.info()[1]=="Windows", 'H:/wash_mapping/01_collapse/',
-               '/share/code/geospatial/adesh/wash_mapping/01_collapse/')
+                    '/snfs2/HOME/wgodwin/wash_mapping/01_collapse/')
+                    #'/share/code/geospatial/adesh/wash_mapping/01_collapse/')
 
 # Load Packages
 # Set package library
-if(Sys.info()[1]!="Windows") {
-  package_lib <- paste0(root,'temp/geospatial/packages') 
-  .libPaths(package_lib)
-}
+#if(Sys.info()[1]!="Windows") {
+  #package_lib <- paste0(root,'temp/geospatial/packages') 
+  #.libPaths(package_lib)
+#}
 
 # Detach all but base packages
 detachAllPackages <- function() {
@@ -76,7 +77,7 @@ lapply(packages, library, character.only = T)
                               encoding="windows-1252", stringsAsFactors = F) 
       definitions2 <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_other_defined_updated_2017_09_07.csv'),
                                encoding="windows-1252", stringsAsFactors = F)
-      #definitions2 <- rename(definitions2, sdg2 = sdg)
+      definitions2 <- rename(definitions2, sdg2 = sdg)
     }
   }
 
@@ -121,6 +122,7 @@ lapply(packages, library, character.only = T)
   short_id <- data.frame(cluster_id = unique(ptdat$cluster_id), 
                          id_short = seq(1:length(unique(ptdat$cluster_id))),
                          stringsAsFactors = F)
+  ptdat <- as.data.frame(ptdat) #Check on why the ptdat is getting turned into a data.table
   ptdat <- left_join(ptdat, short_id, by = 'cluster_id')
   rm(short_id)
 
@@ -134,10 +136,13 @@ lapply(packages, library, character.only = T)
   if (data_type == "pt") {ptdat$shapefile <- NA; ptdat$location_code <- NA}
 
   #### Define Indicator ####
+  message("Defining Indicator...")
+  ptdat <- as.data.frame(ptdat) ### Check on why the ptdat is turning into a data.table-causing left_join in define_indi to break
   ptdat <- define_indi()
 
   #### Address Missingness ####
   # Remove clusters with more than 20% weighted missingness
+  message("Addressing Missingness...")
   ptdat <- rm_miss()
 
   # Remove cluster_ids with missing hhweight or invalid hhs
@@ -148,11 +153,13 @@ lapply(packages, library, character.only = T)
   ptdat <- filter(ptdat, !(id_short %in% invalid_hhs))
 
   # Crosswalk missing household size data
+  message("Crosswalking HH Sizes...")
   ptdat <- hh_cw(data = ptdat)
 
   # Calculated household size weighted means for all clusters
   # Assign observations with NA indicator value the weighted average for the cluster
-  ptdat <- impute_indi()
+  message("Imputing indicator...")
+  ptdat2 <- impute_indi()
 
   #### Aggregate Data ####
   # Aggregate indicator to cluster level
@@ -165,6 +172,7 @@ lapply(packages, library, character.only = T)
   }
   
   # Crosswalk indicator data
+  message("Crosswalking Indicators...")
   ptdat <- cw_indi()
 
   # create sdg improved for sdg era
@@ -184,11 +192,12 @@ lapply(packages, library, character.only = T)
   }else if (data_type == "pt" & project == 'gbd'){
     pt_coll <- copy(ptdat)
   }
-}
+#}
 
+# save for gbd
 if(project == 'gbd') {  
   #alldat <- rbind(pt_coll, ptdat)
   if(indi_fam == "sani") {indi_fam <- "sanitation"}
   if(indi_fam == "hw") {indi_fam <- "hygiene"}
-  write.csv(ptdat, file = paste0(root, "WORK/05_risk/risks/wash_", indi_fam, "/data/exp/01_data_audit/tabulated_", today, ".csv"))
+  write.csv(ptdat, file = paste0(root, "WORK/05_risk/risks/wash_", indi_fam, "/data/exp/01_data_audit/tabulated_", today, "_poly_noimpute.csv"), row.names = F)
 }

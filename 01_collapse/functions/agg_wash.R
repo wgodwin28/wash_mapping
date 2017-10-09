@@ -73,7 +73,7 @@ if(proj != "gbd"){
     for (ind in levels) {
       message(paste("Aggregating",ind))
       surveys <- unique(mydat$nid, na.rm = T)
-      surveys <- setdiff(surveys, c(93806, 235215, 286657)) ## problem surveys to debug
+      surveys <- setdiff(surveys, c(93806, 235215, 286657, 31786, 45549, 11848)) ## problem surveys to debug
       for(id in surveys){
         temp_dat <- filter(mydat, nid == id)
         temp_dat <- as.data.table(temp_dat)
@@ -89,3 +89,6 @@ if(proj != "gbd"){
     return(collapsed_gbd)
   }
 }
+#31786-all strata missing
+#45549-only one psu
+#11848-sum(sapply(covmats, ncol)) : invalid 'type' (list) of argument
