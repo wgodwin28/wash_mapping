@@ -16,7 +16,7 @@ topic <- "wash"
 folder_in <- paste0(j, "LIMITED_USE/LU_GEOSPATIAL/ubCov_extractions/", topic, "_2") #where your extractions are stored
 folder_out <- paste0(j, "LIMITED_USE/LU_GEOSPATIAL/geo_matched/", topic) #where you want to save the big csv of all your extractions together
 
-cores <- 30 #qlogin -pe multi_slot 30 -P proj_geospatial -now no
+cores <- 30 #qlogin -now n -pe multi_slot 30 -P proj_geospatial -l geos_node=TRUE
 #source('/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/00_extract/post_extraction_2.R')
 
 package_lib <- paste0(j,'/temp/geospatial/geos_packages')
@@ -344,8 +344,21 @@ if (topic == "wash"){
   nids_without_unique_hh_ids <- c(157397, 7438, 24915)
   all[nid %in% nids_without_unique_hh_ids, hh_size := NA]
   # 1. separate NA hh_size values from dataset
-  has_hh_size <- all[!is.na(hh_size),]
-  missing_hh_size <- all[is.na(hh_size), hh_size := 1, by="nid"]
+  
+  #drop data that doesn't need a hh_size crosswalk and that has NA hh_sizes
+  #all <- all[!is.na(hh_size) & !is.na(t_type) & !is.na(w_source_drink) & !(nid %in% nids_that_need_hh_size_crosswalk), ]
+  
+  #subset cases where all hh_sizes are present. these are HH
+  has_hh_size <- all[all(!is.na(hh_size)),, by="nid"]
+  
+  #subset cases where all hh_sizes are missing. these are HHM
+  missing_hh_size <- all[all(is.na(hh_size)),, by="nid"]
+  missing_hh_size[, hh_size := 1]
+  
+  #subset cases where some hh_sizes are present and others are missing. these are HH
+  has_hh_sizes_and_nas <- all[any(is.na(hh_size)) & !all(is.na(hh_size)) & !all(!is.na(hh_size)), , by="nid"]
+  
+  has_hh_size <- rbind.fill(has_hh_size, has_hh_sizes_and_nas)
   # 2. unique dataset with hh_size values by nid, urban, hh_id, geospatial_id, 
   #     hhweight, year_start, iso3, lat, long, w_source_drink, 
   #     w_source_other, mins_ws, dist_ws, dist_ws_unit, t_type, 
@@ -355,6 +368,8 @@ if (topic == "wash"){
   
   
   packaged <- rbind(hhhs, missing_hh_size, fill=T)
+  
+  
   nids_that_need_hh_size_crosswalk <- c(20998, #MACRO_DHS_IN UGA 1995 WN
                                         32144, 32138, 1301, 1308, 1322) #BOL/INTEGRATED_HH_SURVEY_EIH
   packaged[nid %in% nids_that_need_hh_size_crosswalk, hh_size := NA]
