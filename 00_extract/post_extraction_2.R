@@ -23,7 +23,7 @@ package_lib <- paste0(j,'/temp/geospatial/geos_packages')
 .libPaths(package_lib)
 if(!require(pacman)) {
   install.packages("pacman"); require(pacman)}
-p_load(haven, plyr, data.table, magrittr, parallel, doParallel, doSNOW, dplyr, feather)
+p_load(haven, plyr, data.table, magrittr, parallel, doParallel, dplyr, feather)
 
 options(warn=-1)
 module_date <- Sys.Date()
@@ -42,10 +42,11 @@ read_add_name_col <- function(file){
   svy <- spl[length(spl)]
   #df <- fread(file, data.table=T)
   #get errors in character encoding from geog codebook and fix
-  df <- read.csv(file, encoding="windows-1252")
+  #previously: df <- read.csv(file, encoding="windows-1252")
+  df <- read.csv(file, encoding="windows-1252", stringsAsFactors = F)
   df <- as.data.table(df)
   df[, survey_series := svy]
-  df <- lapply(df, as.character)
+  #df <- lapply(df, as.character)
   return(df)
 }
 
@@ -163,7 +164,7 @@ message("foreach topics")
 message("make cluster")
 cl <- makeCluster(cores)
 message("register cluster")
-registerDoSNOW(cl)
+registerDoParallel(cl)
 clusterCall(cl, function(x) .libPaths(x), .libPaths())
 message("start foreach")
 excluded_surveys <- c(8556, #dropping MEX/NATIONAL_HEALTH_SURVEY_ENSA due to bad weighting
@@ -184,7 +185,7 @@ stopCluster(cl)
 
 message("rbindlist them all together")
 topics <- rbindlist(top, fill=T, use.names=T)
-topics[!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start, year_start := int_year]
+#topics[!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start, year_start := int_year]
 if (topic == "wash"){
   message("dropping duplicate women in single household (so household sizes aren't duplicated)")
   topics[is.na(hhweight) & !is.na(pweight), hhweight := pweight]
@@ -229,16 +230,18 @@ geo <- rbindlist(geogs, fill=T, use.names=T)
 #geo[grepl(pattern = "^-[[:digit:]]|^[[:digit:]]", lat), lat:=NA]
 #geo[grepl(pattern = "^-[[:digit:]]|^[[:digit:]]", long), long:=NA]
 #coerce lat/longs to numeric, convert iso3s to standard format
+geo[is.na(admin_level), admin_level := "NA"] #set NA values for admin_level to "NA" as a string to keep the following line from dropping them because of bad R logic
 geo <- geo[admin_level != "0", ] #drop anything matched to admin0
-Encoding(geo$lat) <- 'windows-1252'
-Encoding(geo$long) <- 'windows-1252'
-Encoding(geo$geospatial_id) <- 'windows-1252'
+#Encoding(geo$lat) <- 'windows-1252'
+#Encoding(geo$long) <- 'windows-1252'
+#Encoding(geo$geospatial_id) <- 'windows-1252'
+geo[, unique_id := paste(nid, iso3, geospatial_id, sep="_")]
 #dedupe the geography codebook by geospatial_id and nid
-geo <- distinct(geo, nid, iso3, geospatial_id, .keep_all=T)
-geo <- geo[, lat := as.numeric(lat)]
-geo <- geo[, long := as.numeric(long)]
+geo <- distinct(geo, unique_id, .keep_all=T)
+geo[, lat := as.numeric(lat)]
+geo[, long := as.numeric(long)]
 #geo <- geo[, iso3 := substr(iso3, 1, 3)]
-geo <- geo[iso3 == "KOSOVO", iso3 := "SRB"]
+geo[iso3 == "KOSOVO", iso3 := "SRB"]
 
 
 #message("Moving points jittered to the ocean to nearest land")
@@ -274,6 +277,13 @@ all <- merge(geo_k, topics, by.x=c("nid", "iso3", "geospatial_id"), by.y=c("nid"
 #rm(geo)
 all[!is.na(latitude) & is.na(lat), lat := latitude]
 all[!is.na(longitude) & is.na(long), long := longitude]
+
+#set start_year to weighted mean of int_year for clusters with int_years that are reasonable
+all[(!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start) & (!is.na(lat) & !is.na(long)), start_year := weighted.mean(int_year, weight=hhweight), by=c("nid", "psu", "lat", "long")]
+
+#set start_year to a weighted mean of the int_years if the int_years are reasonable and not for point data
+all[(!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start) & (is.na(lat) | is.na(long)), start_year := weighted.mean(int_year, weight=hhweight), by="nid"]
+
 
 if (topic == "wash"){
   message("custom wash fixes")
@@ -348,27 +358,25 @@ if (topic == "wash"){
   #drop data that doesn't need a hh_size crosswalk and that has NA hh_sizes
   #all <- all[!is.na(hh_size) & !is.na(t_type) & !is.na(w_source_drink) & !(nid %in% nids_that_need_hh_size_crosswalk), ]
   
-  #subset cases where all hh_sizes are present. these are HH
-  has_hh_size <- all[all(!is.na(hh_size)),, by="nid"]
+  #create indicator for hh_size missingness
+  all[, missingHHsize := sum(is.na(hh_size)), by=nid]
+  all[, obs := .N, by=nid]
+  all[, pct_miss_hh_size := 100 * missingHHsize / obs]
+  all[, is_hh := pct_miss_hh_size > 0]
   
-  #subset cases where all hh_sizes are missing. these are HHM
-  missing_hh_size <- all[all(is.na(hh_size)),, by="nid"]
-  missing_hh_size[, hh_size := 1]
-  
-  #subset cases where some hh_sizes are present and others are missing. these are HH
-  has_hh_sizes_and_nas <- all[any(is.na(hh_size)) & !all(is.na(hh_size)) & !all(!is.na(hh_size)), , by="nid"]
-  
-  has_hh_size <- rbind.fill(has_hh_size, has_hh_sizes_and_nas)
-  # 2. unique dataset with hh_size values by nid, urban, hh_id, geospatial_id, 
-  #     hhweight, year_start, iso3, lat, long, w_source_drink, 
-  #     w_source_other, mins_ws, dist_ws, dist_ws_unit, t_type, 
-  #     shared_san, shared_san_num, hw_station, hw_water, hw_soap
-  has_hh_size[, uq_id := paste(nid, psu, hh_id, sep="_")]
+  #subset cases where all hh_sizes are present. in these, each row is a HH
+  has_hh_size <- all[pct_miss_hh_size > 0, ]
+  has_hh_size[, uq_id := paste(nid, psu, hh_id, year_start, lat, long, shapefile, location_code, sep="_")] #includes space-time
+  has_hh_size[, prev_uq_id := paste(nid, psu, hh_id, sep="_")] 
+  diff <- length(unique(has_hh_size$uq_id)) - length(unique(has_hh_size$prev_uq_id))
+  message(paste("There are", diff, "more unique households from including spacetime than excluding."))
   hhhs <- distinct(has_hh_size, uq_id, .keep_all=T)
   
+  #subset cases where all hh_sizes are missing. these are HHM
+  missing_hh_size <- all[pct_miss_hh_size <= 0, ]
+  missing_hh_size[, hh_size := 1]
   
   packaged <- rbind(hhhs, missing_hh_size, fill=T)
-  
   
   nids_that_need_hh_size_crosswalk <- c(20998, #MACRO_DHS_IN UGA 1995 WN
                                         32144, 32138, 1301, 1308, 1322) #BOL/INTEGRATED_HH_SURVEY_EIH
@@ -451,6 +459,7 @@ if (topic == "wash"){
   #message("saving data")
   #save(packaged, file=paste0(folder_out, "/packaged_dataset_", module_date, ".Rdata"))
 } else if (topic == "diarrhea"){
+  message("saving to J")
   all <- all[!is.na(had_diarrhea), ]
   #all <- all[age_year < 5,]
   save(all, file=paste0(folder_out, "/", module_date, ".Rdata"))
