@@ -279,11 +279,7 @@ all[!is.na(latitude) & is.na(lat), lat := latitude]
 all[!is.na(longitude) & is.na(long), long := longitude]
 
 #set start_year to weighted mean of int_year for clusters with int_years that are reasonable
-all[(!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start) & (!is.na(lat) & !is.na(long)), start_year := weighted.mean(int_year, weight=hhweight), by=c("nid", "psu", "lat", "long")]
-
-#set start_year to a weighted mean of the int_years if the int_years are reasonable and not for point data
-all[(!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start) & (is.na(lat) | is.na(long)), start_year := weighted.mean(int_year, weight=hhweight), by="nid"]
-
+#all[(!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start) & (!is.na(lat) & !is.na(long)), start_year := weighted.mean(int_year, weight=hhweight), by=c("nid", "psu", "lat", "long")]
 
 if (topic == "wash"){
   message("custom wash fixes")
@@ -448,11 +444,15 @@ if (topic == "wash"){
   
   message("saving points")
   pt_collapse <- packaged[!is.na(lat) & !is.na(long), ]
+  #set start_year to int_year for point data
+  pt_collapse[, start_year := int_year]
   save(pt_collapse, file=paste0(folder_out, "/points_", module_date, ".Rdata"))
   write_feather(pt_collapse, path=paste0(folder_out, "/points_", module_date, ".feather"))
   
   message("saving polygons")
   poly_collapse <- packaged[(is.na(lat) | is.na(long)) & !is.na(shapefile) & !is.na(location_code), ]
+  #set polygon years to a weighted mean
+  poly_collapse[, start_year := weighted.mean(int_year, weight=hhweight, na.rm=T), by=c("nid")]
   save(poly_collapse, file=paste0(folder_out, "/poly_", module_date, ".Rdata"))
   write_feather(poly_collapse, path=paste0(folder_out, "/poly_", module_date, ".feather"))
   
