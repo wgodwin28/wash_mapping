@@ -1,7 +1,7 @@
 rm(list = ls())
 # Set library and load packages
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
-package_list <- c('dplyr','raster', 'seegSDM','seegMBG', 'feather')
+package_list <- c('dplyr','raster', 'seegSDM','seegMBG')
 if(Sys.info()[1]=="Windows") {
   for(package in package_list) {
     library(package, character.only = T)
