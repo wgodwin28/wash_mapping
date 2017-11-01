@@ -51,7 +51,7 @@ for (data_type in c("pt","poly")){
   message('Loading Data...')
   # Load data
   if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_09_28.feather'))
+    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_10_30.feather'))
     Encoding(pt_collapse$w_source_drink) <- "UTF-8"
     Encoding(pt_collapse$w_source_other) <- "UTF-8"
     Encoding(pt_collapse$t_type) <- "UTF-8"
@@ -61,7 +61,7 @@ for (data_type in c("pt","poly")){
   } 
     
   if (!("pt_collapse" %in% ls()) & data_type == 'poly') {
-    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_09_28.feather'))
+    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_10_30.feather'))
     Encoding(pt_collapse$w_source_drink) <- "UTF-8"
     Encoding(pt_collapse$w_source_other) <- "UTF-8"
     Encoding(pt_collapse$t_type) <- "UTF-8"
@@ -80,12 +80,16 @@ for (data_type in c("pt","poly")){
         if (indi_fam == "sani") {
           definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_09_28.csv'),
                                   encoding="windows-1252", stringsAsFactors = F)
+          definitions <- select(definitions, string, sdg)
+          definitions$sdg <- ifelse(definitions$sdg == "", NA, definitions$sdg)
         } else {
           definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_09_28.csv'),
                                   encoding="windows-1252", stringsAsFactors = F) 
           definitions2 <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_other_defined_updated_2017_09_28.csv'),
                                    encoding="windows-1252", stringsAsFactors = F)
           definitions2 <- rename(definitions2, sdg2 = sdg)
+          definitions <- select(definitions, string, sdg, jmp)
+          definitions$sdg <- ifelse(definitions$sdg == "", NA, definitions$sdg)
         }
       }
 
