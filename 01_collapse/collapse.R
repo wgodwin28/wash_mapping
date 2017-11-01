@@ -82,6 +82,9 @@ for (data_type in c("pt","poly")){
                                   encoding="windows-1252", stringsAsFactors = F)
           definitions <- select(definitions, string, sdg)
           definitions$sdg <- ifelse(definitions$sdg == "", NA, definitions$sdg)
+          definitions$string <- ifelse(definitions$sdg == "", NA, definitions$string)
+          definitions$sdg <- ifelse(is.na(definitions$string), NA, definitions$sdg)
+
         } else {
           definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_09_28.csv'),
                                   encoding="windows-1252", stringsAsFactors = F) 
@@ -90,6 +93,9 @@ for (data_type in c("pt","poly")){
           definitions2 <- rename(definitions2, sdg2 = sdg)
           definitions <- select(definitions, string, sdg, jmp)
           definitions$sdg <- ifelse(definitions$sdg == "", NA, definitions$sdg)
+          definitions$string <- ifelse(definitions$sdg == "", NA, definitions$string)
+          definitions$sdg <- ifelse(is.na(definitions$string), NA, definitions$sdg)
+          definitions$jmp <- ifelse(is.na(definitions$string), NA, definitions$jmp)
         }
       }
 

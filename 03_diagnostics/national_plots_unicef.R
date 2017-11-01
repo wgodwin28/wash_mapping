@@ -6,16 +6,19 @@ library(dplyr)
 library(ggplot2)
 library(ggrepel)
 
-ptdat <- read_feather('ptdat_water_unconditional_country_2017_10_25.feather')
+ptdat <- read_feather('ptdat_water_unconditional_country_2017_10_31.feather')
 ptdat$point <- 'pt'
-polydat <- read_feather('polydat_water_unconditional_country_2017_10_25.feather')
+polydat <- read_feather('polydat_water_unconditional_country_2017_10_31.feather')
 polydat$point <- 'poly'
 alldat <- rbind(ptdat, polydat)
 
 drop_nids <- read.csv('/home/j/temp/gmanny/wash_data_vetting/data_vetting_water.csv')
 drop_nids <- drop_nids$nid
 
-alldat <- filter(alldat, !(nid %in% drop_nids))
+#alldat <- filter(alldat, !(nid %in% drop_nids))
+alldat$problem <- ifelse(alldat$nid %in% drop_nids, 1, 0)
+alldat$problem <- as.character(alldat$problem)
+
 #unicef <- read.csv('/home/j/WORK/11_geospatial/wash/unicef/unicef_data.csv',
 #				   stringsAsFactors = F)
 #unicef$year <- as.numeric(unicef$year)
@@ -36,15 +39,15 @@ wssa <- c('CPV','SEN','GMB','GIN','GNB','SLE','MLI','LBR',
           'BFA','MRT')
 africa <- c(sssa_hi, cssa, name_hi, essa_hilo, wssa)
 
-pdf('/home/adesh/Documents/wash/plots/wash_dx_water_clean.pdf')
-for (i in africa) {
+pdf('/home/adesh/Documents/wash/plots/wash_dx_water_problems_10_31.pdf')
+for (i in unique(alldat$iso3)) {
 	message(i)
 	plotdat <- filter(alldat, iso3 == i)
 	if (nrow(plotdat) > 0) {
 	print(
 		ggplot(plotdat) + 
 			geom_point(aes(x = year_start, y = piped, shape = point, size = total_hh,
-						   col = 'piped')) +
+						   col = problem)) +
 			geom_smooth(aes(x = year_start, y = piped, col = 'piped', weight = total_hh),
 							method = glm, size = 0.5, se = F, fullrange = F) +
 			geom_text_repel(aes(x = year_start, y = piped, label = nid)) +
