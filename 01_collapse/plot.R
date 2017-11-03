@@ -1,12 +1,22 @@
 #source("/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/01_collapse/plot.R")
+package_lib <- '/snfs1/temp/geospatial/packages'
+.libPaths(package_lib)
+library(data.table)
+library(magrittr)
 
 message('loading collapsed points')
 #ptdat
-load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_7_20_2017.RData")
+#load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_7_20_2017.RData")
+ptdat <- read_feather("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_water_unconditional__2017_10_27.feather")
+#load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_water_unconditional__2017_10_27.Rdata")
+#save(ptdat, file="/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_water_unconditional__2017_10_25.Rdata")
 
 message('loading collapsed polygons')
 #polydat
-load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_7_20_2017.RData")
+#load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_7_20_2017.RData")
+polydat <- read_feather("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_10_27.feather")
+#save(polydat, file="/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_10_25.Rdata")
+#load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_10_27.Rdata")
 
 message("rbinding points and polys together")
 ptdat <- rbind(polydat, ptdat, fill=T)
@@ -46,23 +56,23 @@ ptdat <- rbind(ptdat_poly, ptdat_points, fill=T)
 # "urban"         "year_start"    "N"             "water"
 
 #add IPUMS
-message("loading ipums")
-path <- "/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/IPUMS"
-f <- list.files(path, full.names=T)
-l <- lapply(f, fread)
-ipums <- rbindlist(l, fill=T, use.names=T)
+#message("loading ipums")
+#path <- "/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/IPUMS"
+#f <- list.files(path, full.names=T)
+#l <- lapply(f, fread)
+#ipums <- rbindlist(l, fill=T, use.names=T)
 # names(ipums)
 # "nid"           "survey_series" "iso3"          "year_start"
 # "N"             "point"         "shapefile"     "location_code"
 # "sani"          "lat"           "long"
-ipums[, water := sani]
-ipums[, sani := NULL]
+#ipums[, water := sani]
+#ipums[, sani := NULL]
 
 
 #add IND_AHS
-message("loading IND_AHS")
-load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/IND_AHS_2010_2013_234353_polys_collapsed.Rdata")
-IND_AHS_collapse <- as.data.table(IND_AHS_collapse)
+#message("loading IND_AHS")
+#load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/IND_AHS_2010_2013_234353_polys_collapsed.Rdata")
+#IND_AHS_collapse <- as.data.table(IND_AHS_collapse)
 # names(IND_AHS_collapse)
 # [1] "nid"                 "iso3"                "geospatial_id"
 # [4] "point"               "shapefile"           "location_code"
@@ -71,19 +81,20 @@ IND_AHS_collapse <- as.data.table(IND_AHS_collapse)
 # [13] "psu"                 "hh_id"               "urban"
 # [16] "w_source_drink"      "t_type"              "shared_san"
 # [19] "hhweight"            "hh_size"             "clusters_in_polygon"
-IND_AHS_collapse <- IND_AHS_collapse[, N := sum(hh_size, na.rm=T), by=list(shapefile, location_code)]
-drop <- c("geospatial_id", "survey_name", "year_end", "survey_module", "strata", "psu", "hh_id", "w_source_drink", "t_type", "shared_san", "clusters_in_polygon", "hh_size")
-IND_AHS_collapse <- IND_AHS_collapse[, (drop) := NULL]
+#IND_AHS_collapse <- IND_AHS_collapse[, N := sum(hh_size, na.rm=T), by=list(shapefile, location_code)]
+#drop <- c("geospatial_id", "survey_name", "year_end", "survey_module", "strata", "psu", "hh_id", "w_source_drink", "t_type", "shared_san", "clusters_in_polygon", "hh_size")
+#IND_AHS_collapse <- IND_AHS_collapse[, (drop) := NULL]
 
 # temporarily generating random numbers as water score. This is a temporary fix. 
-IND_AHS_collapse <- IND_AHS_collapse[, water := runif(nrow(IND_AHS_collapse))*3]
+#IND_AHS_collapse <- IND_AHS_collapse[, water := runif(nrow(IND_AHS_collapse))*3]
 # names(IND_AHS_collapse)
 # [1] "nid"           "iso3"          "point"         "shapefile"
 # [5] "location_code" "survey_series" "year_start"    "urban"
 # [9] "hhweight"      "N"             "water"
 #IND_AHS_collapse <- IND_AHS_collapse[, keep_poly, with=F]
 
-w_collapsed <- rbind(ptdat, ipums, IND_AHS_collapse, fill=T) %>% data.table()
+#w_collapsed <- rbind(ptdat, ipums, IND_AHS_collapse, fill=T) %>% data.table()
+w_collapsed <- ptdat %>% as.data.table()
 
 setnames(w_collapsed, "nid", "svy_id")
 setnames(w_collapsed, "year_start", "start_year")
@@ -98,8 +109,8 @@ for (survey in srvys){
   w_collapsed[grepl(survey, source), source:=survey]
 }
 
-message("Saving collapsed and rbound datatable")
-save(w_collapsed, file="/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/7_19.RData")
+#message("Saving collapsed and rbound datatable")
+#save(w_collapsed, file="/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/7_19.RData")
 #load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/7_19.RData")
 
 # prep for data coverage plotting
@@ -109,9 +120,8 @@ root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
 j <- root
 j_root <- j
 cores <- 30
-package_lib <- paste0(root,'/temp/geospatial/packages') # Library for all MBG versioned packages. Ensures that none of this code is
 #    dependent on the machine where the user runs the code.
-.libPaths(package_lib)                                  # Ensures packages look for dependencies here when called with library().
+                                  # Ensures packages look for dependencies here when called with library().
 #    Necessary for seeg libraries.
 source('mbg_central/mbg_functions.R')                   # Functions to run MBG model.
 source('mbg_central/prep_functions.R')                  # Functions to setup MBG run
@@ -122,6 +132,7 @@ source('mbg_central/gbd_functions.R')
 source('mbg_central/shiny_functions.R')
 source('mbg_central/holdout_functions.R')
 source('mbg_central/polygon_functions.R')
+source('mbg_central/shapefile_functions.R')
 source('mbg_central/collapse_functions.R')
 source('mbg_central/seegMBG_transform_functions.R')     # Using Roy's edit for now that can take temporally varying covariates,
 #   TODO: will need to send pull request to seegMBG of github
@@ -137,23 +148,25 @@ w_collapsed[country == "KOS", country := "SRB"]
 source('/snfs2/HOME/gmanny/backups/Documents/Repos/mbg/mbg_central/graph_data_coverage.R')
 message("start coverage function")
 #regions <- c("south_asia", "se_asia", "africa", "latin_america", "middle_east")
-regions <- c("south_asia", "africa", "latin_america", "middle_east")
+regions <- c("africa", "south_asia", "se_asia", "latin_america", "middle_east")
+regions <- rev(regions)
 for (reg in regions){
   message(reg)
   coverage_maps <- try(graph_data_coverage_values(df = w_collapsed,
                                                   var = 'water',
                                                   title = 'Water',
                                                   year_min = '1980',
-                                                  year_max = '2016',
+                                                  year_max = '2017',
                                                   year_var = 'start_year',
                                                   region = reg,
                                                   sum_by = 'n',
-                                                  since_date = "2017-7-10",
+                                                  since_date = "2017-1-10",
                                                   cores = cores,
                                                   indicator = 'water',
                                                   high_is_bad = FALSE,
                                                   return_maps = TRUE,
                                                   legend_title = "Prevalence",
+                                                  color_scheme = "darker_middle",
                                                   extra_file_tag = "",
                                                   save_on_share = FALSE))
 }
