@@ -169,10 +169,15 @@ all[!is.na(latitude) & is.na(lat), lat := latitude]
 all[!is.na(longitude) & is.na(long), long := longitude]
 
 #set start_year to weighted mean of int_year for clusters with int_years that are reasonable
-#all[(!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start) & (!is.na(lat) & !is.na(long)), start_year := weighted.mean(int_year, weight=hhweight), by=c("nid", "psu", "lat", "long")]
+
 all[,start_year := year_start]
 if (topic == "diarrhea"){
   stop("troubleshoot int_year/start_year issue for diarrhea")
+  all[, year_dummy := start_year]
+  all[, year_experiment := year_dummy]
+  all[, year_experiment := round(weighted.mean(x=year_dummy, w=pweight)), by=.(nid, iso3)]
+  all[(!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start), year_experiment := round(weighted.mean(int_year, weight=pweight)), by=c("nid", "iso3")]
+  
 }
 
 if (topic == "wash"){
