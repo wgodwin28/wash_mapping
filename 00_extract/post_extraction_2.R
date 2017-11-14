@@ -12,14 +12,13 @@ rm(list=ls())
 
 j <- ifelse(Sys.info()[1]=="Windows", "J:/", "/snfs1/")
 
-topic <- "wash"
+topic <- "diarrhea"
 folder_in <- paste0(j, "LIMITED_USE/LU_GEOSPATIAL/ubCov_extractions/", topic, "_2") #where your extractions are stored
 folder_out <- paste0(j, "LIMITED_USE/LU_GEOSPATIAL/geo_matched/", topic) #where you want to save the big csv of all your extractions together
 
 cores <- 30 #qlogin -now n -pe multi_slot 30 -P proj_geospatial -l geos_node=TRUE
 #source('/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/00_extract/post_extraction_2.R')
-
-package_lib <- paste0(j,'/temp/geospatial/geos_packages')
+package_lib <- '/snfs1/temp/geospatial/geos_packages'
 .libPaths(package_lib)
 if(!require(pacman)) {
   install.packages("pacman"); require(pacman)}
@@ -28,11 +27,6 @@ p_load(haven, plyr, data.table, magrittr, parallel, doParallel, dplyr, feather)
 options(warn=-1)
 module_date <- Sys.Date()
 module_date <- gsub("-", "_", module_date)
-
-iso <- read.csv(paste0(j, "temp/gmanny/geospatial_stages_priority.csv"), stringsAsFactors=F)
-#stage_2a <- iso[(iso$Stage == "1" | iso$Stage == "2a" | iso$Stage == "2b"), "alpha.3"] %>% as.character %>% sort()
-stage_2a <- iso[(iso$Stage == "1" | iso$Stage == "2a" | iso$Stage == "2b" | iso$Stage == "3"), "alpha.3"] %>% as.character %>% sort()
-af <- stage_2a
 
 read_add_name_col <- function(file){
   #FOR GEOGRAPHY CODEBOOKS. READS THEM IN AND ADDS A COLUMN WITH THEIR CORRESPONDING SURVEY_SERIES
@@ -50,11 +44,6 @@ read_add_name_col <- function(file){
   return(df)
 }
 
-all_to_char_df <- function(df){
-  df <- data.frame(lapply(df, as.character), stringsAsFactors = FALSE)
-  return(df)
-}
-
 say_file_and_read_dta <- function(file, keep){
   #FOR UBCOV EXTRACTIONS. READ THEM IN AND DROP COLUMNS THAT DON'T COME FROM YOUR EXTRACTIONS
   message(file)
@@ -68,88 +57,6 @@ say_file_and_read_dta <- function(file, keep){
   if ("data.frame" %in% class(dta)){
     return(dta)
   }
-}
-
-force_points_to_nearest_land <- function(geo){
-  stages <- read.csv(paste0(j, "temp/gmanny/geospatial_stages_priority.csv"), stringsAsFactors=F)
-  s1 <- subset(stages, Stage == 1)
-
-  #remove this line when expanding the function to work outside of Africa
-  #geo <- geo[iso3 %in% s1$alpha.3,]
-  #update this shapefile to global when expanding function for outside Africa
-  load(paste0(j, "temp/gmanny/Geography Codebook/global_land_polygon.Rds"))
-  shp <- polygon
-  #shp <- readOGR(paste0(j, "WORK/11_geospatial/05_survey shapefile library/Shapefile directory/Africa_clean.shp"))
-  shp <- spTransform(shp, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
-
-  geo_points <- geo[!is.na(lat) & !is.na(long), ]
-  geo_points <- geo_points[order(iso3)]
-
-  #geopositioning points
-  coordinates(geo_points) <- ~long+lat
-  proj4string(geo_points) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-
-  geo_points <- as(geo_points, "SpatialPoints")
-  shp <- as(shp, "SpatialPolygons")
-  o <- over(geo_points, shp)
-  in_h2o <- o[is.na(o)] %>% names
-  geo_points <- data.frame(geo_points)
-  fix <- geo_points[in_h2o,]
-
-  fix_m <- fix[,c("long", "lat")] %>% data.matrix
-
-  #acceptable_points is a custom shapefile of points between Africa's coastline and 12km inland
-  acceptable_points <- readOGR(paste0(j, "WORK/11_geospatial/05_survey shapefile library/Shapefile directory/af_pts_win_12km_coast.shp"))
-  acceptable_points <- acceptable_points %>% data.frame %>% data.matrix
-  acceptable_points <- acceptable_points[, c("coords.x1", "coords.x2")]
-
-  fixed <- data.frame()
-  for (i in 1:nrow(fix_m)){
-    distances <- spDistsN1(acceptable_points, fix_m[i,])
-    m_dist <- acceptable_points[distances == min(distances)]
-    if (length(m_dist) > 2){
-      if (length(m_dist)%%2 == 0){
-        first <- length(m_dist)/2
-        last <- first+1
-        f <- data.frame(long=m_dist[first], lat=m_dist[last])
-      } else{
-        message("Contact Manny about an issue with the geography codebooks. Not all points will be properly shifted from sea to land.")
-        f <- data.frame(long=m_dist[1], lat=m_dist[2])
-      }
-    } else{
-      f <- data.frame(long=m_dist[1], lat=m_dist[2])
-    }
-    fixed <- rbind.fill(fixed, f)
-  }
-
-  #verify that points were correctly moved
-  fixed_v <- fixed
-  coordinates(fixed_v) <- ~long+lat
-  proj4string(fixed_v) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-  o <- over(fixed_v, shp)
-  if (length(o[is.na(o)]) > 0){
-    #if this is > 0 contact Manny to adjust code.
-    message(paste(length(o[is.na(o)]), "points aren't being properly moved from sea to land."))
-    #possibilities for this error include:
-    #shapefile incorrectly geopositiong land points
-    #wrong data types being fed to the over function
-    #an update to your version of R or one of the geospatial R packages
-    #a mystery. contact manny or another geospatial data analyst to troubleshoot
-  }
-
-  for (i in 1:nrow(fix)){
-    geo[lat == fix[i, "lat"] & long == fix[i, "long"], c("lat", "long") := list(fixed[i, "lat"], fixed[i, "long"])]
-  }
-
-  return(geo)
-}
-
-adjust_year_start_to_int_year <- function(df){
-  nids_missing_int_year <- df[!is.na(int_year), nid]
-  nids_with_big_differences <- df[int_year > year_start + 5 | int_year < start_year,  list(nid, ihme_loc_id, year_start, year_end, survey_name, change := year_start - int_year)]
-  write.csv(nids_with_big_differences, paste0(folder_out, "/changed_years.csv"), row.names=F)
-  updated <- df[!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start, year_start := int_year]
-  return(updated)
 }
 
 extractions <- list.files(folder_in, pattern=".DTA$", ignore.case=T, full.names=T)
@@ -198,14 +105,6 @@ if (topic == "wash"){
   topics[hw_soap2 == 1, hw_soap := 1]
   topics[hw_soap3 == 1, hw_soap := 1]
   
-  #fix nid 11788
-  topics[nid == 11788 & t_type == "42", t_type := "Pit latrine with ventilation pipe on site"]
-  topics[nid == 11788 & t_type == "43", t_type := "Pit latrine with ventilation pipe off site"]
-  topics[nid == 11788 & t_type == "52", t_type := "Pit latrine without ventilation pipe on site"]
-  topics[nid == 11788 & t_type == "53", t_type := "Pit latrine without ventilation pipe off site"]
-  topics[nid == 11788 & t_type == "62", t_type := "Bucket toilet on site"]
-  topics[nid == 11788 & t_type == "63", t_type := "Bucket toilet off site"]
-  
   drop <- c("cooking_fuel", "line_id", "sex_id", "age_year", "age_month", "age_day", "pweight", "cooking_fuel_mapped", "w_treat", "w_filter", "w_boil", "w_bleach", "nid_n", "year", "t_type_multi", "w_solar", "w_cloth", "w_settle", "hw_soap1", "hw_soap2", "hw_soap3")
   topics <- topics[, (drop):= NULL]
   wn <- topics[survey_module == "WN", ]
@@ -227,26 +126,15 @@ geogs <- lapply(files, read_add_name_col)
 message("rbind geography codebooks together")
 geo <- rbindlist(geogs, fill=T, use.names=T)
 
-#geo[grepl(pattern = "^-[[:digit:]]|^[[:digit:]]", lat), lat:=NA]
-#geo[grepl(pattern = "^-[[:digit:]]|^[[:digit:]]", long), long:=NA]
-#coerce lat/longs to numeric, convert iso3s to standard format
 geo[is.na(admin_level), admin_level := "NA"] #set NA values for admin_level to "NA" as a string to keep the following line from dropping them because of bad R logic
 geo <- geo[admin_level != "0", ] #drop anything matched to admin0
-#Encoding(geo$lat) <- 'windows-1252'
-#Encoding(geo$long) <- 'windows-1252'
-#Encoding(geo$geospatial_id) <- 'windows-1252'
+
 geo[, unique_id := paste(nid, iso3, geospatial_id, sep="_")]
-#dedupe the geography codebook by geospatial_id and nid
 geo <- distinct(geo, unique_id, .keep_all=T)
 geo[, lat := as.numeric(lat)]
 geo[, long := as.numeric(long)]
-#geo <- geo[, iso3 := substr(iso3, 1, 3)]
 geo[iso3 == "KOSOVO", iso3 := "SRB"]
 
-
-#message("Moving points jittered to the ocean to nearest land")
-#message("Note: this functionality currently only works for Africa. If necessary for other regions, please update the shapefiles this function uses or contact Manny Garcia.")
-#geo <- force_points_to_nearest_land(geo)
 
 #make everything the same data type to merge
 message("make types between merging datasets match")
@@ -275,11 +163,17 @@ message("merge both datasets together")
 all <- merge(geo_k, topics, by.x=c("nid", "iso3", "geospatial_id"), by.y=c("nid", "ihme_loc_id", "geospatial_id"), all.x=F, all.y=T)
 #rm(topics)
 #rm(geo)
+
+#only overwrite lat/longs with original microdata they're NA in the geography codebooks
 all[!is.na(latitude) & is.na(lat), lat := latitude]
 all[!is.na(longitude) & is.na(long), long := longitude]
 
 #set start_year to weighted mean of int_year for clusters with int_years that are reasonable
 #all[(!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start) & (!is.na(lat) & !is.na(long)), start_year := weighted.mean(int_year, weight=hhweight), by=c("nid", "psu", "lat", "long")]
+all[,start_year := year_start]
+if (topic == "diarrhea"){
+  stop("troubleshoot int_year/start_year issue for diarrhea")
+}
 
 if (topic == "wash"){
   message("custom wash fixes")
@@ -375,7 +269,8 @@ if (topic == "wash"){
   packaged <- rbind(hhhs, missing_hh_size, fill=T)
   
   nids_that_need_hh_size_crosswalk <- c(20998, #MACRO_DHS_IN UGA 1995 WN
-                                        32144, 32138, 1301, 1308, 1322) #BOL/INTEGRATED_HH_SURVEY_EIH
+                                        32144, 32138, 1301, 1308, 1322, #BOL/INTEGRATED_HH_SURVEY_EIH
+                                        7375) # KEN 2007 Household Health Expenditure Utilization Survey KEN/HH_HEALTH_EXPENDITURE_UTILIZATION_SURVEY
   packaged[nid %in% nids_that_need_hh_size_crosswalk, hh_size := NA]
   
   # pt_collapse <- packaged[!is.na(lat) & !is.na(long),]
@@ -445,14 +340,16 @@ if (topic == "wash"){
   message("saving points")
   pt_collapse <- packaged[!is.na(lat) & !is.na(long), ]
   #set start_year to int_year for point data
-  pt_collapse[, start_year := int_year]
+  pt_collapse[, year_experiment := start_year]
+  pt_collapse[!is.na(int_year), year_experiment := int_year]
   save(pt_collapse, file=paste0(folder_out, "/points_", module_date, ".Rdata"))
   write_feather(pt_collapse, path=paste0(folder_out, "/points_", module_date, ".feather"))
   
   message("saving polygons")
   poly_collapse <- packaged[(is.na(lat) | is.na(long)) & !is.na(shapefile) & !is.na(location_code), ]
   #set polygon years to a weighted mean
-  poly_collapse[, start_year := weighted.mean(int_year, weight=hhweight, na.rm=T), by=c("nid")]
+  poly_collapse[, year_experiment := start_year]
+  poly_collapse[, year_experiment := weighted.mean(int_year, weight=hhweight, na.rm=T), by=c("nid")]
   save(poly_collapse, file=paste0(folder_out, "/poly_", module_date, ".Rdata"))
   write_feather(poly_collapse, path=paste0(folder_out, "/poly_", module_date, ".feather"))
   
@@ -460,7 +357,7 @@ if (topic == "wash"){
   #save(packaged, file=paste0(folder_out, "/packaged_dataset_", module_date, ".Rdata"))
 } else if (topic == "diarrhea"){
   message("saving to J")
-  all <- all[!is.na(had_diarrhea), ]
+  #all <- all[!is.na(had_diarrhea), ]
   #all <- all[age_year < 5,]
   save(all, file=paste0(folder_out, "/", module_date, ".Rdata"))
 }
