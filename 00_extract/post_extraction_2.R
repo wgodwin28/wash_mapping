@@ -169,15 +169,30 @@ all[!is.na(latitude) & is.na(lat), lat := latitude]
 all[!is.na(longitude) & is.na(long), long := longitude]
 
 #set start_year to weighted mean of int_year for clusters with int_years that are reasonable
-
 all[,start_year := year_start]
+all[is.na(pweight) & !is.na(hhweight), pweight := hhweight]
 if (topic == "diarrhea"){
-  stop("troubleshoot int_year/start_year issue for diarrhea")
   all[, year_dummy := start_year]
   all[, year_experiment := year_dummy]
-  all[, year_experiment := round(weighted.mean(x=year_dummy, w=pweight)), by=.(nid, iso3)]
-  all[(!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start), year_experiment := round(weighted.mean(int_year, weight=pweight)), by=c("nid", "iso3")]
   
+  all[, year_experiment := round(weighted.mean(x=year_dummy, w=pweight, na.rm=T)), by=.(nid, iso3)]
+  
+  all[(!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start), year_experiment := round(weighted.mean(int_year, weight=pweight, na.rm=T)), by=c("nid", "iso3")]
+  
+  #make point-level clusters annually representative of themselves
+  all[!is.na(lat) & !is.na(long) & !is.na(int_year) & int_year <= year_start+5 & int_year >= year_start, year_experiment := round(weighted.mean(x=int_year, w=pweight)), by=.(nid, iso3, lat, long)]
+  
+  
+  bad_year_nids <- unique(all[is.na(year_experiment), nid])
+  for (bad_nid in bad_year_nids){
+    message(bad_nid)
+    only_year <- unique(all[nid==bad_nid, year_experiment])
+    only_year <- only_year[!is.na(only_year)]
+    all[nid == bad_nid, year_experiment := only_year]
+  }
+  message("if a table longer than 0 rows appears here diagnose issues with year_experiment")
+  unique(all[is.na(year_experiment), .(nid, iso3)])
+  message("end of table")
 }
 
 if (topic == "wash"){
