@@ -5,8 +5,9 @@ indi_fam <- 'water'
 
 if (indi_fam == 'water' ) {
 	for (i in c('piped','imp','unimp','surface')) {
+		message(i)
 		rm(mydat, mydat2, mydat3)
-		setwd(paste0('/home/j/WORK/11_geospatial/wash/data/resamp/water/',i,'/2017-10-02'))
+		setwd(paste0('/home/j/WORK/11_geospatial/wash/data/resamp/water/',i,'/2017-10-31'))
 
 
 		mydat <- lapply(list.files(), read.csv, stringsAsFactors = F)

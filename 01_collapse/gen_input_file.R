@@ -7,7 +7,7 @@ setwd('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash')
 
 indi_fam <- 'water'
 if (indi_fam == 'water') {
-  ptdat <- read_feather('ptdat_water_unconditional_clean_2017_09_29.feather')
+  ptdat <- read_feather('ptdat_water_unconditional__2017_10_31.feather')
 
   w_piped <- ptdat
   w_piped <- dplyr::select(w_piped, -surface, -imp, -unimp)

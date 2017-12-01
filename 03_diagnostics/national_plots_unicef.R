@@ -62,4 +62,4 @@ for (i in unique(alldat$iso3)) {
 		)
 	}
 }
-dev.off()
+dev.off()	
