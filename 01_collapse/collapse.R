@@ -51,7 +51,7 @@ for (data_type in c("pt","poly")){
   message('Loading Data...')
   # Load data
   if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_10_30.feather'))
+    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_11_20.feather'))
     Encoding(pt_collapse$w_source_drink) <- "UTF-8"
     Encoding(pt_collapse$w_source_other) <- "UTF-8"
     Encoding(pt_collapse$t_type) <- "UTF-8"
@@ -61,7 +61,7 @@ for (data_type in c("pt","poly")){
   } 
     
   if (!("pt_collapse" %in% ls()) & data_type == 'poly') {
-    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_10_30.feather'))
+    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_11_20.feather'))
     Encoding(pt_collapse$w_source_drink) <- "UTF-8"
     Encoding(pt_collapse$w_source_other) <- "UTF-8"
     Encoding(pt_collapse$t_type) <- "UTF-8"
@@ -70,7 +70,7 @@ for (data_type in c("pt","poly")){
     pt_collapse$t_type <- tolower(pt_collapse$t_type)
   }
 
-  for (indi_fam in c('water')) {
+  for (indi_fam in c('water','sani')) {
     rm(definitions)
 
     for (agg_level in c('country','')) {

@@ -6,9 +6,9 @@ library(dplyr)
 library(ggplot2)
 library(ggrepel)
 
-ptdat <- read_feather('ptdat_water_unconditional_country_2017_10_31.feather')
+ptdat <- read_feather('ptdat_water_unconditional_country_2017_12_01.feather')
 ptdat$point <- 'pt'
-polydat <- read_feather('polydat_water_unconditional_country_2017_10_31.feather')
+polydat <- read_feather('polydat_water_unconditional_country_2017_12_01.feather')
 polydat$point <- 'poly'
 alldat <- rbind(ptdat, polydat)
 
@@ -39,7 +39,7 @@ wssa <- c('CPV','SEN','GMB','GIN','GNB','SLE','MLI','LBR',
           'BFA','MRT')
 africa <- c(sssa_hi, cssa, name_hi, essa_hilo, wssa)
 
-pdf('/home/adesh/Documents/wash/plots/wash_dx_water_problems_10_31.pdf')
+pdf('/home/adesh/Documents/wash/plots/wash_dx_w_piped_problems_12_01.pdf')
 for (i in unique(alldat$iso3)) {
 	message(i)
 	plotdat <- filter(alldat, iso3 == i)
