@@ -10,7 +10,7 @@ user <- "adesh"
 setwd('/share/code/geospatial/adesh/wash_mapping/02_resample/')
 indicators <- c("water")
 run_date <- Sys.Date()
-polydat <- read_feather('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_12_01.feather')
+polydat <- read_feather('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_sani_unconditional__2017_12_01.feather')
 
 
 for (indic in indicators) {
