@@ -1,4 +1,7 @@
-nodes <- ''
+.libPaths('/share/code/geospatial/adesh/r_packages')
+library(feather)
+
+nodes <- 'geos'
 proj <- ifelse(nodes == 'geos',
         '-P proj_geo_nodes -l gn=TRUE',                      		
         '-P proj_geospatial')
@@ -7,7 +10,7 @@ user <- "adesh"
 setwd('/share/code/geospatial/adesh/wash_mapping/02_resample/')
 indicators <- c("water")
 run_date <- Sys.Date()
-load('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_12_01.RData')
+polydat <- read_feather('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_12_01.feather')
 
 
 for (indic in indicators) {
