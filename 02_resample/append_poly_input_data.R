@@ -57,8 +57,15 @@ if (indi_fam == 'water' ) {
 				            N = total_hh, year = year_start,
 		        		    country = iso3) %>% 
                 		mutate(w_imp_cr = imp*N, w_piped = piped*N) %>%
-                		mutate(N = N - w_piped) %>%
+                		mutate(N = N - w_piped) %>% rename(prop = imp)
                 		select(-w_piped, piped) %>% filter(N > 0)
+
+		mydat2 <- read.csv(paste0('/home/j/WORK/11_geospatial/10_mbg/input_data/w_',i,'.csv'),
+		                   stringsAsFactors = F)
+		mydat2 <- select(mydat2, -X)
+		mydat3 <- rbind(mydat2, mydat)
+		mydat3 <- select(mydat3, -prop)
+		write.csv(mydat3, paste0('/home/j/WORK/11_geospatial/10_mbg/input_data/w_',i,'.csv'))
 
 		}
 
@@ -75,9 +82,16 @@ if (indi_fam == 'water' ) {
 				            N = total_hh, year = year_start,
 		        		    country = iso3) %>% 
                 		mutate(w_unimp_cr = unimp*N, w_piped = piped*N, w_imp = imp*N) %>%
-                		mutate(N = N - w_piped - w_imp) %>%
+                		mutate(N = N - w_piped - w_imp) %>% rename(prop = unimp)
                 		select(-w_piped, piped, -w_imp, -imp) %>%
                 		filter(N > 0)
+
+        mydat2 <- read.csv(paste0('/home/j/WORK/11_geospatial/10_mbg/input_data/w_',i,'.csv'),
+		                   stringsAsFactors = F)
+		mydat2 <- select(mydat2, -X)
+		mydat3 <- rbind(mydat2, mydat)
+		mydat3 <- select(mydat3, -prop)
+		write.csv(mydat3, paste0('/home/j/WORK/11_geospatial/10_mbg/input_data/w_',i,'.csv'))   
 
 		}
 	}
@@ -131,8 +145,14 @@ if (indi_fam == 'sani' ) {
 		            N = total_hh, year = year_start,
         		    country = iso3) %>% 
         		mutate(s_unimp_cr = unimp*N, s_imp = imp*N) %>%
-        		mutate(N = N - s_imp) %>%
+        		mutate(N = N - s_imp) %>% rename(prop = imp)
         		select(-s_imp, -imp) %>%
         		filter(N > 0)
 
+    mydat2 <- read.csv('/home/j/WORK/11_geospatial/10_mbg/input_data/s_unimp_cr.csv',
+		                   stringsAsFactors = F)
+	mydat2 <- select(mydat2, -X)
+	mydat3 <- rbind(mydat2, mydat)
+	mydat3 <- select(mydat3, -prop)
+	write.csv(mydat3, '/home/j/WORK/11_geospatial/10_mbg/input_data/s_unimp_cr.csv')   
 }
