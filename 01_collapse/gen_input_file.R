@@ -31,7 +31,7 @@ if (indi_fam == 'water') {
   w_imp_cr <- mutate(w_imp_cr, point = 1, weight = 1, w_imp_cr = (imp*total_hh), w_piped = (piped*total_hh))
   w_imp_cr <- rename(w_imp_cr, country = iso3, year = year_start, prop = imp, N = total_hh, latitude = lat,
                   longitude = long)
-  w_imp_cr <- mutate(w_imp_cr, N = ((N)) - w_piped) %>% select(-piped, -w_piped) %%>
+  w_imp_cr <- mutate(w_imp_cr, N = ((N)) - w_piped) %>% select(-piped, -w_piped) %>%
               filter(N > 0)
   write.csv(w_imp_cr, '/home/j/WORK/11_geospatial/10_mbg/input_data/w_imp_cr.csv')
 
