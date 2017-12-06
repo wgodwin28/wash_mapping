@@ -8,7 +8,7 @@ proj <- ifelse(nodes == 'geos',
 user <- "adesh"
 
 setwd('/share/code/geospatial/adesh/wash_mapping/02_resample/')
-indicators <- c("sani")
+indicators <- c("water", 'sani')
 run_date <- Sys.Date()
 
 for (indic in indicators) {
