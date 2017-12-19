@@ -1,10 +1,11 @@
+#source("/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/04_strings/match_strings.R")
 library(magrittr)
 library(plyr)
 j <- ifelse(Sys.info()[1]=="Windows", "J:/", "/snfs1/")
 
-most_recent_water <- paste0(j, "WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_07_21.csv")
-most_recent_wother <- paste0(j, "WORK/11_geospatial/wash/definitions/w_other_defined_updated_2017_07_21.csv")
-most_recent_toilet <- paste0(j, "WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_07_21.csv")
+most_recent_water <- paste0(j, "WORK/11_geospatial/wash/definitions/w_source_defined_2017_12_18.csv")
+most_recent_wother <- paste0(j, "WORK/11_geospatial/wash/definitions/w_other_defined_2017_12_18.csv")
+most_recent_toilet <- paste0(j, "WORK/11_geospatial/wash/definitions/t_type_defined_2017_12_18.csv")
 
 w <- read.csv(most_recent_water, stringsAsFactors=F, encoding = 'windows-1252')
 w_o <- read.csv(most_recent_wother, stringsAsFactors=F, encoding = 'windows-1252')
@@ -12,9 +13,11 @@ t <- read.csv(most_recent_toilet, stringsAsFactors=F, encoding = 'windows-1252')
 
 
 
-most_recent_extract <- paste0(j, "LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/packaged_dataset_08_10_2017.Rdata")
+most_recent_extract <- paste0(j, "LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/2017_12_18.Rdata")
 load(most_recent_extract)
-#called packaged
+#called all. should rename to packaged
+packaged <- all
+rm(all)
 
 new_w <- packaged$w_source_drink %>% unique
 new_wo <- packaged$w_source_other %>% unique

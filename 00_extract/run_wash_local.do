@@ -75,18 +75,19 @@ init, topics(`topics')
 
 local outpath = "`j'/LIMITED_USE/LU_GEOSPATIAL/ubCov_extractions/wash_2"
 
-local array 8401
+local array 8407
 foreach number in `array'{
 	local i `number'
-	run_extract `i', bypass_map bypass //keep
+	run_extract `i', bypass //keep
 	tostring year_start, gen(year_n)
 	tostring year_end, gen(end_year_n)
 	tostring nid, gen(nid_n)
 	local filename = survey_name + "_" + nid_n + "_" + survey_module + "_" + ihme_loc_id + "_" + year_n + "_" + end_year_n
 	local filename = subinstr("`filename'", "/", "_",.)
 	// recodes for postprocessing
-	do "`j'/WORK/11_geospatial/07_data extraction/WASH/wash_recodes.do"
+	do "`j'/WORK/11_geospatial/07_data extraction/WASH/wash_recodes_2.do"
 	drop year_n end_year_n nid_n
 	cd 	`outpath'
 	saveold "`filename'", replace
 }
+
