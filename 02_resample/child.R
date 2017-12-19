@@ -1,14 +1,14 @@
 rm(list = ls())
 # Set library and load packages
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
-package_list <- c('dplyr','raster', 'seegSDM','seegMBG')
+package_list <- c('dplyr','raster', 'seegSDM','seegMBG', 'feather')
 if(Sys.info()[1]=="Windows") {
   for(package in package_list) {
     library(package, character.only = T)
   }
 } else {
   package_lib <- ifelse(grepl("geos", Sys.info()[4]),
-                        paste0(root,'temp/geospatial/geos_packages'),                      		
+                        paste0('/share/code/geospatial/adesh/r_packages'),                      		
                         paste0(root,'temp/geospatial/packages'))
   .libPaths(package_lib)     
   for(package in package_list) {
@@ -23,9 +23,11 @@ run_date <- commandArgs()[5]
 
 if (indic == 'water') {
   levels <- c('piped','imp','unimp','surface')
-} else {levels <- c('imp','unimp','shared','open')}
+  polydat <- read_feather('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_12_01.feather')
+} else {levels <- c('imp','unimp','od')
+  polydat <- read_feather('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_sani_unconditional__2017_12_01.feather')
+}
 
-load('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_2017_09_06_clean.RData')
 subset <- polydat[which(polydat$shapefile == shp),]
 
 shape_master <- shapefile(paste0('/home/j//WORK/11_geospatial/05_survey shapefile library/Shapefile directory/',shp,'.shp'))

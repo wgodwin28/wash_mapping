@@ -18,7 +18,7 @@ if(Sys.info()[1]=="Windows") {
 }
 
 # Input filepath for collapsed polydata
-load('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_2017_09_06.RData')
+load('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_2017_09_13.RData')
 
 # Input survey shapefile library
 shp_dir <- '/home/j/WORK/11_geospatial/05_survey shapefile library/Shapefile directory/'
