@@ -89,7 +89,7 @@ if (indi_fam == 'sani') {
   s_unimp_cr <- rename(s_unimp_cr, country = iso3, year = year_start, prop = unimp, N = total_hh, latitude = lat,
                   longitude = long)
   s_unimp_cr <- mutate(s_unimp_cr, N = ((N) - s_imp)) %>% select(-s_imp, -imp) %>% filter(N > 0)
-  write.csv(s_unimp_cr, '/home/j/WORK/11_geospatial/10_mbg/input_data/s_unimp.csv')
+  write.csv(s_unimp_cr, '/home/j/WORK/11_geospatial/10_mbg/input_data/s_unimp_cr.csv')
 
   s_od <- ptdat
   s_od <- select(s_od, -imp, -unimp)

@@ -30,9 +30,9 @@ lakes_df <- data.frame(lakes_df)
 colnames(lakes_df) <- c("long", 'lat', 'lakes')
 
 # read in raster brick of hybrid
-lri <- brick('water/w_piped_median_ci_hybrid.tif')
+lri <- brick('water/w_imp_greater_median_ci_hybrid.tif')
 
-indicator <- 'w_piped'
+indicator <- 'w_imp_greater'
 indi_fam <- 'water'
 file_type <- '_hybrid_uncertainty'
 ### Process indicator raster to data frame for ggplot2 ###
