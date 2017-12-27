@@ -61,7 +61,8 @@ say_file_and_read_dta <- function(file, keep){
 
 extractions <- list.files(folder_in, pattern=".DTA$", ignore.case=T, full.names=T)
 extractions <- grep("IPUMS_CENSUS", extractions, invert=T, value = T) #IPUMS is handled separately
-extractions <- grep("234353", extractions, invert=T, value=T) #234353 is a massive India dataset that slows everything down and gets us killed on the cluster. It is handled separately.
+extractions <- grep("234353|233917", extractions, invert=T, value=T) #234353 is a massive India dataset that slows everything down and gets us killed on the cluster. It is handled separately.
+#233917 is another IND survey that isn't quite as large but it also has to be collapsed separately. 
 extractions <- extractions[!grepl("/a", extractions)] #omit chinese surveys that aren't actually in the folder but that the cluster keeps finding
 
 
@@ -133,7 +134,7 @@ geo[, unique_id := paste(nid, iso3, geospatial_id, sep="_")]
 geo <- distinct(geo, unique_id, .keep_all=T)
 geo[, lat := as.numeric(lat)]
 geo[, long := as.numeric(long)]
-geo[iso3 == "KOSOVO", iso3 := "SRB"]
+#geo[iso3 == "KOSOVO", iso3 := "SRB"]
 
 
 #make everything the same data type to merge
@@ -169,15 +170,30 @@ all[!is.na(latitude) & is.na(lat), lat := latitude]
 all[!is.na(longitude) & is.na(long), long := longitude]
 
 #set start_year to weighted mean of int_year for clusters with int_years that are reasonable
-
 all[,start_year := year_start]
+all[is.na(pweight) & !is.na(hhweight), pweight := hhweight]
 if (topic == "diarrhea"){
-  stop("troubleshoot int_year/start_year issue for diarrhea")
   all[, year_dummy := start_year]
   all[, year_experiment := year_dummy]
-  all[, year_experiment := round(weighted.mean(x=year_dummy, w=pweight)), by=.(nid, iso3)]
-  all[(!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start), year_experiment := round(weighted.mean(int_year, weight=pweight)), by=c("nid", "iso3")]
   
+  all[, year_experiment := round(weighted.mean(x=year_dummy, w=pweight, na.rm=T)), by=.(nid, iso3)]
+  
+  all[(!is.na(int_year) & int_year <= year_start+5 & int_year >= year_start), year_experiment := round(weighted.mean(int_year, weight=pweight, na.rm=T)), by=c("nid", "iso3")]
+  
+  #make point-level clusters annually representative of themselves
+  all[!is.na(lat) & !is.na(long) & !is.na(int_year) & int_year <= year_start+5 & int_year >= year_start, year_experiment := round(weighted.mean(x=int_year, w=pweight)), by=.(nid, iso3, lat, long)]
+  
+  
+  bad_year_nids <- unique(all[is.na(year_experiment), nid])
+  for (bad_nid in bad_year_nids){
+    message(bad_nid)
+    only_year <- unique(all[nid==bad_nid, year_experiment])
+    only_year <- only_year[!is.na(only_year)]
+    all[nid == bad_nid, year_experiment := only_year]
+  }
+  message("if a table longer than 0 rows appears here diagnose issues with year_experiment")
+  unique(all[is.na(year_experiment), .(nid, iso3)])
+  message("end of table")
 }
 
 if (topic == "wash"){
@@ -278,70 +294,6 @@ if (topic == "wash"){
                                         7375) # KEN 2007 Household Health Expenditure Utilization Survey KEN/HH_HEALTH_EXPENDITURE_UTILIZATION_SURVEY
   packaged[nid %in% nids_that_need_hh_size_crosswalk, hh_size := NA]
   
-  # pt_collapse <- packaged[!is.na(lat) & !is.na(long),]
-  # poly_collapse <- packaged[(is.na(lat) & is.na(long)) & (!is.na(shapefile) & !is.na(location_code))]
-  # ## ADD URBAN ^^^^
-  # # 3. 
-  # #
-  # #
-  # #
-  # #
-  # #
-  # ####
-  # #save(packaged, file="/snfs1/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/peru_08_04_2017.RData")
-  # #stop("You just saved a Peru-Specific dataset. Should that still be in the code?")
-  # #nids <- unique(packaged$nid)
-  # #for (n in nids){
-  # #  message(paste("nid", n))
-  # #  message(sum(packaged[nid == n, ]$hh_size, na.rm=T))
-  # #  message()
-  # #}
-  # pt_collapse <- all[!is.na(lat) & !is.na(long), ]
-  # #if hh_size is 99 make it NA
-  # pt_collapse[is.na(hh_size), hhs := 1]
-  # pt_collapse[is.na(hh_size), hh_size := sum(hhs, na.rm=T), by=list(nid, hh_id, geospatial_id, hhweight, 
-  #                                                                   year_start, iso3, lat, long, w_source_drink, 
-  #                                                                   w_source_other, mins_ws, dist_ws, dist_ws_unit, 
-  #                                                                   t_type, shared_san, shared_san_num, hw_station, 
-  #                                                                   hw_water, hw_soap)]
-  # pt_collapse[, hhs := NULL]
-  # key <- c("nid", "hh_id", "geospatial_id", "hhweight", "year_start", "iso3", "lat", "long", 
-  #          "w_source_drink", "w_source_other", "mins_ws", "dist_ws", 
-  #          "dist_ws_unit", "t_type", "shared_san", "shared_san_num", 
-  #          "hw_station", "hw_water", "hw_soap")
-  # pt_collapse <- unique(pt_collapse, by=key)
-  # pt_collapse <- pt_collapse[nid %in% nids_that_need_hh_size_crosswalk, hh_size := NA]
-  # #if (any(pt_collapse$hh_size > 1000)) { stop("household sizes are crazy big in the points")}
-  # 
-  # #l <- nrow(pt_collapse)*0.2
-  # #pt_sample <- pt_collapse[sample(nrow(pt_collapse), l), ]
-  # #save(pt_sample, file=paste0(folder_out, "/sample_points_collapsed_", module_date, ".Rdata"))
-  # message("saving point data")
-  # save(pt_collapse, file=paste0(folder_out, "/points_collapsed_", module_date, ".Rdata"))
-  # 
-  # #collapse polys by shp/location_id
-  # all[shapefile=="", shapefile:=NA]
-  # all[location_code=="", location_code:=NA]
-  # poly_collapse <- all[!is.na(shapefile) & !is.na(location_code) & (is.na(lat) | is.na(long)),]
-  # poly_collapse <- poly_collapse[is.na(hh_size), hhs:=1]
-  # poly_collapse <- poly_collapse[is.na(hh_size), hh_size := sum(hhs), by=list(nid, hh_id, geospatial_id, hhweight, year_start, iso3, 
-  #                                                                             shapefile, location_code, w_source_drink, w_source_other, 
-  #                                                                             mins_ws, dist_ws, dist_ws_unit, t_type, shared_san, 
-  #                                                                             shared_san_num, hw_station, hw_water, hw_soap)]
-  # poly_collapse[, hhs := NULL]
-  # #poly_collapse <- poly_collapse[, clusters_in_collapse := uniqueN(psu), by=list(nid, hh_id, geospatial_id, hhweight, year_start, iso3, shapefile, location_code, w_source_drink, w_source_other, mins_ws, dist_ws, dist_ws_unit, t_type, shared_san, shared_san_num, hw_station, hw_water, hw_soap)]
-  # poly_collapse <- poly_collapse[nid %in% nids_that_need_hh_size_crosswalk, hh_size := NA]
-  # #setkey(poly_collapse, shapefile, location_code, w_source_drink, w_source_other, mins_ws, dist_ws, dist_ws_unit, t_type, shared_san, shared_san_num, hw_station, hw_water, hw_soap)
-  # key <- c("nid", "hh_id", "geospatial_id", "hhweight", "year_start", "iso3", "shapefile", "location_code", 
-  #          "w_source_drink", "w_source_other", "mins_ws", "dist_ws", 
-  #          "dist_ws_unit", "t_type", "shared_san", "shared_san_num", 
-  #          "hw_station", "hw_water", "hw_soap")
-  # poly_collapse <- unique(poly_collapse, by=key)
-  #if (any(poly_collapse$hh_size > 1000)) { stop("household sizes are crazy big in the polygons")}
-  #l <- nrow(poly_collapse)*0.2
-  #poly_sample <- poly_collapse[sample(nrow(poly_collapse), l), ]
-  #save(poly_sample, file=paste0(folder_out, "/sample_polys_collapsed_", module_date, ".Rdata"))
-  
   message("saving points")
   pt_collapse <- packaged[!is.na(lat) & !is.na(long), ]
   #set start_year to int_year for point data
@@ -387,13 +339,16 @@ if (topic == "wash"){
 message("subsetting out unmatched geographies")
 gnid <- unique(geo$nid)
 #fix <- subset(all, is.na(shapefile) & (is.na(lat) | is.na(long)) )
+
+stages <- read.csv("/snfs1/temp/gmanny/geospatial_stages_priority.csv", stringsAsFactors=F)
+
 fix <- subset(all, !(all$nid %in% gnid))
 fix <- data.frame(fix)
 fix_collapse <- unique(fix[c("nid", "iso3", "year_start", "survey_name")])
-fix_collapse <- merge(fix_collapse, iso, by.x="iso3", by.y="alpha.3", all.x=T)
+fix_collapse <- merge(fix_collapse, stages, by.x="iso3", by.y="alpha.3", all.x=T)
 
 message("writing csv of unmatched extractions")
 fix_outpath <- paste0("/snfs1/LIMITED_USE/LU_GEOSPATIAL/geo_matched/", topic, "/new_geographies_to_match.csv")
-write.csv(fix_collapse, fix_outpath, row.names=F)
+write.csv(fix_collapse, fix_outpath, row.names=F, na="")
 
 #SAVE .Rdata OF EXTRACTIONS MATCHED TO GEOGRAPHIES

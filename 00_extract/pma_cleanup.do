@@ -1,0 +1,184 @@
+//BFA
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_257044_WN_BFA_2014_2014.dta", clear
+gen mins_queue_plus_trip = mins_ws
+drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_257044_WN_BFA_2014_2014.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_257045_WN_BFA_2015_2015.dta", clear
+gen mins_queue_plus_trip = mins_ws
+drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_257045_WN_BFA_2015_2015.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_285993_WN_BFA_2016_2016.dta", clear
+gen mins_queue_plus_trip = mins_ws
+drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_285993_WN_BFA_2016_2016.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_307751_WN_BFA_2016_2017.dta", clear
+gen mins_queue_plus_trip = mins_ws
+drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_307751_WN_BFA_2016_2017.dta", replace
+
+//COD
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_257822_HHM_COD_2013_2014.dta", clear
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_257822_HHM_COD_2013_2014.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_257823_WN_COD_2014_2014.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_257823_WN_COD_2014_2014.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_257826_WN_COD_2015_2015.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_257826_WN_COD_2015_2015.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_286019_WN_COD_2015_2016.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_286019_WN_COD_2015_2016.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_286020_WN_COD_2015_2016.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold"J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_286020_WN_COD_2015_2016.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_286054_HHM_COD_2016_2016.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_286054_HHM_COD_2016_2016.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_286055_HHM_COD_2016_2016.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_286055_HHM_COD_2016_2016.dta", replace
+
+//ETH
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_153503_HHM_ETH_2014_2014.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_153503_HHM_ETH_2014_2014.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256175_HH_ETH_2014_2014.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256175_HH_ETH_2014_2014.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256176_HH_ETH_2015_2015.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256176_HH_ETH_2015_2015.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_285891_HHM_ETH_2016_2016.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_285891_HHM_ETH_2016_2016.dta", replace
+
+
+//GHA
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_197904_HHM_GHA_2013_2013.dta", clear
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_197904_HHM_GHA_2013_2013.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256241_HHM_GHA_2014_2014.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256241_HHM_GHA_2014_2014.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256243_HH_GHA_2014_2014.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256243_HH_GHA_2014_2014.dta", replace
+
+
+//KEN
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256244_HH_GHA_2015_2015.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+save "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256244_HH_GHA_2015_2015.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256338_HH_KEN_2014_2014.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256338_HH_KEN_2014_2014.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256365_HH_KEN_2015_2015.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256365_HH_KEN_2015_2015.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256366_HHM_KEN_2015_2015.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256366_HHM_KEN_2015_2015.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_197910_HHM_KEN_2014_2014.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_197910_HHM_KEN_2014_2014.dta", replace
+
+//NER
+//nid 256177 is skipped because its data came in a 100% ubcov-friendly format
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_286052_HHM_NER_2016_2016.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_286052_HHM_NER_2016_2016.dta", replace
+
+//NGA
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256263_HH_NGA_2014_2014.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256263_HH_NGA_2014_2014.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256262_HH_NGA_2014_2014.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256262_HH_NGA_2014_2014.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256268_HHM_NGA_2015_2015.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256268_HHM_NGA_2015_2015.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256267_HHM_NGA_2015_2015.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256267_HHM_NGA_2015_2015.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_286022_HHM_NGA_2016_2016.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_286022_HHM_NGA_2016_2016.dta", replace
+
+//UGA
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256199_HH_UGA_2014_2014.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256199_HH_UGA_2014_2014.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256200_HHM_UGA_2015_2015.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256200_HHM_UGA_2015_2015.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256201_HH_UGA_2015_2015.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_256201_HH_UGA_2015_2015.dta", replace
+
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_285893_HHM_UGA_2016_2016.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_285893_HHM_UGA_2016_2016.dta", replace
+
+//IND
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_257614_HH_IDN_2015_2015.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_257614_HH_IDN_2015_2015.dta", replace
+
+//IDN
+use "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_285980_HH_IND_2016_2016.dta", clear
+cap gen mins_queue_plus_trip = mins_ws
+cap drop mins_ws
+saveold "J:\LIMITED_USE\LU_GEOSPATIAL\ubCov_extractions\wash_2\fixed_pma\JHSPH_PERFORMANCE_MONITORING_ACCOUNTABILITY_SURVEY_PMA2020_285980_HH_IND_2016_2016.dta", replace
