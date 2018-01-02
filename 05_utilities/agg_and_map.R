@@ -20,6 +20,7 @@ w_imp <- raster('/homes/adesh/results/water/w_imp_median.tif', band = 16)
 s_imp <- raster('/homes/adesh/results/sani/s_imp_median.tif', band = 16)
 s_od <- raster('/homes/adesh/results/sani/s_od_median.tif', band = 16)
 
+
 piped_pop <- piped*pop
 w_imp_pop <- w_imp*pop
 s_imp_pop <- s_imp*pop

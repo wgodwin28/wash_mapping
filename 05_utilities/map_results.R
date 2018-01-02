@@ -28,12 +28,12 @@ colnames(lakes_df) <- c("long", 'lat', 'lakes')
 
 ### Read in indicator rasters from mbg output ###
 indi_fam <- 'water'
-indicator <- 'w_piped'
+indicator <- 'w_imp_greater'
 run_date <- '2017_11_01_16_42_03'
 var_name <- 'Piped on Premises'
 #file_type <- '_iqr_traditional'
 
-file_types <- c('_median')
+file_types <- c('_cirange')
 
 for (file_type in file_types) {
     message(file_type)
