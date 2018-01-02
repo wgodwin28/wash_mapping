@@ -1,25 +1,31 @@
 #source("/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/01_collapse/plot.R")
-package_lib <- '/snfs1/temp/geospatial/packages'
+
+cores <- 5
+package_lib <- '/snfs1/temp/geospatial/geos_packages'
 .libPaths(package_lib)
 library(data.table)
+library(feather)
 library(magrittr)
 
 message('loading collapsed points')
 #ptdat
 #load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_7_20_2017.RData")
-ptdat <- read_feather("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_water_unconditional__2017_10_27.feather")
+ptdat <- read_feather("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_water_unconditional__2017_12_18.feather")
 #load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_water_unconditional__2017_10_27.Rdata")
 #save(ptdat, file="/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_water_unconditional__2017_10_25.Rdata")
 
 message('loading collapsed polygons')
 #polydat
 #load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_7_20_2017.RData")
-polydat <- read_feather("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_10_27.feather")
+polydat <- read_feather("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_12_18.feather")
+
 #save(polydat, file="/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_10_25.Rdata")
 #load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_10_27.Rdata")
 
 message("rbinding points and polys together")
 ptdat <- rbind(polydat, ptdat, fill=T)
+#fix for broken UGA shp
+ptdat[shapefile == 'UGA_regions_2014_custom', shapefile := 'UGA_regions_custom']
 #returns ptdat data frame with data from non-IPUMS or AHS extractions
 # names(ptdat)
 # "id_short"      "nid"           "iso3"          "lat"
@@ -119,7 +125,7 @@ setwd(repo)
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
 j <- root
 j_root <- j
-cores <- 30
+
 #    dependent on the machine where the user runs the code.
                                   # Ensures packages look for dependencies here when called with library().
 #    Necessary for seeg libraries.
@@ -156,11 +162,11 @@ for (reg in regions){
                                                   var = 'water',
                                                   title = 'Water',
                                                   year_min = '1980',
-                                                  year_max = '2017',
+                                                  year_max = '2018',
                                                   year_var = 'start_year',
                                                   region = reg,
                                                   sum_by = 'n',
-                                                  since_date = "2017-1-10",
+                                                  since_date = "2017-10-27",
                                                   cores = cores,
                                                   indicator = 'water',
                                                   high_is_bad = FALSE,
