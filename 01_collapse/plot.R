@@ -1,25 +1,50 @@
 #source("/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/01_collapse/plot.R")
-package_lib <- '/snfs1/temp/geospatial/packages'
+
+cores <- 5
+package_lib <- '/snfs1/temp/geospatial/geos_packages'
 .libPaths(package_lib)
 library(data.table)
+library(feather)
 library(magrittr)
+
+indicator <- 'sani' #water or sani
 
 message('loading collapsed points')
 #ptdat
 #load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_7_20_2017.RData")
-ptdat <- read_feather("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_water_unconditional__2017_10_27.feather")
+pts <- list.files("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash", pattern="ptdat", full.names = T)
+pts <- grep(pts, pattern=".feather$", value=T)
+pts <- grep(pts, pattern=indicator, value=T)
+pts <- grep(pts, pattern="2018", value=T)
+pts <- grep(pts, pattern="country", invert=T, value=T) %>% sort
+pts <- pts[length(pts)]
+ptdat <- read_feather(pts)
 #load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_water_unconditional__2017_10_27.Rdata")
 #save(ptdat, file="/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_water_unconditional__2017_10_25.Rdata")
 
 message('loading collapsed polygons')
 #polydat
 #load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_7_20_2017.RData")
-polydat <- read_feather("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_10_27.feather")
+polys <- list.files("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash", pattern="polydat", full.names = T)
+polys <- grep(polys, pattern=".feather$", value=T)
+polys <- grep(polys, pattern=indicator, value=T)
+polys <- grep(polys, pattern="2018", value=T)
+polys <- grep(polys, pattern="country", invert=T, value=T) %>% sort
+polys <- polys[length(polys)]
+polydat <- read_feather(polys)
+#polydat <- read_feather("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_12_18.feather")
+
 #save(polydat, file="/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_10_25.Rdata")
 #load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_10_27.Rdata")
 
 message("rbinding points and polys together")
-ptdat <- rbind(polydat, ptdat, fill=T)
+ptdat <- rbind(polydat, ptdat, fill=T) %>% data.table
+#fix for broken UGA shp
+ptdat[shapefile == 'UGA_regions_2014_custom', shapefile := 'UGA_regions_custom']
+ptdat <- ptdat[iso3 != "TRUE"]
+ptdat <- ptdat[shapefile == "TRUE", shapefile := NA]
+ptdat[shapefile == "", shapefile := NA]
+ptdat[, location_code := as.numeric(location_code)]
 #returns ptdat data frame with data from non-IPUMS or AHS extractions
 # names(ptdat)
 # "id_short"      "nid"           "iso3"          "lat"
@@ -29,8 +54,7 @@ ptdat <- rbind(polydat, ptdat, fill=T)
 
 
 message("cleaning data for plot code")
-ptdat <- data.table(ptdat)
-ptdat[, water := piped]
+ptdat[, water := imp]
 ptdat_drop <- c("id_short", "piped", "surface", "imp", "unimp", "sdg_imp")
 ptdat[, (ptdat_drop) := NULL]
 # names(ptdat)
@@ -119,7 +143,7 @@ setwd(repo)
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
 j <- root
 j_root <- j
-cores <- 30
+
 #    dependent on the machine where the user runs the code.
                                   # Ensures packages look for dependencies here when called with library().
 #    Necessary for seeg libraries.
@@ -149,24 +173,25 @@ source('/snfs2/HOME/gmanny/backups/Documents/Repos/mbg/mbg_central/graph_data_co
 message("start coverage function")
 #regions <- c("south_asia", "se_asia", "africa", "latin_america", "middle_east")
 regions <- c("africa", "south_asia", "se_asia", "latin_america", "middle_east")
-regions <- rev(regions)
+#regions <- rev(regions)
+regions <- "africa" #remove this whan Ani updates the collapse code to include more countries
 for (reg in regions){
   message(reg)
   coverage_maps <- try(graph_data_coverage_values(df = w_collapsed,
                                                   var = 'water',
-                                                  title = 'Water',
+                                                  title = indicator,
                                                   year_min = '1980',
-                                                  year_max = '2017',
+                                                  year_max = '2018',
                                                   year_var = 'start_year',
                                                   region = reg,
                                                   sum_by = 'n',
-                                                  since_date = "2017-1-10",
+                                                  since_date = "2017-12-27",
                                                   cores = cores,
-                                                  indicator = 'water',
+                                                  indicator = indicator,
                                                   high_is_bad = FALSE,
                                                   return_maps = TRUE,
                                                   legend_title = "Prevalence",
-                                                  color_scheme = "darker_middle",
+                                                  color_scheme = "classic",
                                                   extra_file_tag = "",
                                                   save_on_share = FALSE))
 }
