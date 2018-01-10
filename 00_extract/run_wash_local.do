@@ -75,7 +75,7 @@ init, topics(`topics')
 
 local outpath = "`j'/LIMITED_USE/LU_GEOSPATIAL/ubCov_extractions/wash_2"
 
-local array 3423
+local array 7500
 foreach number in `array'{
 	local i `number'
 	run_extract `i', bypass //keep
