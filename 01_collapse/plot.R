@@ -7,7 +7,10 @@ library(data.table)
 library(feather)
 library(magrittr)
 
-indicator <- 'sani' #water or sani
+indicator <- 'water' #water or sani
+var <- 'imp' #imp, unimp, surface, od, piped
+
+title <- paste(c(var, indicator), collapse=" ")
 
 message('loading collapsed points')
 #ptdat
@@ -45,6 +48,7 @@ ptdat <- ptdat[iso3 != "TRUE"]
 ptdat <- ptdat[shapefile == "TRUE", shapefile := NA]
 ptdat[shapefile == "", shapefile := NA]
 ptdat[, location_code := as.numeric(location_code)]
+setnames(ptdat, "total_hh", "N")
 #returns ptdat data frame with data from non-IPUMS or AHS extractions
 # names(ptdat)
 # "id_short"      "nid"           "iso3"          "lat"
@@ -53,27 +57,27 @@ ptdat[, location_code := as.numeric(location_code)]
 # "surface"       "imp"           "unimp"         "sdg_imp"
 
 
-message("cleaning data for plot code")
-ptdat[, water := imp]
-ptdat_drop <- c("id_short", "piped", "surface", "imp", "unimp", "sdg_imp")
-ptdat[, (ptdat_drop) := NULL]
-# names(ptdat)
-# "nid"           "iso3"          "lat"
-# "long"          "shapefile"     "location_code" "survey_series"
-# "urban"         "year_start"    "total_hh"      "water"
-ptdat_poly <- ptdat[is.na(lat) & is.na(long) & !is.na(shapefile) & !is.na(location_code), ]
-ptdat_poly <- ptdat_poly[, water := mean(water, na.rm=T), by=list(shapefile, location_code)]
-ptdat_poly <- ptdat_poly[, N := sum(total_hh, na.rm=T), by=list(shapefile, location_code)]
-ptdat_poly <- ptdat_poly[, total_hh := NULL]
-ptdat_poly <- ptdat_poly[, point := 0]
-
-ptdat_points <- ptdat[!is.na(lat) & !is.na(long), ]
-ptdat_points <- ptdat_points[, water := mean(water, na.rm=T), by=list(lat, long)]
-ptdat_points <- ptdat_points[, N := sum(total_hh, na.rm=T), by=list(lat, long)]
-ptdat_points <- ptdat_points[, total_hh := NULL]
-ptdat_points <- ptdat_points[, point := 1]
-
-ptdat <- rbind(ptdat_poly, ptdat_points, fill=T)
+# message("cleaning data for plot code")
+# ptdat[, water := imp]
+# #ptdat_drop <- c("id_short", "piped", "surface", "imp", "unimp", "sdg_imp")
+# #ptdat[, (ptdat_drop) := NULL]
+# # names(ptdat)
+# # "nid"           "iso3"          "lat"
+# # "long"          "shapefile"     "location_code" "survey_series"
+# # "urban"         "year_start"    "total_hh"      "water"
+# ptdat_poly <- ptdat[is.na(lat) & is.na(long) & !is.na(shapefile) & !is.na(location_code), ]
+# ptdat_poly <- ptdat_poly[, water := mean(water, na.rm=T), by=list(shapefile, location_code)]
+# ptdat_poly <- ptdat_poly[, N := sum(total_hh, na.rm=T), by=list(shapefile, location_code)]
+# ptdat_poly <- ptdat_poly[, total_hh := NULL]
+# ptdat_poly <- ptdat_poly[, point := 0]
+# 
+# ptdat_points <- ptdat[!is.na(lat) & !is.na(long), ]
+# ptdat_points <- ptdat_points[, water := mean(water, na.rm=T), by=list(lat, long)]
+# ptdat_points <- ptdat_points[, N := sum(total_hh, na.rm=T), by=list(lat, long)]
+# ptdat_points <- ptdat_points[, total_hh := NULL]
+# ptdat_points <- ptdat_points[, point := 1]
+# 
+# ptdat <- rbind(ptdat_poly, ptdat_points, fill=T)
 # names(ptdat)
 # "nid"           "iso3"          "lat"           "point"
 # "long"          "shapefile"     "location_code" "survey_series"
@@ -171,15 +175,14 @@ w_collapsed[country == "KOS", country := "SRB"]
 # start data coverage plotting
 source('/snfs2/HOME/gmanny/backups/Documents/Repos/mbg/mbg_central/graph_data_coverage.R')
 message("start coverage function")
-#regions <- c("south_asia", "se_asia", "africa", "latin_america", "middle_east")
 regions <- c("africa", "south_asia", "se_asia", "latin_america", "middle_east")
 #regions <- rev(regions)
 regions <- "africa" #remove this whan Ani updates the collapse code to include more countries
 for (reg in regions){
   message(reg)
   coverage_maps <- try(graph_data_coverage_values(df = w_collapsed,
-                                                  var = 'water',
-                                                  title = indicator,
+                                                  var = var,
+                                                  title = title,
                                                   year_min = '1980',
                                                   year_max = '2018',
                                                   year_var = 'start_year',
@@ -192,6 +195,6 @@ for (reg in regions){
                                                   return_maps = TRUE,
                                                   legend_title = "Prevalence",
                                                   color_scheme = "classic",
-                                                  extra_file_tag = "",
+                                                  extra_file_tag = var,
                                                   save_on_share = FALSE))
 }
