@@ -1,4 +1,6 @@
 #source("/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/04_strings/match_strings.R")
+package_lib <- '/snfs1/temp/geospatial/geos_packages'
+.libPaths(package_lib)
 library(magrittr)
 library(data.table)
 j <- ifelse(Sys.info()[1]=="Windows", "J:/", "/snfs1/")
@@ -14,7 +16,6 @@ w <- read.csv(most_recent_water, stringsAsFactors=F, encoding = 'windows-1252')
 w_o <- read.csv(most_recent_wother, stringsAsFactors=F, encoding = 'windows-1252')
 t <- read.csv(most_recent_toilet, stringsAsFactors=F, encoding = 'windows-1252')
 
-
 most_recent_extracts <- list.files(paste0(j, "LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/"), full.names = T, pattern=".Rdata$") %>% grep(value=T, pattern="poly|points", invert=T)
 extract_info <- file.info(most_recent_extracts)
 extract_info$path <- rownames(extract_info)
@@ -23,9 +24,9 @@ most_recent_extract <- extract_info[order(mtime, decreasing = T), path][1]
 
 message("Loading big extraction .Rdata")
 load(most_recent_extract)
-#called all. should rename to packaged
-packaged <- all
-rm(all)
+#called all. should rename to packaged. subset only to surveys that have data at or beyond 1997
+packaged <- all[all$year_end >= 1997, ]
+#rm(all)
 
 message("Making data.frames of new strings")
 new_w <- packaged$w_source_drink %>% unique
