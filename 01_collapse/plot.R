@@ -1,25 +1,54 @@
 #source("/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/01_collapse/plot.R")
-package_lib <- '/snfs1/temp/geospatial/packages'
+
+cores <- 5
+package_lib <- '/snfs1/temp/geospatial/geos_packages'
 .libPaths(package_lib)
 library(data.table)
+library(feather)
 library(magrittr)
+
+indicator <- 'water' #water or sani
+var <- 'imp' #imp, unimp, surface, od, piped
+
+title <- paste(c(var, indicator), collapse=" ")
 
 message('loading collapsed points')
 #ptdat
 #load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_7_20_2017.RData")
-ptdat <- read_feather("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_water_unconditional__2017_10_27.feather")
+pts <- list.files("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash", pattern="ptdat", full.names = T)
+pts <- grep(pts, pattern=".feather$", value=T)
+pts <- grep(pts, pattern=indicator, value=T)
+pts <- grep(pts, pattern="2018", value=T)
+pts <- grep(pts, pattern="country", invert=T, value=T) %>% sort
+pts <- pts[length(pts)]
+ptdat <- read_feather(pts)
 #load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_water_unconditional__2017_10_27.Rdata")
 #save(ptdat, file="/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_water_unconditional__2017_10_25.Rdata")
 
 message('loading collapsed polygons')
 #polydat
 #load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_7_20_2017.RData")
-polydat <- read_feather("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_10_27.feather")
+polys <- list.files("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash", pattern="polydat", full.names = T)
+polys <- grep(polys, pattern=".feather$", value=T)
+polys <- grep(polys, pattern=indicator, value=T)
+polys <- grep(polys, pattern="2018", value=T)
+polys <- grep(polys, pattern="country", invert=T, value=T) %>% sort
+polys <- polys[length(polys)]
+polydat <- read_feather(polys)
+#polydat <- read_feather("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_12_18.feather")
+
 #save(polydat, file="/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_10_25.Rdata")
 #load("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_10_27.Rdata")
 
 message("rbinding points and polys together")
-ptdat <- rbind(polydat, ptdat, fill=T)
+ptdat <- rbind(polydat, ptdat, fill=T) %>% data.table
+#fix for broken UGA shp
+ptdat[shapefile == 'UGA_regions_2014_custom', shapefile := 'UGA_regions_custom']
+ptdat <- ptdat[iso3 != "TRUE"]
+ptdat <- ptdat[shapefile == "TRUE", shapefile := NA]
+ptdat[shapefile == "", shapefile := NA]
+ptdat[, location_code := as.numeric(location_code)]
+setnames(ptdat, "total_hh", "N")
 #returns ptdat data frame with data from non-IPUMS or AHS extractions
 # names(ptdat)
 # "id_short"      "nid"           "iso3"          "lat"
@@ -28,28 +57,27 @@ ptdat <- rbind(polydat, ptdat, fill=T)
 # "surface"       "imp"           "unimp"         "sdg_imp"
 
 
-message("cleaning data for plot code")
-ptdat <- data.table(ptdat)
-ptdat[, water := piped]
-ptdat_drop <- c("id_short", "piped", "surface", "imp", "unimp", "sdg_imp")
-ptdat[, (ptdat_drop) := NULL]
-# names(ptdat)
-# "nid"           "iso3"          "lat"
-# "long"          "shapefile"     "location_code" "survey_series"
-# "urban"         "year_start"    "total_hh"      "water"
-ptdat_poly <- ptdat[is.na(lat) & is.na(long) & !is.na(shapefile) & !is.na(location_code), ]
-ptdat_poly <- ptdat_poly[, water := mean(water, na.rm=T), by=list(shapefile, location_code)]
-ptdat_poly <- ptdat_poly[, N := sum(total_hh, na.rm=T), by=list(shapefile, location_code)]
-ptdat_poly <- ptdat_poly[, total_hh := NULL]
-ptdat_poly <- ptdat_poly[, point := 0]
-
-ptdat_points <- ptdat[!is.na(lat) & !is.na(long), ]
-ptdat_points <- ptdat_points[, water := mean(water, na.rm=T), by=list(lat, long)]
-ptdat_points <- ptdat_points[, N := sum(total_hh, na.rm=T), by=list(lat, long)]
-ptdat_points <- ptdat_points[, total_hh := NULL]
-ptdat_points <- ptdat_points[, point := 1]
-
-ptdat <- rbind(ptdat_poly, ptdat_points, fill=T)
+# message("cleaning data for plot code")
+# ptdat[, water := imp]
+# #ptdat_drop <- c("id_short", "piped", "surface", "imp", "unimp", "sdg_imp")
+# #ptdat[, (ptdat_drop) := NULL]
+# # names(ptdat)
+# # "nid"           "iso3"          "lat"
+# # "long"          "shapefile"     "location_code" "survey_series"
+# # "urban"         "year_start"    "total_hh"      "water"
+# ptdat_poly <- ptdat[is.na(lat) & is.na(long) & !is.na(shapefile) & !is.na(location_code), ]
+# ptdat_poly <- ptdat_poly[, water := mean(water, na.rm=T), by=list(shapefile, location_code)]
+# ptdat_poly <- ptdat_poly[, N := sum(total_hh, na.rm=T), by=list(shapefile, location_code)]
+# ptdat_poly <- ptdat_poly[, total_hh := NULL]
+# ptdat_poly <- ptdat_poly[, point := 0]
+# 
+# ptdat_points <- ptdat[!is.na(lat) & !is.na(long), ]
+# ptdat_points <- ptdat_points[, water := mean(water, na.rm=T), by=list(lat, long)]
+# ptdat_points <- ptdat_points[, N := sum(total_hh, na.rm=T), by=list(lat, long)]
+# ptdat_points <- ptdat_points[, total_hh := NULL]
+# ptdat_points <- ptdat_points[, point := 1]
+# 
+# ptdat <- rbind(ptdat_poly, ptdat_points, fill=T)
 # names(ptdat)
 # "nid"           "iso3"          "lat"           "point"
 # "long"          "shapefile"     "location_code" "survey_series"
@@ -119,7 +147,7 @@ setwd(repo)
 root <- ifelse(Sys.info()[1]=="Windows", "J:/", "/home/j/")
 j <- root
 j_root <- j
-cores <- 30
+
 #    dependent on the machine where the user runs the code.
                                   # Ensures packages look for dependencies here when called with library().
 #    Necessary for seeg libraries.
@@ -147,26 +175,26 @@ w_collapsed[country == "KOS", country := "SRB"]
 # start data coverage plotting
 source('/snfs2/HOME/gmanny/backups/Documents/Repos/mbg/mbg_central/graph_data_coverage.R')
 message("start coverage function")
-#regions <- c("south_asia", "se_asia", "africa", "latin_america", "middle_east")
 regions <- c("africa", "south_asia", "se_asia", "latin_america", "middle_east")
-regions <- rev(regions)
+#regions <- rev(regions)
+regions <- "africa" #remove this whan Ani updates the collapse code to include more countries
 for (reg in regions){
   message(reg)
   coverage_maps <- try(graph_data_coverage_values(df = w_collapsed,
-                                                  var = 'water',
-                                                  title = 'Water',
+                                                  var = var,
+                                                  title = title,
                                                   year_min = '1980',
-                                                  year_max = '2017',
+                                                  year_max = '2018',
                                                   year_var = 'start_year',
                                                   region = reg,
                                                   sum_by = 'n',
-                                                  since_date = "2017-1-10",
+                                                  since_date = "2017-12-27",
                                                   cores = cores,
-                                                  indicator = 'water',
+                                                  indicator = indicator,
                                                   high_is_bad = FALSE,
                                                   return_maps = TRUE,
                                                   legend_title = "Prevalence",
-                                                  color_scheme = "darker_middle",
-                                                  extra_file_tag = "",
+                                                  color_scheme = "classic",
+                                                  extra_file_tag = var,
                                                   save_on_share = FALSE))
 }
