@@ -3,24 +3,27 @@
 setwd('/share/code/geospatial/adesh/wash_mapping/05_utilities')
 
 # set node preference
-nodes <- ''
+nodes <- 'geos'
 if (nodes == 'geos') {
   proj <- "-P proj_geo_nodes -l gn=TRUE"
   r_shell <- 'shell_geos.sh'
 } else {
-  proj <- "-P proj_geospatial"
+  proj <- "-P proj_geospatial -q all.q"
   r_shell <- 'shell_prod.sh'
 }
 
 # ihme username
 user <- "adesh"
 
-# indicators to be launched
-run_dates <- c('2017_12_22_14_12_39', '2017_12_22_14_12_40', '2017_12_22_14_12_41', '2017_12_22_14_12_42',
-               '2017_12_22_14_12_43', '2017_12_22_14_12_44', '2017_12_22_14_12_45')
+# run dates to be combind
+run_dates <- c('2018_01_23_10_44_09', '2018_01_23_10_44_10', '2018_01_23_10_44_11', 
+               '2018_01_23_10_44_12', '2018_01_23_10_44_13', '2018_01_23_10_44_14',
+               '2018_01_23_10_44_15', '2018_01_23_10_44_16', '2018_01_23_10_44_17',
+               '2018_01_23_10_44_18', '2018_01_23_10_44_19', '2018_01_23_10_44_20',
+               '2018_01_23_10_44_21', '2018_01_23_10_44_22', '2018_01_23_10_44_23')
 
 for (rd in run_dates) {
-  jname <- paste0(indic_list[indc], "_parent")
+  jname <- paste0(paste0("cr_",rd))
   mycores <- 20
   sys.sub <- paste0("qsub ",proj,paste0(" -e /homes/adesh/cluster_errors"," -o /homes/adesh/cluster_output/ "),
                     "-cwd -N ", jname, " ", "-pe multi_slot ", mycores, " ")
@@ -32,8 +35,8 @@ for (rd in run_dates) {
 }
 
 for (rd in run_dates) {
-  jname <- paste0(indic_list[indc], "_parent")
-  mycores <- 20
+  jname <- paste0(paste0("ml_",rd))
+  mycores <- 50
   sys.sub <- paste0("qsub ",proj,paste0(" -e /homes/adesh/cluster_errors"," -o /homes/adesh/cluster_output/ "),
                     "-cwd -N ", jname, " ", "-pe multi_slot ", mycores, " ")
   # launch script name to qsub

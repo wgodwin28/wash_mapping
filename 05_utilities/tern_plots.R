@@ -274,7 +274,7 @@ for (i in c('water','sani')) {
     tern_df_loop <- filter(tern_df_master, family == i, Region == j)
     gg_plot <- ggtern(tern_df_loop, aes(x=basic*100, y = unimp*100, z = worst*100)) +
       theme_classic() + Rlab(ifelse(i == 'water', 'S', 'OD')) +
-      Llab('B') + Tlab('U') +
+      Llab('I') + Tlab('U') +
 
       geom_point(aes(size = pop, color = ISO3, fill = ISO3),
         alpha = 0.5) +

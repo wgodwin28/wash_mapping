@@ -83,7 +83,7 @@ hh_cw_reg <- function(data, var_family = indi_fam) {
 
   library(dplyr)
 
-  message('Only African Data is currently CWed by reg')
+  #message('Only African Data is currently CWed by reg')
   message('The regs are sssa_hi, cssa, wsssa, name_hi, and essa_hilo')
   sssa_hi <- c('NAM','BWA','ZAF')
   cssa <- c('CAF','GAB','GNQ','COD','COG','AGO','STP')
@@ -95,6 +95,8 @@ hh_cw_reg <- function(data, var_family = indi_fam) {
   wssa <- c('CPV','SEN','GMB','GIN','GNB','SLE','MLI','LBR',
             'CIV','GHA','TGO','BEN','NGA','NER','TCD','CMR',
             'BFA','MRT')
+  africa <- c(sssa_hi, cssa, name_hi, essa_hilo, wssa)
+
   results <- list()
   
   message('sssa_hi')
@@ -125,6 +127,12 @@ hh_cw_reg <- function(data, var_family = indi_fam) {
   mydat <- filter(data, iso3 %in% name_hi)
   if (nrow(mydat)>0) {
     results[[5]] <- hh_cw(data = mydat, var_family = var_family)
+  }
+
+  message('non africa')
+  mydat <- filter(data, !(iso3 %in% africa))
+  if (nrow(mydat)>0) {
+    results[[6]] <- hh_cw(data = mydat, var_family = var_family)
   }
   
   results <- do.call(rbind, results)

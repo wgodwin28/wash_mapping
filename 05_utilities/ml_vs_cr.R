@@ -66,7 +66,7 @@ for (map in c('w_piped','w_imp_calc','w_unimp_calc','w_surface_calc')) {
 rm(list = c('w_imp_calc','w_unimp_calc','w_surface_calc'))
 
 #### Model 2 Extraction ###
-run_date <- '2017_12_14_11_01_03'
+run_date <- '2017_12_22_14_12_39'
 for (indicator in c('w_piped', 'w_imp','w_unimp', 'w_surface')) {
     message(indicator); 
 

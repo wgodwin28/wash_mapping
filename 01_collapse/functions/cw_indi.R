@@ -117,6 +117,8 @@ cw_indi_reg <- function(data, var_family = indi_fam) {
   wssa <- c('CPV','SEN','GMB','GIN','GNB','SLE','MLI','LBR',
             'CIV','GHA','TGO','BEN','NGA','NER','TCD','CMR',
             'BFA','MRT')
+  africa <- c(sssa_hi, cssa, name_hi, essa_hilo, wssa)
+
   results <- list()
   
   message('sssa_hi')
@@ -147,6 +149,12 @@ cw_indi_reg <- function(data, var_family = indi_fam) {
   mydat <- filter(data, iso3 %in% name_hi)
   if (nrow(mydat)>0) {
     results[[5]] <- cw_indi(mydat = mydat, var_family = var_family)
+  }
+
+  message('non africa')
+  mydat <- filter(data, !(iso3 %in% africa))
+  if (nrow(mydat)>0) {
+    results[[6]] <- cw_indi(mydat = mydat, var_family = var_family)
   }
 
   results <- do.call(rbind, results)
