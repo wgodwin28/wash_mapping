@@ -7,10 +7,10 @@ library(data.table)
 library(feather)
 library(magrittr)
 
-indicator <- 'water' #water or sani
+indicator <- 'sani' #water or sani
 var <- 'imp' #imp, unimp, surface, od, piped
 
-title <- paste(c(var, indicator), collapse=" ")
+title <- paste(var, indicator, sep=" ")
 
 message('loading collapsed points')
 #ptdat
@@ -173,7 +173,9 @@ w_collapsed[, country := substr(country, 1, 3)]
 w_collapsed[country == "KOS", country := "SRB"]
 
 # start data coverage plotting
-source('/snfs2/HOME/gmanny/backups/Documents/Repos/mbg/mbg_central/graph_data_coverage.R')
+source("/snfs2/HOME/gmanny/backups/Documents/Repos/lbd_core/mbg_central/graph_data_coverage.R")
+source("/snfs2/HOME/gmanny/backups/Documents/Repos/lbd_core/mbg_central/shapefile_functions.R")
+source("/snfs2/HOME/gmanny/backups/Documents/Repos/lbd_core/mbg_central/polygon_functions.R")
 message("start coverage function")
 regions <- c("africa", "south_asia", "se_asia", "latin_america", "middle_east")
 #regions <- rev(regions)
@@ -183,12 +185,12 @@ for (reg in regions){
   coverage_maps <- try(graph_data_coverage_values(df = w_collapsed,
                                                   var = var,
                                                   title = title,
-                                                  year_min = '1980',
+                                                  year_min = '1997',
                                                   year_max = '2018',
                                                   year_var = 'start_year',
                                                   region = reg,
                                                   sum_by = 'n',
-                                                  since_date = "2017-12-27",
+                                                  since_date = "2018-1-01",
                                                   cores = cores,
                                                   indicator = indicator,
                                                   high_is_bad = FALSE,
@@ -196,5 +198,6 @@ for (reg in regions){
                                                   legend_title = "Prevalence",
                                                   color_scheme = "classic",
                                                   extra_file_tag = var,
-                                                  save_on_share = FALSE))
+                                                  save_on_share = FALSE,
+                                                  fast_shapefiles=T))
 }
