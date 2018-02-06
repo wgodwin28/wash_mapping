@@ -85,7 +85,7 @@ for (file in file_names){
   for (indi_fam in c('sani')) {
     rm(definitions)
 
-    # Load indicator definitions
+    # Load indicator definitions and appropriately format strings
     for (agg_level in c('')) {
       message(paste("Collapsing",indi_fam, "with", agg_level, "agg_level"))
       message('Loading Definitions...')
@@ -97,32 +97,27 @@ for (file in file_names){
         } else {
           definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_2018_01_24.csv'),
                                   encoding="windows-1252", stringsAsFactors = F) 
-          definitions2 <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_other_defined_2018_01_24.csv'),
-                                   encoding="windows-1252", stringsAsFactors = F)
-          definitions2 <- rename(definitions2, sdg2 = sdg)
-          definitions <- select(definitions, string, sdg, jmp)
         }
       }
 
+      definitions <- select(definitions, string, sdg, jmp)
+
       definitions$string <- iconv(definitions$string, 'windows-1252', 'UTF-8')
       definitions$string <- tolower(definitions$string)
-      definitions$sdg <- ifelse(definitions$sdg == "", NA, definitions$sdg)
+      definitions$sdg <- ifelse(definitions$sdg == "" | is.na(definitions$string),
+                                NA, definitions$sdg)
       definitions$string <- ifelse(definitions$sdg == "", NA, definitions$string)
-      definitions$sdg <- ifelse(is.na(definitions$string), NA, definitions$sdg)
+      definitions$sdg <- ifelse(, NA, definitions$sdg)
       if (indi_fam == "water") {
         definitions$jmp <- ifelse(is.na(definitions$string), NA, definitions$jmp)
       }
       definitions <- distinct(definitions)
       
-      if (exists('definitions2')) {
-        definitions2$string <- iconv(definitions2$string, 'windows-1252', 'UTF-8')
-        definitions2$string <- tolower(definitions2$string)
-        definitions2 <- distinct(definitions2)
-      }
-
+      # Clean up workspace
       rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam',
         'repo','data_type','root','agg_level', 'sdg', 'pt_list','poly_list')))
 
+      # Import collapse functions
       message("Importing functions...")
       setwd(repo)
       source('functions/initial_cleaning.R')
@@ -146,9 +141,9 @@ for (file in file_names){
       ptdat <- temp_list[[1]]; ptdat_0 <- temp_list[[2]]; rm(temp_list)
 
 
-      #### Define Indicator ####
+      #### Define Indicator #### # update definitions to use ipums definitions
       message("Defining Indicator...")
-      ptdat <- define_indi(sdg_indi = T)
+      ptdat <- define_indi(sdg_indi = T, ipums = T)
 
       # Remove cluster_ids with missing hhweight or invalid hhs
       miss_wts <- unique(ptdat$id_short[which(is.na(ptdat$hhweight))])

@@ -41,7 +41,7 @@ cw <- function(data, debug = F, var_family = indi_fam) {
   return(ratio)
 }
 
-hh_cw <- function(data, debug = F, var_family = indi_fam) {
+hh_cw <- function(data, debug = F, var_family = indi_fam, reg, dtype) {
   
   if (debug) {browser()}
   
@@ -64,7 +64,8 @@ hh_cw <- function(data, debug = F, var_family = indi_fam) {
   o_ratio <- cw(overall)
   
   # Plug in ratios into hh_sizes based on urban-rural specificity
-  results <- data.frame(urban = c(1,0,2), ratio = c(u_ratio,r_ratio,o_ratio))
+  results <- data.frame(urban = c(1,0,2), ratio = c(u_ratio,r_ratio,o_ratio),
+                        region  = reg, data_type = dtype)
   data$hh_size[which(is.na(data$hh_size) &
                  data$urban == 1)] <- u_ratio
   data$hh_size[which(is.na(data$hh_size) &
@@ -74,12 +75,12 @@ hh_cw <- function(data, debug = F, var_family = indi_fam) {
   
   # Print ratios
   print(results)
-  return(data)
+  return(list(data, results))
   
   }
 }
 
-hh_cw_reg <- function(data, var_family = indi_fam) {
+hh_cw_reg <- function(data, var_family = indi_fam, dt = data_type) {
 
   library(dplyr)
 
@@ -98,43 +99,100 @@ hh_cw_reg <- function(data, var_family = indi_fam) {
   africa <- c(sssa_hi, cssa, name_hi, essa_hilo, wssa)
 
   results <- list()
-  
+  ratios <- list()
+
   message('sssa_hi')
   mydat <- filter(data, iso3 %in% sssa_hi)
   if (nrow(mydat)>0) {
-    results[[1]] <- hh_cw(data = mydat, var_family = var_family)
+    output <- hh_cw(data = mydat, var_family = var_family,
+                          reg = 'sssa_hi', dtype = dt)
+    results[[1]] <- output[[1]]
+    ratios[[1]] <- output[[2]]
   }
 
   message('wssa')
   mydat <- filter(data, iso3 %in% wssa)
   if (nrow(mydat)>0) {
-    results[[2]] <- hh_cw(data = mydat, var_family = var_family)
+    output <- hh_cw(data = mydat, var_family = var_family,
+                          reg = 'wssa', dtype = dt)
+    results[[2]] <- output[[1]]
+    ratios[[2]] <- output[[2]]
   }
   
   message('cssa')
   mydat <- filter(data, iso3 %in% cssa)
   if (nrow(mydat)>0) {
-    results[[3]] <- hh_cw(data = mydat, var_family = var_family)
+    output <- hh_cw(data = mydat, var_family = var_family,
+                          reg = 'cssa', dtype = dt)
+    results[[3]] <- output[[1]]
+    ratios[[3]] <- output[[2]]
   }
 
   message('essa_hilo')
   mydat <- filter(data, iso3 %in% essa_hilo)
   if (nrow(mydat)>0) {
-    results[[4]] <- hh_cw(data = mydat, var_family = var_family)
+    output <- hh_cw(data = mydat, var_family = var_family,
+                          reg = 'essa_hilo', dtype = dt)
+    results[[4]] <- output[[1]]
+    ratios[[4]] <- output[[2]]
   }
 
   message('name_hi')
   mydat <- filter(data, iso3 %in% name_hi)
   if (nrow(mydat)>0) {
-    results[[5]] <- hh_cw(data = mydat, var_family = var_family)
+    output <- hh_cw(data = mydat, var_family = var_family,
+                          reg = 'name_hi', dtype = dt)
+    results[[5]] <- output[[1]]
+    ratios[[5]] <- output[[2]]
   }
 
   message('non africa')
   mydat <- filter(data, !(iso3 %in% africa))
   if (nrow(mydat)>0) {
-    results[[6]] <- hh_cw(data = mydat, var_family = var_family)
+    output <- hh_cw(data = mydat, var_family = var_family,
+                          reg = 'non africa', dtype = dt)
+    results[[6]] <- output[[1]]
+    ratios[[6]] <- output[[2]]
   }
   
   results <- do.call(rbind, results)
+  ratios <- do.call(rbind, ratios)
+  
+  write.csv(ratios, '/home/adesh/Documents/hh_size_ratios.csv')
+  
   return(results)
+}
+
+assign_ipums_hh <- function(mydat = ptdat, dt = data_type) {
+  current_iso3 <- unique(mydat$iso3)
+ 
+  sssa_hi <- c('NAM','BWA','ZAF')
+  cssa <- c('CAF','GAB','GNQ','COD','COG','AGO','STP')
+  name_hi <- c('MAR','DZA','TUN','LBY','EGY')
+  essa_hilo <- c('SDN','ERI','DJI','SOM','ETH','SSD',
+                 'SSD','UGA','KEN','RWA','BDI','TZA',
+                 'MWI','MOZ','ZMB','MDG','ZWE','SWZ','LSO',
+                 'COM')
+  wssa <- c('CPV','SEN','GMB','GIN','GNB','SLE','MLI','LBR',
+            'CIV','GHA','TGO','BEN','NGA','NER','TCD','CMR',
+            'BFA','MRT')
+  africa <- c(sssa_hi, cssa, name_hi, essa_hilo, wssa)
+
+  current_reg <- ifelse(current_iso3 %in% sssa_hi, 'sssa_hi',
+                        ifelse(current_iso3 %in% cssa, 'cssa',
+                          ifelse(current_iso3 %in% name_hi, 'name_hi',
+                            ifelse(current_iso3 %in% essa_hilo, 'essa_hilo',
+                              ifelse(current_iso3 %in% wssa, 'wssa', 'non africa'
+                          )))))
+
+  ratios <- read.csv('/home/adesh/Documents/hh_size_ratios.csv', stringsAsFactors = F)
+  ratios <- filter(ratios, region == current_reg & data_type == dt)
+
+  mydat$hh_size[which(is.na(mydat$hh_size) &
+                 mydat$urban == 1)] <- ratios$ratio[which(ratios$urban == 1)]
+  mydat$hh_size[which(is.na(mydat$hh_size) &
+                 mydat$urban == 0)] <- ratios$ratio[which(ratios$urban == 2)]
+  mydat$hh_size[which(is.na(mydat$hh_size) &
+                 is.na(mydat$urban))] <- ratios$ratio[which(ratios$urban == 0)]
+   
 }
