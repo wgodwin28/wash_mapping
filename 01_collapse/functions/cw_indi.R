@@ -105,7 +105,7 @@ cw_indi_reg <- function(data, var_family = indi_fam) {
 
   library(dplyr)
 
-  message('Only African Data is currently CWed by reg')
+  # message('Only African Data is currently CWed by reg')
   message('The regs are sssa_hi, cssa, wsssa, name_hi, and essa_hilo')
   sssa_hi <- c('NAM','BWA','ZAF')
   cssa <- c('CAF','GAB','GNQ','COD','COG','AGO','STP')
