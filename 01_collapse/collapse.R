@@ -45,7 +45,7 @@ if(length(new.packages)) install.packages(new.packages)
 lapply(packages, library, character.only = T)
 
 #### Load functions ####
-for (file_type in c('pt', 'poly', 'ipums')){
+for (file_type in c('ipums')){
   message(paste("Loading",file_type, "data"))
   rm(pt_collapse)
   message('Loading Data...')
@@ -98,21 +98,20 @@ for (file_type in c('pt', 'poly', 'ipums')){
       } else {
         data_type <- 'pt'
       }
+
+      message('Skipping water for IPUMS due to non-standard data')
+      indicators <- 'sani'
+
     } else {
       pt_collapse <- files[[1]]
       ipums <- F
+      indicators <- c('sani', 'water')
       rm(files)
     }
     
-    for (indi_fam in c('sani', 'water')) {
+    for (indi_fam in indicators) {
     rm(definitions)
     message(paste('Processing:', indi_fam))
-
-    # Skipping water for IPUMS
-    if (ipums & indi_fam == 'water') {
-      message('Skipping water for IPUMS due to non-standard data')
-      next
-    }
 
       for (agg_level in c('')) {
         message(paste("Collapsing",indi_fam, "with", agg_level, "agg_level"))
@@ -161,7 +160,8 @@ for (file_type in c('pt', 'poly', 'ipums')){
   
         
         rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam',
-          'repo','data_type','root','agg_level', 'sdg', 'ipums', 'files', 'index', 'files_length')))
+          'repo','data_type','root','agg_level', 'sdg', 'ipums', 'files', 'index', 'files_length',
+          'file_type', 'ipums_dir')))
 
         message("Importing functions...")
         setwd(repo)
@@ -188,6 +188,9 @@ for (file_type in c('pt', 'poly', 'ipums')){
         
         # Remove clusters with more than 20% weighted missingness
         ptdat <- rm_miss()
+        if (nrow(ptdat) == 0) {
+          next
+        }
 
         # Remove cluster_ids with missing hhweight or invalid hhs
         miss_wts <- unique(ptdat$id_short[which(is.na(ptdat$hhweight))])
@@ -195,6 +198,10 @@ for (file_type in c('pt', 'poly', 'ipums')){
 
         invalid_hhs <- unique(ptdat$id_short[which(ptdat$hh_size <= 0)])
         ptdat <- filter(ptdat, !(id_short %in% invalid_hhs))
+
+        if (nrow(ptdat) == 0) {
+          next
+        }
 
         # Crosswalk missing household size data
         message("Crosswalking HH Sizes...")
@@ -206,6 +213,10 @@ for (file_type in c('pt', 'poly', 'ipums')){
         
         # Remove missing observations
         ptdat <- filter(ptdat, !is.na(imp))
+
+        if (nrow(ptdat) == 0) {
+          next
+        }
 
         #### Aggregate Data ####
         # Bookmarking dataset so it can be looped over for conditional switch

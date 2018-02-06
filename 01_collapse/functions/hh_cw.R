@@ -158,6 +158,33 @@ hh_cw_reg <- function(data, var_family = indi_fam, dt = data_type) {
   results <- do.call(rbind, results)
   ratios <- do.call(rbind, ratios)
   
+  original <- try(read.csv('/home/j/WORK/11_geospatial/wash/definitions/hh_size_ratios.csv'),
+                  silent = T)
+  
+  if (class(original) == 'try-error') {
+    rm(original)
+  }
+
+  if (exists('original')) {
+    data_present <- unlist(strsplit(unique(as.character(original$data_type)), ','))
+    data_present <- gsub(' ', '', data_present)
+    original <- select(original, -X)
+  } else {
+    data_present <- ''
+  }
+
+ if (dt %in% data_present) {
+    write.csv(mydat, '/home/j/WORK/11_geospatial/wash/definitions/cw_water.csv')
+  } else {
+
+    if (data_present != '') {
+      ratios <- bind_rows(ratios, original)
+      ratios$data_type <- paste(dt, ',', data_present)
+    } else {
+      ratios$data_type <- dt
+    }
+  }
+
   write.csv(ratios, '/home/j/WORK/11_geospatial/wash/definitions/hh_size_ratios.csv')
   
   return(results)
