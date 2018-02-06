@@ -168,20 +168,32 @@ hh_cw_reg <- function(data, var_family = indi_fam, dt = data_type) {
   if (exists('original')) {
     data_present <- unlist(strsplit(unique(as.character(original$data_type)), ','))
     data_present <- gsub(' ', '', data_present)
+
+    indi_present <- unlist(strsplit(unique(as.character(original$indi_fam)), ','))
+    indi_present <- gsub(' ', '', indi_present)
+
     original <- select(original, -X)
   } else {
     data_present <- ''
+    indi_present <- ''
   }
 
- if (dt %in% data_present) {
+ if ((dt %in% data_present) & (var_family %in% indi_present)) {
     write.csv(ratios, '/home/j/WORK/11_geospatial/wash/definitions/hh_size_ratios.csv')
   } else {
 
-    if (data_present != '') {
-      ratios <- bind_rows(ratios, original)
-      ratios$data_type <- paste(dt, ',', data_present)
+    if (dt %in% data_present) {
+      if (!(var_family %in% indi_present)) {
+        message("These ratios have already been output")
+      }
     } else {
-      ratios$data_type <- dt
+      if (data_present != '') {
+        ratios <- bind_rows(ratios, original)
+        ratios$data_type <- paste(dt, ',', data_present)
+        ratios$indi_fam <- paste(var_family, ',', indi_present)
+      } else {
+        ratios$data_type <- dt
+      }
     }
   }
 
