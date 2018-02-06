@@ -195,5 +195,6 @@ assign_ipums_hh <- function(mydat = ptdat, dt = data_type) {
                  mydat$urban == 0)] <- ratios$ratio[which(ratios$urban == 2)]
   mydat$hh_size[which(is.na(mydat$hh_size) &
                  is.na(mydat$urban))] <- ratios$ratio[which(ratios$urban == 0)]
-   
+  
+  return(mydat) 
 }

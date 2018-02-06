@@ -152,6 +152,7 @@ write_cw_ratio <- function(mydat = ptdat, dt = data_type, census = ipums,
 	# Create indicator variable indicating data sources represented in the cw csv
 	if (exists('original')) {
 		data_present <- unlist(strsplit(unique(as.character(original$data)), ','))
+		data_present <- gsub(' ', '', data_present)
 		original <- select(original, -X)
 	} else {
 		data_present <- ''
