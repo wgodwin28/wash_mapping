@@ -174,7 +174,7 @@ hh_cw_reg <- function(data, var_family = indi_fam, dt = data_type) {
   }
 
  if (dt %in% data_present) {
-    write.csv(mydat, '/home/j/WORK/11_geospatial/wash/definitions/cw_water.csv')
+    write.csv(ratios, '/home/j/WORK/11_geospatial/wash/definitions/hh_size_ratios.csv')
   } else {
 
     if (data_present != '') {

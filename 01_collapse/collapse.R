@@ -45,7 +45,7 @@ if(length(new.packages)) install.packages(new.packages)
 lapply(packages, library, character.only = T)
 
 #### Load functions ####
-for (file_type in c('ipums')){
+for (file_type in c('pt','poly','ipums')){
   message(paste("Loading",file_type, "data"))
   rm(pt_collapse)
   message('Loading Data...')
