@@ -2,7 +2,7 @@ rm(list=ls())
 
 #source("/snfs2/HOME/gmanny/backups/Documents/Repos/wash_mapping/00_extract/id_incomplete_defintion_nids.R")
 
-indicator <- "w_source" #w_source or t_type
+indicator <- "t_type" #w_source or t_type
 
 j <- ifelse(Sys.info()[1]=="Windows", "J:/", "/snfs1/")
 .libPaths(paste0(j, "temp/geospatial/geos_packages/"))
@@ -15,7 +15,7 @@ library(dplyr)
 stages <- read.csv(paste0(j, "temp/gmanny/geospatial_stages_priority.csv"), stringsAsFactors=F) %>% data.table
 africa <- stages[Stage == 1, alpha.3]
 
-defs <- list.files(paste0(j, "WORK/11_geospatial/wash/definitions"), pattern=indicator, full.names = T) %>% grep(value=T, pattern="other", invert=T)
+defs <- list.files(paste0(j, "WORK/11_geospatial/wash/definitions"), pattern=indicator, full.names = T) %>% grep(value=T, pattern="other", invert=T) #%>% grep(pattern="overwrite", value=T) #temp fix to J permissions issue
 def <- defs[length(defs)] #gets latest defintions file
 
 w_defs <- read.csv(def, encoding="windows-1252", stringsAsFactors = F)
@@ -46,7 +46,7 @@ message("Merging")
 
 merge_key <- ifelse(indicator == "w_source", "w_source_drink", indicator)
 relevant <- data.frame(relevant)
-#merging large data.tables causes specific strings to (consistently and reproduicibly) drop. this is concerning. Make sure everything is a data frame before merging. 
+#merging large data.tables causes specific strings to (consistently and reproduicibly) drop. this is concerning. Make sure everything is a data frame before merging.
 try(setnames(w_defs, "string", merge_key))
 start_time <- Sys.time()
 m <- left_join(relevant, w_defs, by=merge_key)
