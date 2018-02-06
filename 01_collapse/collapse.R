@@ -73,7 +73,7 @@ for (file_type in c('pt', 'ipums')){
   }
 
   if (file_type == 'ipums') {
-    ipums_dir <- '/home/adesh/Documents/test/ipums_source'
+    ipums_dir <- '/home/j/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/IPUMS_feathers'
     files <- list.files(ipums_dir, '.feather')
     files_length <- length(files)
   } else {
@@ -239,20 +239,17 @@ for (file_type in c('pt', 'ipums')){
           if (data_type == "poly") {
             polydat <- ptdat
             rm(ptdat)
-            write_feather(polydat,
-                          paste0('/home/adesh/Documents/test/points/',
-                          indi_fam, '_test.feather'))
+            write_feather(polydat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_",
+                          indi_fam, '_', conditional, '_', agg_level, '_', today, ".feather"))
           } else{
-          write_feather(ptdat,
-                        paste0('/home/adesh/Documents/test/points/',
-                        indi_fam, '_test.feather'))
-          }  
+            write_feather(ptdat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_",
+                          indi_fam, '_', conditional, '_', agg_level, '_', today, ".feather"))
+          }
         }
         
         if (ipums) {
-          write_feather(ptdat,
-                        paste0('/home/adesh/Documents/test/ipums_output/collapsed_',
-                          files[index]))
+          write_feather(ptdat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/IPUMS/feather/",
+                          indi_fam, '_', conditional, '_', agg_level, '_', today, '_', files[index]))
         }
         
       }

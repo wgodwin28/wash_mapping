@@ -158,7 +158,7 @@ hh_cw_reg <- function(data, var_family = indi_fam, dt = data_type) {
   results <- do.call(rbind, results)
   ratios <- do.call(rbind, ratios)
   
-  write.csv(ratios, '/home/adesh/Documents/hh_size_ratios.csv')
+  write.csv(ratios, '/home/j/WORK/11_geospatial/wash/definitions/hh_size_ratios.csv')
   
   return(results)
 }
@@ -185,7 +185,8 @@ assign_ipums_hh <- function(mydat = ptdat, dt = data_type) {
                               ifelse(current_iso3 %in% wssa, 'wssa', 'non africa'
                           )))))
 
-  ratios <- read.csv('/home/adesh/Documents/hh_size_ratios.csv', stringsAsFactors = F)
+  ratios <- read.csv('/home/j/WORK/11_geospatial/wash/definitions/hh_size_ratios.csv',
+                      stringsAsFactors = F)
   ratios <- filter(ratios, region == current_reg & data_type == dt)
 
   mydat$hh_size[which(is.na(mydat$hh_size) &

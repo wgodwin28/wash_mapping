@@ -57,7 +57,7 @@ write_cw_ratio <- function(mydat = ptdat, dt = data_type, census = ipums,
 		  		   		  	 data = dt)
 
 	# Read in original cw file if it exists
-	original <- try(read.csv('/home/adesh/Documents/cw_sani.csv', stringsAsFactors = F),
+	original <- try(read.csv('/home/j/WORK/11_geospatial/wash/definitions/cw_sani.csv', stringsAsFactors = F),
 					silent = T)
 	
 	if (class(original) == 'try-error') {
@@ -76,7 +76,7 @@ write_cw_ratio <- function(mydat = ptdat, dt = data_type, census = ipums,
 	
 	# if current data type is in the cw csv overwrite the csv with fresh run
 	if (dt %in% data_present) {
-		write.csv(mydat, '/home/adesh/Documents/cw_sani.csv')
+		write.csv(mydat, '/home/j/WORK/11_geospatial/wash/definitions/cw_sani.csv')
 	} else {
 
 		# If it current data type isnt represented rbind and re-collapse
@@ -104,7 +104,7 @@ write_cw_ratio <- function(mydat = ptdat, dt = data_type, census = ipums,
 	  		   		  	   flush_cw = sum(flush_cw),
 	  		   		  	   sources = sum(sources))
 
-	  	write.csv(mydat, '/home/adesh/Documents/cw_sani.csv')
+	  	write.csv(mydat, '/home/j/WORK/11_geospatial/wash/definitions/cw_sani.csv')
 
 	}
 
@@ -142,7 +142,7 @@ write_cw_ratio <- function(mydat = ptdat, dt = data_type, census = ipums,
 		  		   		  	 data = dt)
 	
 	# Read in original cw file if it exists
-	original <- try(read.csv('/home/adesh/Documents/cw_water.csv'),
+	original <- try(read.csv('/home/j/WORK/11_geospatial/wash/definitions/cw_water.csv'),
 					silent = T)
 	
 	if (class(original) == 'try-error') {
@@ -160,7 +160,7 @@ write_cw_ratio <- function(mydat = ptdat, dt = data_type, census = ipums,
 	
 	# if current data type is in the cw csv overwrite the csv with fresh run
 	if (dt %in% data_present) {
-		write.csv(mydat, '/home/adesh/Documents/cw_water.csv')
+		write.csv(mydat, '/home/j/WORK/11_geospatial/wash/definitions/cw_water.csv')
 	} else {
 
 		# This is if csv doesn't exist then the first write is generated
@@ -191,7 +191,7 @@ write_cw_ratio <- function(mydat = ptdat, dt = data_type, census = ipums,
 		  		   		   piped_cw = sum(piped_cw),
 	  		   		  	   sources = sum(sources))
 
-	  	write.csv(mydat, '/home/adesh/Documents/cw_water.csv')
+	  	write.csv(mydat, '/home/j/WORK/11_geospatial/wash/definitions/cw_water.csv')
 
 		}
 
