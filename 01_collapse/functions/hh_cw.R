@@ -189,7 +189,6 @@ hh_cw_reg <- function(data, var_family = indi_fam, dt = data_type) {
         ratios$indi_fam <- var_family
       }
     }
-  }
 
   write.csv(ratios, '/home/j/WORK/11_geospatial/wash/definitions/hh_size_ratios.csv')
   
