@@ -156,8 +156,6 @@ for (file_type in c('poly', 'pt','ipums')){
                                        NA, definitions$string)
           definitions <- distinct(definitions)
         }
-
-  
         
         rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam',
           'repo','data_type','root','agg_level', 'sdg', 'ipums', 'files', 'index', 'files_length',
@@ -239,8 +237,24 @@ for (file_type in c('poly', 'pt','ipums')){
           next
         }
 
+        # Delete cw dictionary if ipums already added to it previously
+        if (index == 1 & ipums) {
+          message('Checking if IPUMS already added to CW data previously')
+          original <- try(read.csv('/home/j/WORK/11_geospatial/wash/definitions/cw_sani.csv', stringsAsFactors = F),
+                        silent = T)
+        
+          if (class(original) == 'try-error') {
+            rm(original)
+          }  else {
+            if ('ipums' %in% original$data_type) {
+             system('rm /home/j/WORK/11_geospatial/wash/definitions/cw_sani.csv')
+            } 
+            rm(original)
+          }  
+        }
+        
         # Write crosswalking dictionary
-        message('Output CW files')
+        message('Output CW files')    
         write_cw_ratio(census = ipums)
 
         #save poly and point collapses

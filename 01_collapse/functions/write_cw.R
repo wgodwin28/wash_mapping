@@ -75,7 +75,7 @@ write_cw_ratio <- function(mydat = ptdat, dt = data_type, census = ipums,
 				
 	
 	# if current data type is in the cw csv overwrite the csv with fresh run
-	if (dt %in% data_present) {
+	if ((dt %in% data_present) & dt != 'ipums') {
 		write.csv(mydat, '/home/j/WORK/11_geospatial/wash/definitions/cw_sani.csv')
 	} else {
 
