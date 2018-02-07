@@ -189,7 +189,6 @@ hh_cw_reg <- function(data, var_family = indi_fam, dt = data_type) {
     } else {
       if (data_present != '') {
         ratios <- bind_rows(ratios, original)
-        ratios$data_type <- paste(dt, ',', data_present)
         ratios$indi_fam <- paste(var_family, ',', indi_present)
       } else {
         ratios$data_type <- dt
