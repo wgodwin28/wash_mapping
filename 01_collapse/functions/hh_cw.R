@@ -181,15 +181,9 @@ hh_cw_reg <- function(data, var_family = indi_fam, dt = data_type) {
  if ((dt %in% data_present) & (var_family %in% indi_present)) {
     write.csv(ratios, '/home/j/WORK/11_geospatial/wash/definitions/hh_size_ratios.csv')
   } else {
-
-    if (dt %in% data_present) {
-      if (!(var_family %in% indi_present)) {
-        message("These ratios have already been output")
-      }
-    } else {
       if (data_present != '') {
         ratios <- bind_rows(ratios, original)
-        ratios$indi_fam <- paste(var_family, ',', indi_present)
+        ratios <- filter(ratios, indi_fam == 'sani')
       } else {
         ratios$data_type <- dt
         ratios$indi_fam <- var_family
