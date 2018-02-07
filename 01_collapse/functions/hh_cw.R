@@ -65,7 +65,7 @@ hh_cw <- function(data, debug = F, var_family = indi_fam, reg, dtype) {
   
   # Plug in ratios into hh_sizes based on urban-rural specificity
   results <- data.frame(urban = c(1,0,2), ratio = c(u_ratio,r_ratio,o_ratio),
-                        region  = reg, data_type = dtype)
+                        region  = reg, data_type = dtype, indi_fam = var_family)
   data$hh_size[which(is.na(data$hh_size) &
                  data$urban == 1)] <- u_ratio
   data$hh_size[which(is.na(data$hh_size) &
@@ -193,6 +193,7 @@ hh_cw_reg <- function(data, var_family = indi_fam, dt = data_type) {
         ratios$indi_fam <- paste(var_family, ',', indi_present)
       } else {
         ratios$data_type <- dt
+        ratios$indi_fam <- var_family
       }
     }
   }
