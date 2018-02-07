@@ -67,7 +67,7 @@ write_cw_ratio <- function(mydat = ptdat, dt = data_type, census = ipums,
 	# Create indicator variable indicating data sources represented in the cw csv
 	if (exists('original')) {
 		data_present <- unlist(strsplit(unique(as.character(original$data)), ','))
-		data_present <- gsub(' ', '', data_present)
+		data_present <- unique(gsub(' ', '', data_present))
 		original <- select(original, -X)
 	} else {
 		data_present <- ''
@@ -85,7 +85,15 @@ write_cw_ratio <- function(mydat = ptdat, dt = data_type, census = ipums,
 		# with the current data type being processed
 		if (data_present != '') {
 			mydat <- bind_rows(mydat, original)
-			mydat$data <- paste(dt, ',', data_present)
+			if (dt != 'ipums') {
+				mydat$data <- paste(dt, ',', paste(data_present, collapse = ', '))
+			} else {
+				if (dt %in% data_present) {
+				  mydat$data <- paste(data_present, collapse = ', ')
+				} else {
+					mydat$data <- paste(dt, ',', paste(data_present, collapse = ', '))
+				}
+			}
 		} else {
 			mydat$data <- dt
 		}
@@ -160,17 +168,25 @@ write_cw_ratio <- function(mydat = ptdat, dt = data_type, census = ipums,
 				
 	
 	# if current data type is in the cw csv overwrite the csv with fresh run
-	if (dt %in% data_present) {
+	if ((dt %in% data_present) & dt != 'ipums') {
 		write.csv(mydat, '/home/j/WORK/11_geospatial/wash/definitions/cw_water.csv')
 	} else {
 
-		# This is if csv doesn't exist then the first write is generated
-		# with the current data type being processed
 		# If it current data type isnt represented rbind and re-collapse
 		# the dataset to update counts
+		# This is if csv doesn't exist then the first write is generated
+		# with the current data type being processed
 		if (data_present != '') {
 			mydat <- bind_rows(mydat, original)
-			mydat$data <- paste(dt, ',', data_present)
+			if (dt != 'ipums') {
+				mydat$data <- paste(dt, ',', paste(data_present, collapse = ', '))
+			} else {
+				if (dt %in% data_present) {
+				  mydat$data <- paste(data_present, collapse = ', ')
+				} else {
+					mydat$data <- paste(dt, ',', paste(data_present, collapse = ', '))
+				}
+			}
 		} else {
 			mydat$data <- dt
 		}
