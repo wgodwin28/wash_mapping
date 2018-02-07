@@ -45,7 +45,7 @@ if(length(new.packages)) install.packages(new.packages)
 lapply(packages, library, character.only = T)
 
 #### Load functions ####
-for (file_type in c('pt','poly','ipums')){
+for (file_type in c('poly')){
   message(paste("Loading",file_type, "data"))
   rm(pt_collapse)
   message('Loading Data...')
@@ -195,7 +195,8 @@ for (file_type in c('pt','poly','ipums')){
         # Remove cluster_ids with missing hhweight or invalid hhs
         miss_wts <- unique(ptdat$id_short[which(is.na(ptdat$hhweight))])
         ptdat <- filter(ptdat, !(id_short %in% miss_wts))
-
+        ptdat <- filter(ptdat, hhweight != 0)
+        
         invalid_hhs <- unique(ptdat$id_short[which(ptdat$hh_size <= 0)])
         ptdat <- filter(ptdat, !(id_short %in% invalid_hhs))
 

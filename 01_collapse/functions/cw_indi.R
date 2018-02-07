@@ -1,15 +1,19 @@
 cw_water <- function(mydat) {
 
-	cw_dat <- read.csv('/home/adesh/Documents/cw_water.csv')
+	cw_dat <- read.csv('/home/j/WORK/11_geospatial/wash/definitions/cw_water.csv')
 
 	results <- list()
-	for (i in unique(ptdat$iso3)) {
+	for (i in unique(mydat$iso3)) {
+		message(i)
 		cw_sub <- filter(cw_dat, iso3 == i)
+		if (nrow(cw_sub) == 0) {
+			cw_sub[1,] <- 0
+		}
 		attach(cw_sub)
-		reg <- (cw_sub$sources < 5) |
+		reg <- (sources < 5) |
 			   (piped + piped_imp == 0) |
 			   (well_imp + well_unimp == 0) |
-			   (spring_imp + spring_unimp == 0) |
+			   (spring_imp + spring_unimp == 0) 
 		detach(cw_sub)
 
 		if (!reg) {
@@ -39,10 +43,10 @@ cw_water <- function(mydat) {
 			  			    ifelse(i %in% cssa, 'cssa',
 			                  ifelse(i %in% name_hi, 'name_hi',
 			   				    ifelse(i %in% essa_hilo, 'essa_hilo',
-			  					  ifelse(i %in% wssa, 'wssa', mydat$reg
+			  					  ifelse(i %in% wssa, 'wssa', NA
 			  					  	))))))
 
-			  cw_reg <- filter(cw_reg, reg == region)
+			  cw_reg <- filter(cw_dat, reg == region)
 			  cw_reg <- cw_reg %>% 
 			  			group_by(reg) %>%
 			  			summarize(well_imp = sum(well_imp),
@@ -59,25 +63,25 @@ cw_water <- function(mydat) {
 
 		}
 		
-		mydat <- mydat %>%
-				 filter(mydat, iso3 == i)
+		subdat <- mydat %>%
+				 filter(iso3 == i)
 
 		if (is.na(ipiped_pct)) {
 			ipiped_pct <- 1
-			mydat$piped_cw <- 0
+			subdat$piped_cw <- 0
 		}
 
 		if (is.na(iwell_pct)) {
 			iwell_pct <- 1
-			mydat$well_cw <- 0
+			subdat$well_cw <- 0
 		}
 
 		if (is.na(ispring_pct)) {
 			ispring_pct <- 1
-			mydat$spring_cw <- 0
+			subdat$spring_cw <- 0
 		}
 
-		mydat <- mydat %>%
+		subdat <- subdat %>%
 				 mutate(piped = piped + piped_cw * (1 - ipiped_pct),
 				 		unimp = unimp + well_unimp + 
 				 				(well_cw * (1 - iwell_pct)) +
@@ -93,7 +97,7 @@ cw_water <- function(mydat) {
 				 		year_start,
 				 		N,
 				 		piped, imp, unimp, surface)
-		results[[length(results) + 1]] <- mydat
+		results[[length(results) + 1]] <- subdat
 
 	}
 
@@ -104,14 +108,17 @@ cw_water <- function(mydat) {
 
 cw_sani <- function(mydat) {
 
-	cw_dat <- read.csv('/home/adesh/Documents/cw_sani.csv')
+	cw_dat <- read.csv('/home/j/WORK/11_geospatial/wash/definitions/cw_sani.csv')
 
 	results <- list()
-	for (i in unique(ptdat$iso3)) {
+	for (i in unique(mydat$iso3)) {
+		message(i)
 		cw_sub <- filter(cw_dat, iso3 == i)
-		reg <- cw_sub$sources < 5
+		if (nrow(cw_sub) == 0) {
+			cw_sub[1,] <- 0
+		}
 		attach(cw_sub)
-		reg <- (cw_sub$sources < 5) |
+		reg <- (sources < 5) |
 			   (latrine_imp + latrine_unimp == 0) |
 			   (flush_imp + flush_unimp == 0)
 		detach(cw_sub)
@@ -142,10 +149,10 @@ cw_sani <- function(mydat) {
 			  			    ifelse(i %in% cssa, 'cssa',
 			                  ifelse(i %in% name_hi, 'name_hi',
 			   				    ifelse(i %in% essa_hilo, 'essa_hilo',
-			  					  ifelse(i %in% wssa, 'wssa', mydat$reg
+			  					  ifelse(i %in% wssa, 'wssa', NA
 			  					  	))))))
 
-			  cw_reg <- filter(cw_reg, reg == region)
+			  cw_reg <- filter(cw_dat, reg == region)
 			  cw_reg <- cw_reg %>% 
 			  			group_by(reg) %>%
 			  			summarize(latrine_imp = sum(latrine_imp),
@@ -160,36 +167,34 @@ cw_sani <- function(mydat) {
 		}
 		
 
-		mydat <- mydat %>%
-				 filter(mydat, iso3 == i)
+		subdat <- mydat %>%
+				 filter(iso3 == i)
 
 		if (is.na(ilatrine_pct)) {
 			ilatrine_pct <- 1
-			mydat$latrine_cw <- 0
+			subdat$latrine_cw <- 0
 		}
 
 		if (is.na(iflush_pct)) {
 			iflush_pct <- 1
-			mydat$flush_cw <- 0
+			subdat$flush_cw <- 0
 		}
 
-		mydat <- mydat %>%
-				 mutate(piped = piped + piped_cw * (1 - ipiped_pct),
-				 		unimp = unimp + well_unimp + 
-				 				(well_cw * (1 - iwell_pct)) +
-				 				spring_unimp + (spring_cw * (1 - ispring_pct)),
-				 		surface = surface) %>%
-				 mutate(imp = piped + (piped_cw * ipiped_pct) +
-				 			  well_imp + (well_cw * iwell_pct) +
-				 			  spring_imp + (spring_cw * ispring_pct) +
-				 			  imp) %>%
+		subdat <- subdat %>%
+				 mutate(imp = imp + 
+				 			  (ilatrine_pct * latrine_cw) + latrine_imp +
+				 			  (iflush_pct * flush_cw) + flush_imp,
+				 		unimp = unimp + 
+				 				(latrine_cw * (1 - ilatrine_pct)) + latrine_unimp +
+				 				(flush_cw * (1 - iflush_pct)) + flush_unimp,
+				 		od = od) %>%
 				 rename(N = total_hh) %>%
 				 select(nid, iso3, survey_series, 
 				 		lat, long, shapefile, location_code,
 				 		year_start,
 				 		N,
-				 		piped, imp, unimp, surface)
-		results[[length(results) + 1]] <- mydat
+				 		imp, unimp, od)
+		results[[length(results) + 1]] <- subdat
 
 	}
 
