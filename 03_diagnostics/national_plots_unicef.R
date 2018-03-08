@@ -1,31 +1,17 @@
 rm(list = ls())
-setwd('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash')
+setwd('/home/j/WORK/11_geospatial/wash/data/cwed')
 
 library(feather)
 library(dplyr)
 library(ggplot2)
 library(ggrepel)
 
-ptdat <- read_feather('ptdat_water_unconditional_country_2017_12_01.feather')
-ptdat$point <- 'pt'
-polydat <- read_feather('polydat_water_unconditional_country_2017_12_01.feather')
-polydat$point <- 'poly'
-alldat <- rbind(ptdat, polydat)
-
-drop_nids <- read.csv('/home/j/temp/gmanny/wash_data_vetting/data_vetting_water.csv')
-drop_nids <- drop_nids$nid
-
-#alldat <- filter(alldat, !(nid %in% drop_nids))
-alldat$problem <- ifelse(alldat$nid %in% drop_nids, 1, 0)
-alldat$problem <- as.character(alldat$problem)
-
-#unicef <- read.csv('/home/j/WORK/11_geospatial/wash/unicef/unicef_data.csv',
-#				   stringsAsFactors = F)
-#unicef$year <- as.numeric(unicef$year)
-#unicef$piped <- as.numeric(unicef$piped)
-#unicef$piped <- (unicef$piped)/100
-#unicef$improved <- as.numeric(unicef$improved)
-#unicef$improved <- (unicef$improved)/100
+alldat <- read_feather('sani_2018_02_07.feather')
+alldat$point <- as.character(ifelse(is.na(alldat$lat), 0, 1))
+alldat <- alldat %>%
+		  group_by(nid, iso3, survey_series, year_start, point) %>%
+		  summarize(imp = weighted.mean(imp, N),
+		  			N = sum(N))
 
 sssa_hi <- c('NAM','BWA','ZAF')
 cssa <- c('CAF','GAB','GNQ','COD','COG','AGO','STP')
@@ -38,19 +24,19 @@ wssa <- c('CPV','SEN','GMB','GIN','GNB','SLE','MLI','LBR',
           'CIV','GHA','TGO','BEN','NGA','NER','TCD','CMR',
           'BFA','MRT')
 africa <- c(sssa_hi, cssa, name_hi, essa_hilo, wssa)
+alldat <- filter(alldat, iso3 %in% africa)
 
-pdf('/home/adesh/Documents/wash/plots/wash_dx_w_piped_problems_12_01.pdf')
+pdf('/home/adesh/Documents/wash/plots/wash_dx_s_imp_problems_02_07.pdf')
 for (i in unique(alldat$iso3)) {
 	message(i)
 	plotdat <- filter(alldat, iso3 == i)
 	if (nrow(plotdat) > 0) {
 	print(
 		ggplot(plotdat) + 
-			geom_point(aes(x = year_start, y = piped, shape = point, size = total_hh,
-						   col = problem)) +
-			geom_smooth(aes(x = year_start, y = piped, col = 'piped', weight = total_hh),
-							method = glm, size = 0.5, se = F, fullrange = F) +
-			geom_text_repel(aes(x = year_start, y = piped, label = nid)) +
+			geom_point(aes(x = year_start, y = imp, col = point, size = N)) +
+			geom_smooth(aes(x = year_start, y = imp, col = 'imp', weight = N),
+							method = 'glm', size = 0.5, se = F, fullrange = F) +
+			geom_text_repel(aes(x = year_start, y = imp, label = nid)) +
 			#geom_point(aes(x = year_start, y = imp, shape = point, size = total_hh,
 			#			   col = 'MBG Imp.')) +
 			#geom_smooth(aes(x = year_start, y = imp, col = 'MBG Imp.', weight = total_hh),
