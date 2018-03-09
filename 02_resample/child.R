@@ -23,11 +23,13 @@ run_date <- commandArgs()[5]
 
 if (indic == 'water') {
   levels <- c('piped','imp','unimp','surface')
-  polydat <- read_feather('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_water_unconditional__2017_12_01.feather')
-} else {levels <- c('imp','unimp','od')
-  polydat <- read_feather('/home/j/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_sani_unconditional__2017_12_01.feather')
+  polydat <- read_feather('/home/j/WORK/11_geospatial/wash/data/cwed/water_2018_03_08.feather')
+} else {
+  levels <- c('imp','unimp','od')
+  polydat <- read_feather('/home/j/WORK/11_geospatial/wash/data/cwed/sani_2018_03_08.feather')
 }
 
+polydat <- filter(polydat, is.na(lat) & !is.na(shapefile) & !is.na(location_code))
 subset <- polydat[which(polydat$shapefile == shp),]
 
 shape_master <- shapefile(paste0('/home/j//WORK/11_geospatial/05_survey shapefile library/Shapefile directory/',shp,'.shp'))
