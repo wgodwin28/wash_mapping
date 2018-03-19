@@ -5,7 +5,7 @@ indic <- as.character(commandArgs()[4])
 if (indic == 'water') {
     run_date <- as.character(commandArgs()[5])
     for (region in c('cssa','essa_hilo','name_hi','sssa_hi','wssa')) {
-        for (indicator in c('w_piped', 'w_imp_cr','w_unimp_cr')) {
+        for (indicator in c('w_piped_cr', 'w_imp','w_unimp_cr')) {
             message(region); message(indicator); 
             
             message('loading data...')
@@ -19,16 +19,16 @@ if (indic == 'water') {
         }
 
         message('calculating...')
-        w_imp_calc <- (1 - w_piped) * w_imp_cr; rm(w_imp_cr)
-        w_unimp_calc <- (1 - w_piped - w_imp_calc) * w_unimp_cr; rm(w_unimp_cr)
-        w_surface_calc <- 1 - w_piped - w_imp_calc - w_unimp_calc
+        w_piped_calc <- w_piped_cr * w_imp; rm(w_piped_cr)
+        w_unimp_calc <- (1 - w_imp) * w_unimp_cr; rm(w_unimp_cr)
+        w_surface_calc <- 1 - w_imp - w_unimp_calc
 
-        message('saving w_imp_calc...')
-        dir.create(paste0('/share/geospatial/mbg/wash/w_imp_calc/output/',run_date))
-        setwd(paste0('/share/geospatial/mbg/wash/w_imp_calc/output/',run_date))
-        save(w_imp_calc, file = paste0("w_imp_calc_cell_draws_eb_bin0_",
+        message('saving w_piped_calc...')
+        dir.create(paste0('/share/geospatial/mbg/wash/w_piped_calc/output/',run_date))
+        setwd(paste0('/share/geospatial/mbg/wash/w_piped_calc/output/',run_date))
+        save(w_piped_calc, file = paste0("w_piped_calc_cell_draws_eb_bin0_",
                                     region,"_0.RData"))
-        rm(w_imp_calc)
+        rm(w_piped_calc)
 
         message('saving w_unimp_calc...')
         dir.create(paste0('/share/geospatial/mbg/wash/w_unimp_calc/output/',run_date))
