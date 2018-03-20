@@ -4,7 +4,7 @@ indic <- as.character(commandArgs()[4])
 
 if (indic == 'water') {
     run_date <- as.character(commandArgs()[5])
-    for (region in c('cssa','essa_hilo','name_hi','sssa_hi','wssa')) {
+    for (region in c('cssa','essa_hilo','sssa_hi','wssa','name_hi')) {
         for (indicator in c('w_piped_cr', 'w_imp','w_unimp_cr')) {
             message(region); message(indicator); 
             
@@ -49,7 +49,7 @@ if (indic == 'water') {
 
 if (indic == 'sani') {
     run_date <- as.character(commandArgs()[5])
-    for (region in c('cssa','essa_hilo','name_hi','sssa_hi','wssa')) {
+    for (region in c('cssa','essa_hilo','sssa_hi','wssa','name_hi')) {
         for (indicator in c('s_imp', 's_unimp_cr')) {
             message(region); message(indicator); 
             
@@ -86,7 +86,7 @@ if (indic == 'sani') {
 
 if (indic == 'both') {
     run_date <- commandArgs()[5]
-    for (region in c('cssa','essa_hilo','name_hi','sssa_hi','wssa')) {
+    for (region in c('cssa','essa_hilo','sssa_hi','wssa','name_hi')) {
         for (indicator in c('w_piped', 'w_imp_cr','w_unimp_cr')) {
             message(region); message(indicator); 
             
@@ -129,7 +129,7 @@ if (indic == 'both') {
     }
 
     run_date <- as.character(commandArgs()[5])
-    for (region in c('cssa','essa_hilo','name_hi','sssa_hi','wssa')) {
+    for (region in c('cssa','essa_hilo','sssa_hi','wssa','name_hi')) {
         for (indicator in c('s_imp', 's_unimp_cr')) {
             message(region); message(indicator); 
             
