@@ -16,7 +16,7 @@ if (nodes == 'geos') {
 user <- "adesh"
 
 # run dates to be combind
-run_dates <- c('2018_03_18_02_05_11')
+run_dates <- c('2018_03_19_15_10_19', '2018_03_19_15_10_28', '2018_03_19_15_10_34')
 
 for (rd in run_dates) {
   jname <- paste0(paste0("cr_",rd))
@@ -25,7 +25,7 @@ for (rd in run_dates) {
                     "-cwd -N ", jname, " ", "-pe multi_slot ", mycores, " ")
   # launch script name to qsub
   script <- "combine_cr_ordinal.R"
-  indic <- 'water'
+  indic <- 'both'
   args <- paste(indic, rd)
   system(paste(sys.sub, r_shell, script, args)) 
 }
