@@ -203,7 +203,7 @@ for (reg in regions) {
             ggtitle(paste(i, reg, indi)) +
             annotate("text", seq(2001, 2012, by = 2), 1, label = c('int', 'gam', 'gbm',
             											'lasso','ridge','year_cov')) +
-            annotate("text", seq(2001, 2012, by = 2), 0.9, label = means)
+            annotate("text", seq(2001, 2012, by = 2), 0.9, label = means) +
             ylim(0,1)
     print(gg2)
 
