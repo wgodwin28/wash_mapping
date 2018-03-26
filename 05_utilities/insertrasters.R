@@ -73,7 +73,7 @@ source('mbg_central/seegMBG_transform_functions.R')     # Using Roy's edit for n
 		lci_results[[i]] <- lci_ras
 	}
 
-	mean_ras <- do.call(raster::merge, mean_results)
+	# mean_ras <- do.call(raster::merge, mean_results)
 	uci_ras <- do.call(raster::merge, uci_results)
 	lci_ras <- do.call(raster::merge, lci_results)
 	
