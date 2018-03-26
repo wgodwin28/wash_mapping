@@ -35,7 +35,7 @@ source('mbg_central/seegMBG_transform_functions.R')     # Using Roy's edit for n
 # s_imp
 #for (indi in c('s_imp', 's_od_calc','s_unimp_calc','w_imp','w_piped_calc','w_unimp_calc','w_surface_calc')) {
 	print(indi)
-	setwd(paste0('/share/geospatial/mbg/wash/',indi,'/output/2018_03_22_20_13_18'))
+	setwd(paste0('/share/geospatial/mbg/wash/',indi,'/output/2018_03_22_20_13_25'))
 
 	regions <- c('name_hi','cssa','sssa_hi','wssa','essa_hilo')
 
