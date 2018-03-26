@@ -63,13 +63,10 @@ source('mbg_central/seegMBG_transform_functions.R')     # Using Roy's edit for n
 		## Make cell preds and a mean raster
 		test <- load(paste0(indi,'_cell_draws_eb_bin0_',reg,'_0.RData'))
 		pred <- get(test)
+		
 		#mean_ras  <- insertRaster(simple_raster,matrix(rowMedians(pred),ncol = 16))
-		
-		uci <- apply(pred, 1, quantile, 0.975)
-		uci_ras <- insertRaster(simple_raster,matrix(uci,ncol = 16))
-		
-		lci <- apply(pred, 1, quantile, 0.025)
-		lci_ras <- insertRaster(simple_raster,matrix(lci,ncol = 16))
+		uci_ras <- insertRaster(simple_raster,matrix(rowQuantiles(pred, probs = 0.975),ncol = 16))
+		lci_ras <- insertRaster(simple_raster,matrix(rowQuantiles(pred, probs = 0.025),ncol = 16))
 		
 		#mean_results[[i]] <- mean_ras
 		uci_results[[i]] <- uci_ras
