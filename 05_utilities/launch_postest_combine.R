@@ -16,7 +16,7 @@ if (nodes == 'geos') {
 user <- "adesh"
 
 # run dates to be combind
-run_dates <- c('2018_03_22_20_13_18')
+run_dates <- c('2018_03_24_16_32_12')
 holdout <- 1:5
 
 for (rd in run_dates) {

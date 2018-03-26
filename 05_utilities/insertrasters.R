@@ -6,7 +6,7 @@ root           <- ifelse(Sys.info()[1]=='Windows', 'J:/', '/home/j/')
 package_lib    <- ifelse(grepl('geos', Sys.info()[4]),
                           sprintf('%stemp/geospatial/geos_packages',root),
                           sprintf('%stemp/geospatial/packages',root))
-
+indi <- commandArgs()[4]
 ## Load libraries and  MBG project functions.
 .libPaths(package_lib)
 package_list <- c(t(read.csv(sprintf('%s/package_list.csv',commondir),header=FALSE)))
@@ -33,14 +33,15 @@ source('mbg_central/misc_vaccine_functions.R')
 source('mbg_central/seegMBG_transform_functions.R')     # Using Roy's edit for now that can take tempo
 
 # s_imp
-for (indi in c('s_od_calc','s_unimp_calc','w_imp','w_piped_calc','w_unimp_calc','w_surface_calc')) {
+#for (indi in c('s_imp', 's_od_calc','s_unimp_calc','w_imp','w_piped_calc','w_unimp_calc','w_surface_calc')) {
 	print(indi)
 	setwd(paste0('/share/geospatial/mbg/wash/',indi,'/output/2018_03_22_20_13_18'))
 
 	regions <- c('name_hi','cssa','sssa_hi','wssa','essa_hilo')
 
 	results <- list()
-	for (reg in regions) {
+	for (i in 1:length(regions)) {
+		reg <- regions[i]
 		print(reg)
 		## Load simple polygon template to model over
 		gaul_list           <- get_gaul_codes(reg)
@@ -58,28 +59,12 @@ for (indi in c('s_od_calc','s_unimp_calc','w_imp','w_piped_calc','w_unimp_calc',
 		print('check3')
 		## Make cell preds and a mean raster
 		test <- load(paste0(indi,'_cell_draws_eb_bin0_',reg,'_0.RData'))
-		cell_pred <- get(test)
-		mean_ras  <- insertRaster(simple_raster,matrix(rowMedians(cell_pred),ncol = 16))
-		results[[1 + length(results)]] <- mean_ras
+		pred <- get(test)
+		mean_ras  <- insertRaster(simple_raster,matrix(rowMedians(pred),ncol = 16))
+		results[[i]] <- mean_ras
 	}
 
 	mean_ras <- do.call(raster::merge, results)
 
 	writeRaster(mean_ras, format = 'GTiff', filename = paste0(indi,'_median.tif'), overwrite = T)	
-}
-
-
-rm(cell_pred)
-setwd('/share/geospatial/mbg/wash/s_imp/output/2018_03_22_20_13_18')
-load('s_imp_cell_draws_eb_bin0_cssa_0.RData')
-s_imp <- cell_pred
-
-rm(cell_pred)
-setwd('/share/geospatial/mbg/wash/s_unimp_cr/output/2018_03_22_20_13_18')
-load('s_unimp_cr_cell_draws_eb_bin0_cssa_0.RData')
-s_unimp <- cell_pred
-
-rm(cell_pred); rm(list = ls())
-setwd('/share/geospatial/mbg/wash/s_od_calc/output/2018_03_22_20_13_18')
-load('s_od_calc_cell_draws_eb_bin0_cssa_0.RData')
-s_od <- cell_pred
+#}
