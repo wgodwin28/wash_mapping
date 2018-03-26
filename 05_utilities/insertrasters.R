@@ -65,10 +65,10 @@ source('mbg_central/seegMBG_transform_functions.R')     # Using Roy's edit for n
 		pred <- get(test)
 		#mean_ras  <- insertRaster(simple_raster,matrix(rowMedians(pred),ncol = 16))
 		
-		uci <- apply(test, 1, quantile, 0.975)
+		uci <- apply(pred, 1, quantile, 0.975)
 		uci_ras <- insertRaster(simple_raster,matrix(uci,ncol = 16))
 		
-		lci <- apply(test, 1, quantile, 0.025)
+		lci <- apply(pred, 1, quantile, 0.025)
 		lci_ras <- insertRaster(simple_raster,matrix(lci,ncol = 16))
 		
 		#mean_results[[i]] <- mean_ras
