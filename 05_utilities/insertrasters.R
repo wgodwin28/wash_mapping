@@ -39,7 +39,10 @@ source('mbg_central/seegMBG_transform_functions.R')     # Using Roy's edit for n
 
 	regions <- c('name_hi','cssa','sssa_hi','wssa','essa_hilo')
 
-	results <- list()
+	mean_results <- list()
+	uci_results <- list()
+	lci_results <- list()
+
 	for (i in 1:length(regions)) {
 		reg <- regions[i]
 		print(reg)
@@ -60,11 +63,24 @@ source('mbg_central/seegMBG_transform_functions.R')     # Using Roy's edit for n
 		## Make cell preds and a mean raster
 		test <- load(paste0(indi,'_cell_draws_eb_bin0_',reg,'_0.RData'))
 		pred <- get(test)
-		mean_ras  <- insertRaster(simple_raster,matrix(rowMedians(pred),ncol = 16))
-		results[[i]] <- mean_ras
+		#mean_ras  <- insertRaster(simple_raster,matrix(rowMedians(pred),ncol = 16))
+		
+		uci <- apply(test, 1, quantile, 0.975)
+		uci_ras <- insertRaster(simple_raster,matrix(uci,ncol = 16))
+		
+		lci <- apply(test, 1, quantile, 0.025)
+		lci_ras <- insertRaster(simple_raster,matrix(lci,ncol = 16))
+		
+		#mean_results[[i]] <- mean_ras
+		uci_results[[i]] <- uci_ras
+		lci_results[[i]] <- lci_ras
 	}
 
-	mean_ras <- do.call(raster::merge, results)
-
-	writeRaster(mean_ras, format = 'GTiff', filename = paste0(indi,'_median.tif'), overwrite = T)	
+	mean_ras <- do.call(raster::merge, mean_results)
+	uci_ras <- do.call(raster::merge, uci_results)
+	lci_ras <- do.call(raster::merge, lci_results)
+	
+	#writeRaster(mean_ras, format = 'GTiff', filename = paste0(indi,'_median.tif'), overwrite = T)	
+	writeRaster(uci_ras, format = 'GTiff', filename = paste0(indi,'_uci.tif'), overwrite = T)	
+	writeRaster(lci_ras, format = 'GTiff', filename = paste0(indi,'_lci.tif'), overwrite = T)	
 #}
