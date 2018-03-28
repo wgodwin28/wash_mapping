@@ -1,8 +1,8 @@
 .libPaths('/share/code/geospatial/adesh/r_packages')
 rm(list = ls())
 indic <- as.character(commandArgs()[4])
-holdout <- as.numeric(commandArgs()[6])
-region <- as.numeric(commandArgs()[7])
+holdout <- as.character(commandArgs()[6])
+region <- as.character(commandArgs()[7])
 
 if (indic == 'water') {
     run_date <- as.character(commandArgs()[5])
