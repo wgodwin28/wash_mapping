@@ -2,10 +2,11 @@
 rm(list = ls())
 indic <- as.character(commandArgs()[4])
 holdout <- as.numeric(commandArgs()[6])
+region <- as.numeric(commandArgs()[7])
 
 if (indic == 'water') {
     run_date <- as.character(commandArgs()[5])
-    for (region in c('cssa','essa_hilo','sssa_hi','wssa','name_hi')) {
+
         for (indicator in c('w_piped_cr', 'w_imp','w_unimp_cr')) {
             message(region); message(indicator); 
             
@@ -46,12 +47,10 @@ if (indic == 'water') {
                                     region,"_", holdout, ".RData"))
         rm(w_surface_calc); rm(w_piped)
         
-    }    
-}
+    }
 
 if (indic == 'sani') {
     run_date <- as.character(commandArgs()[5])
-    for (region in c('cssa','essa_hilo','sssa_hi','wssa','name_hi')) {
         for (indicator in c('s_imp', 's_unimp_cr')) {
             message(region); message(indicator); 
             
@@ -84,13 +83,12 @@ if (indic == 'sani') {
                                     region,"_", holdout, ".RData"))
         rm(s_od_calc); rm(s_imp)
         
-    }
+
 }
 
 if (indic == 'both') {
     
     run_date <- commandArgs()[5]
-    for (region in c('cssa','essa_hilo','sssa_hi','wssa','name_hi')) {
         for (indicator in c('s_imp', 's_unimp_cr')) {
             message(region); message(indicator); 
             
@@ -123,10 +121,9 @@ if (indic == 'both') {
                                     region,"_", holdout, ".RData"))
         rm(s_od_calc); rm(s_imp)
         
-    }
+    
 
     run_date <- as.character(commandArgs()[5])
-    for (region in c('cssa','essa_hilo','sssa_hi','wssa','name_hi')) {
         for (indicator in c('w_piped_cr', 'w_imp','w_unimp_cr')) {
             message(region); message(indicator); 
             
@@ -166,6 +163,6 @@ if (indic == 'both') {
         save(w_surface_calc, file = paste0("w_surface_calc_cell_draws_eb_bin0_",
                                     region,"_", holdout, ".RData"))
         rm(w_surface_calc); rm(w_piped)
-    }
+    
 
 }

@@ -17,19 +17,22 @@ user <- "adesh"
 
 # run dates to be combind
 run_dates <- c('2018_03_25_17_10_43')
-holdout <- 1:5
-
-for (rd in run_dates) {
-  for (ho in holdout) {
-    jname <- paste0(paste0("cr_",rd))
-    mycores <- 20
-    sys.sub <- paste0("qsub ",proj,paste0(" -e /homes/adesh/cluster_errors"," -o /homes/adesh/cluster_output/ "),
-                      "-cwd -N ", jname, " ", "-pe multi_slot ", mycores, " ")
-    # launch script name to qsub
-    script <- "combine_cr_ordinal.R"
-    indic <- 'both'
-    args <- paste(indic, rd, ho)
-    system(paste(sys.sub, r_shell, script, args))   
+holdout <- 2
+regions <- c('sssa_hi','wssa','name_hi')
+for (reg in regions) {
+  for (rd in run_dates) {
+    for (ho in holdout) {
+      jname <- paste0(paste0("cr_",rd))
+      mycores <- 20
+      sys.sub <- paste0("qsub ",proj,paste0(" -e /homes/adesh/cluster_errors"," -o /homes/adesh/cluster_output/ "),
+                        "-cwd -N ", jname, " ", "-pe multi_slot ", mycores, " ")
+      # launch script name to qsub
+      script <- "combine_cr_ordinal.R"
+      indic <- 'both'
+      region <- reg
+      args <- paste(indic, rd, ho, region)
+      system(paste(sys.sub, r_shell, script, args))   
+    }
+    
   }
-  
 }

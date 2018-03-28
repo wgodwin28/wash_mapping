@@ -18,7 +18,7 @@ for (indi in indicators) {
 		uci <- apply(ad1[,3:252], 1, quantile, 0.975, na.rm = T)
 		median <- apply(ad1[,3:252], 1, median, na.rm = T)
 
-		ad1 <- cbind(ad1[,1:2], lci, uci, median)
+		ad1 <- cbind(ad1[,1:2], lci, median, uci)
 		print(nrow(ad1))
 		ad1 <- left_join(ad1, distinct(select(geo, region, ADM0_CODE, ADM0_NAME, ADM1_NAME, ADM1_CODE)))
 		print(nrow(ad1))
@@ -27,8 +27,8 @@ for (indi in indicators) {
 
 	ad1 <- do.call(rbind, results)
 	names(ad1)[3] <- paste0(indi, '_lci')
-	names(ad1)[4] <- paste0(indi, '_median')
-	names(ad1)[5] <- paste0(indi, '_uci')
+	names(ad1)[4] <- paste0(indi, '_uci')
+	names(ad1)[5] <- paste0(indi, '_median')
 	assign(indi, ad1)	
 
 }
@@ -37,6 +37,8 @@ for (indi in indicators) {
 nrow(w_imp)
 master_ad1 <- left_join(w_imp, w_surface_calc)
 nrow(master_ad1)
+master_ad1 <- left_join(master_ad1, w_unimp_calc)
+master_ad1 <- left_join(master_ad1, w_piped_calc)
 master_ad1 <- left_join(master_ad1, s_imp)
 master_ad1 <- left_join(master_ad1, s_unimp_calc)
 master_ad1 <- left_join(master_ad1, s_od_calc)
@@ -60,15 +62,15 @@ for (indi in indicators) {
 		uci <- apply(ad2[,3:252], 1, quantile, 0.975, na.rm = T)
 		median <- apply(ad2[,3:252], 1, median, na.rm = T)
 
-		ad2 <- cbind(ad2[,1:2], lci, uci, median)
+		ad2 <- cbind(ad2[,1:2], lci, median, uci)
 		ad2 <- left_join(ad2, distinct(select(geo, region, ADM0_CODE, ADM0_NAME, ADM1_NAME, ADM1_CODE, ADM2_NAME, ADM2_CODE)))
 		results[[i]] <- ad2
 	}
 
 	ad2 <- do.call(rbind, results)
 	names(ad2)[3] <- paste0(indi, '_lci')
-	names(ad2)[4] <- paste0(indi, '_median')
-	names(ad2)[5] <- paste0(indi, '_uci')
+	names(ad2)[4] <- paste0(indi, '_uci')
+	names(ad2)[5] <- paste0(indi, '_median')
 	assign(indi, ad2)	
 
 }
@@ -76,6 +78,8 @@ for (indi in indicators) {
 
 
 master_ad2<- left_join(w_imp, w_surface_calc)
+master_ad2 <- left_join(master_ad2, w_unimp_calc)
+master_ad2 <- left_join(master_ad2, w_piped_calc)
 master_ad2 <- left_join(master_ad2, s_imp)
 master_ad2 <- left_join(master_ad2, s_unimp_calc)
 master_ad2 <- left_join(master_ad2, s_od_calc)
@@ -97,7 +101,7 @@ for (indi in indicators) {
 		uci <- apply(ad0[,3:252], 1, quantile, 0.975, na.rm = T)
 		median <- apply(ad0[,3:252], 1, median, na.rm = T)
 
-		ad0 <- cbind(ad0[,1:2], lci, uci, median)
+		ad0 <- cbind(ad0[,1:2], lci, median, uci)
 		print(nrow(ad0))
 		ad0 <- left_join(ad0, distinct(select(geo, region, ADM0_CODE, ADM0_NAME)))
 		print(nrow(ad0))
@@ -106,8 +110,8 @@ for (indi in indicators) {
 
 	ad0 <- do.call(rbind, results)
 	names(ad0)[3] <- paste0(indi, '_lci')
-	names(ad0)[4] <- paste0(indi, '_median')
-	names(ad0)[5] <- paste0(indi, '_uci')
+	names(ad0)[4] <- paste0(indi, '_uci')
+	names(ad0)[5] <- paste0(indi, '_median')
 	assign(indi, ad0)	
 
 }
@@ -115,7 +119,9 @@ for (indi in indicators) {
 
 nrow(w_imp)
 master_ad0 <- left_join(w_imp, w_surface_calc)
+master_ad0 <- left_join(master_ad0, w_unimp_calc)
 nrow(master_ad0)
+master_ad0 <- left_join(master_ad0, w_piped_calc)
 master_ad0 <- left_join(master_ad0, s_imp)
 master_ad0 <- left_join(master_ad0, s_unimp_calc)
 master_ad0 <- left_join(master_ad0, s_od_calc)
