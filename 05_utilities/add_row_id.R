@@ -2,7 +2,7 @@ setwd('/home/j/WORK/11_geospatial/10_mbg/input_data')
 rm(list = ls())
 library(dplyr)
 
-w_imp <- read.csv('s_imp.csv', stringsAsFactors = F)
+w_imp <- read.csv('w_imp.csv', stringsAsFactors = F)
 
 w_imp_unique <- w_imp
 w_imp_unique$latitude <- ifelse(w_imp$point == 0, NA, w_imp_unique$latitude)
@@ -54,7 +54,9 @@ w_imp_poly <- do.call(bind_rows, results)
 w_imp2 <- bind_rows(w_imp_pt, w_imp_poly)
 w_imp2 <- mutate(w_imp2, master_id = paste(point,cluster_id, row_id, sep = '_'))
 
-for (set in c('s_unimp_cr')) {
+#w_imp2 <- read.csv('s_imp.csv')
+
+for (set in c('w_unimp_calc','w_surface_calc','w_piped_calc')) {
 	w_imp <- read.csv(paste0(set,'.csv'), stringsAsFactors = F)
 	w_imp_pt <- filter(w_imp, point == 1)
 	w_imp_poly <- filter(w_imp, point == 0)
@@ -97,5 +99,7 @@ for (set in c('s_unimp_cr')) {
 	
 }
 
-write.csv(w_imp2, file = 's_imp.csv')
-write.csv(s_unimp_cr, file = 's_unimp_cr.csv')
+#write.csv(w_imp2, file = 's_imp.csv')
+write.csv(w_unimp_calc, file = 'w_unimp_calc.csv')
+write.csv(w_surface_calc, file = 'w_surface_calc.csv')
+write.csv(w_piped_calc, file = 'w_piped_calc.csv')
