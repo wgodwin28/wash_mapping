@@ -26,6 +26,7 @@ for (p in package_list) {
 library(seegSDM, lib.loc = '/share/code/geospatial/adesh/r_packages_hf_sing/')
 library(seegMBG, lib.loc = '/share/code/geospatial/adesh/r_packages_hf_sing/')
 library(mgcv)
+library(matrixStats)
 
 # Load MBG packages and functions
 message('Loading in required R packages and MBG functions')
