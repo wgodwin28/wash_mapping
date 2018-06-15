@@ -29,15 +29,15 @@ for (reg in regions) {
   for (rd in run_dates) {
     for (ho in holdout) {
       jname <- paste0(paste0("cr_",rd))
-      mycores <- 20
+      mycores <- 10
       sys.sub <- paste0("qsub ",proj,paste0(" -e /homes/adesh/cluster_errors"," -o /homes/adesh/cluster_output/ "),
-                        "-cwd -N ", jname, " ", "-pe multi_slot ", mycores, " -hold_jid 189168011 ")
+                        "-cwd -N ", jname, " ", "-pe multi_slot ", mycores)
       # launch script name to qsub
       script <- "combine_cr_ordinal.R"
       indic <- 'both'
       region <- reg
       args <- paste(indic, rd, ho, region)
-      system(paste(sys.sub, r_shell, script, args))   
+      system(paste(sys.sub, r_shell, mkl, script, args))   
     }
     
   }

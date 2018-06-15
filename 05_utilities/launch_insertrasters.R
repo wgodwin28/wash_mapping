@@ -16,7 +16,11 @@ if (nodes == 'geos') {
 user <- "adesh"
 
 # run dates to be combind
+# Use hf_inla
+hf_inla_shell <- '/share/singularity-images/health_fin/forecasting/shells/health_fin_forecasting_shell_mkl_singularity.sh'
 
+r_shell <- hf_inla_shell
+mkl <- 1
 
 for (indi in c('s_imp', 's_od_calc','s_unimp_calc','w_imp','w_piped_calc','w_unimp_calc','w_surface_calc')) {
     jname <- paste0(indi, '_raster')
@@ -27,5 +31,5 @@ for (indi in c('s_imp', 's_od_calc','s_unimp_calc','w_imp','w_piped_calc','w_uni
     script <- "insertrasters.R"
     indic <- 'both'
     args <- paste(indi)
-    system(paste(sys.sub, r_shell, script, args))   
+    system(paste(sys.sub, r_shell, mkl, script, args))   
  }

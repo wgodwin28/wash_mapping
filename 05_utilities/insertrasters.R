@@ -6,7 +6,7 @@ root           <- ifelse(Sys.info()[1]=='Windows', 'J:/', '/home/j/')
 package_lib    <- ifelse(grepl('geos', Sys.info()[4]),
                           sprintf('%stemp/geospatial/geos_packages',root),
                           sprintf('%stemp/geospatial/packages',root))
-indi <- commandArgs()[4]
+indi <- commandArgs()[6]
 ## Load libraries and  MBG project functions.
 .libPaths(package_lib)
 package_list <- c(t(read.csv(sprintf('%s/package_list.csv',commondir),header=FALSE)))
@@ -35,9 +35,9 @@ source('mbg_central/seegMBG_transform_functions.R')     # Using Roy's edit for n
 # s_imp
 #for (indi in c('s_imp', 's_od_calc','s_unimp_calc','w_imp','w_piped_calc','w_unimp_calc','w_surface_calc')) {
 	print(indi)
-	setwd(paste0('/share/geospatial/mbg/wash/',indi,'/output/2018_03_22_20_13_25'))
+	setwd(paste0('/share/geospatial/mbg/wash/',indi,'/output/2018_06_05_10_31_32'))
 
-	regions <- c('name_hi','cssa','sssa_hi','wssa','essa_hilo')
+	regions <- c('name_hi3', 'egy','cssa','sssa_hi','wssa','essa_hilo')
 
 	mean_results <- list()
 	uci_results <- list()
@@ -64,20 +64,20 @@ source('mbg_central/seegMBG_transform_functions.R')     # Using Roy's edit for n
 		test <- load(paste0(indi,'_cell_draws_eb_bin0_',reg,'_0.RData'))
 		pred <- get(test)
 		
-		#mean_ras  <- insertRaster(simple_raster,matrix(rowMedians(pred),ncol = 16))
+		mean_ras  <- insertRaster(simple_raster,matrix(rowMeans(pred),ncol = 16))
 		uci_ras <- insertRaster(simple_raster,matrix(rowQuantiles(pred, probs = 0.975),ncol = 16))
 		lci_ras <- insertRaster(simple_raster,matrix(rowQuantiles(pred, probs = 0.025),ncol = 16))
 		
-		#mean_results[[i]] <- mean_ras
+		mean_results[[i]] <- mean_ras
 		uci_results[[i]] <- uci_ras
 		lci_results[[i]] <- lci_ras
 	}
 
-	# mean_ras <- do.call(raster::merge, mean_results)
+	mean_ras <- do.call(raster::merge, mean_results)
 	uci_ras <- do.call(raster::merge, uci_results)
 	lci_ras <- do.call(raster::merge, lci_results)
 	
-	#writeRaster(mean_ras, format = 'GTiff', filename = paste0(indi,'_median.tif'), overwrite = T)	
+	writeRaster(mean_ras, format = 'GTiff', filename = paste0(indi,'_mean.tif'), overwrite = T)	
 	writeRaster(uci_ras, format = 'GTiff', filename = paste0(indi,'_uci.tif'), overwrite = T)	
 	writeRaster(lci_ras, format = 'GTiff', filename = paste0(indi,'_lci.tif'), overwrite = T)	
 #}
