@@ -1,36 +1,31 @@
 rm(list = ls())
 user <- 'adesh'
 commondir      <- sprintf('/share/geospatial/mbg/common_inputs')
-repo            <- sprintf('/share/code/geospatial/%s/mbg/',user)
 root           <- ifelse(Sys.info()[1]=='Windows', 'J:/', '/home/j/')
-package_lib    <- ifelse(grepl('geos', Sys.info()[4]),
-                          sprintf('%stemp/geospatial/geos_packages',root),
-                          sprintf('%stemp/geospatial/packages',root))
-indi <- commandArgs()[6]
-## Load libraries and  MBG project functions.
-.libPaths(package_lib)
+## load packages and custom functions
+## drive locations
+root           <- ifelse(Sys.info()[1]=='Windows', 'J:/', '/home/j/')
+sharedir       <- sprintf('/share/geospatial/mbg/%s/%s',indicator_group,indicator)
+commondir      <- sprintf('/share/geospatial/mbg/common_inputs')
 package_list <- c(t(read.csv(sprintf('%s/package_list.csv',commondir),header=FALSE)))
+repo            <- sprintf('/share/code/geospatial/%s/mbg/',user)
 
-for(package in package_list) {
-    library(package, lib.loc = package_lib, character.only=TRUE)
-}
+# TBD: Remve all 'setwd()'
 setwd(repo)
+core_repo <- repo
 
-library(matrixStats)
+for (p in package_list) {
+  try(library(p, character.only = T))
+}
 
-source('mbg_central/mbg_functions.R')                   # Functions to run MBG model.
-source('mbg_central/prep_functions.R')                  # Functions to setup MBG run
-source('mbg_central/covariate_functions.R')             # Functions to prep and transform 5*5 covariates
-source('mbg_central/misc_functions.R')                  # Other computational MBG-related functions.
-source('mbg_central/post_estimation_functions.R')
-source('mbg_central/gbd_functions.R')
-source('mbg_central/shiny_functions.R')
-source('mbg_central/holdout_functions.R')
-source('mbg_central/categorical_variable_functions.R')
-source('mbg_central/validation_functions.R') 
-source('mbg_central/validation_report_functions.R') 
-source('mbg_central/misc_vaccine_functions.R') 
-source('mbg_central/seegMBG_transform_functions.R')     # Using Roy's edit for now that can take tempo
+library(seegSDM, lib.loc = '/share/code/geospatial/adesh/r_packages_hf_sing/')
+library(seegMBG, lib.loc = '/share/code/geospatial/adesh/r_packages_hf_sing/')
+library(mgcv)
+
+# Load MBG packages and functions
+message('Loading in required R packages and MBG functions')
+source(paste0(repo, '/mbg_central/setup.R'))
+mbg_setup(package_list = package_list, repos = repo)
 
 # s_imp
 #for (indi in c('s_imp', 's_od_calc','s_unimp_calc','w_imp','w_piped_calc','w_unimp_calc','w_surface_calc')) {
