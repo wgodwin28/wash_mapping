@@ -10,7 +10,7 @@ root           <- ifelse(Sys.info()[1]=='Windows', 'J:/', '/home/j/')
 ## load packages and custom functions
 ## drive locations
 root           <- ifelse(Sys.info()[1]=='Windows', 'J:/', '/home/j/')
-sharedir       <- sprintf('/share/geospatial/mbg/%s/%s',indicator_group,indicator)
+sharedir       <- sprintf('/share/geospatial/mbg/%s/%s',indicator_group,indi)
 commondir      <- sprintf('/share/geospatial/mbg/common_inputs')
 package_list <- c(t(read.csv(sprintf('%s/package_list.csv',commondir),header=FALSE)))
 repo            <- sprintf('/share/code/geospatial/%s/mbg/',user)
