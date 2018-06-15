@@ -49,7 +49,7 @@ if (indic == 'water') {
     }
 
 if (indic == 'sani') {
-    run_date <- as.character(commandArgs()[5])
+    run_date <- as.character(commandArgs()[7])
         for (indicator in c('s_imp', 's_unimp_cr')) {
             message(region); message(indicator); 
             
@@ -87,7 +87,7 @@ if (indic == 'sani') {
 
 if (indic == 'both') {
     
-    run_date <- commandArgs()[5]
+    run_date <- as.character(commandArgs()[7])
         for (indicator in c('s_imp', 's_unimp_cr')) {
             message(region); message(indicator); 
             
@@ -122,7 +122,7 @@ if (indic == 'both') {
         
     
 
-    run_date <- as.character(commandArgs()[5])
+    run_date <- as.character(commandArgs()[7])
         for (indicator in c('w_piped_cr', 'w_imp','w_unimp_cr')) {
             message(region); message(indicator); 
             
