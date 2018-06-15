@@ -2,7 +2,7 @@ rm(list = ls())
 indic <- as.character(commandArgs()[6])
 holdout <- as.character(commandArgs()[8])
 region <- as.character(commandArgs()[9])
-
+print(commandArgs())
 if (indic == 'water') {
     run_date <- as.character(commandArgs()[7])
 
