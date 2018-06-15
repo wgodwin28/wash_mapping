@@ -1,4 +1,9 @@
 rm(list = ls())
+
+indi <- as.character(commandArgs()[6])
+run_date <- '2018_06_05_10_31_32'
+indicator_group <- 'wash'
+holdout <- 0
 user <- 'adesh'
 commondir      <- sprintf('/share/geospatial/mbg/common_inputs')
 root           <- ifelse(Sys.info()[1]=='Windows', 'J:/', '/home/j/')
@@ -27,7 +32,6 @@ message('Loading in required R packages and MBG functions')
 source(paste0(repo, '/mbg_central/setup.R'))
 mbg_setup(package_list = package_list, repos = repo)
 
-indi <- as.character(commandArgs()[6])
 # s_imp
 #for (indi in c('s_imp', 's_od_calc','s_unimp_calc','w_imp','w_piped_calc','w_unimp_calc','w_surface_calc')) {
 	print(indi)
