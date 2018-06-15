@@ -1,11 +1,10 @@
-.libPaths('/share/code/geospatial/adesh/r_packages')
 rm(list = ls())
-indic <- as.character(commandArgs()[4])
-holdout <- as.character(commandArgs()[6])
-region <- as.character(commandArgs()[7])
+indic <- as.character(commandArgs()[6])
+holdout <- as.character(commandArgs()[8])
+region <- as.character(commandArgs()[9])
 
 if (indic == 'water') {
-    run_date <- as.character(commandArgs()[5])
+    run_date <- as.character(commandArgs()[7])
 
         for (indicator in c('w_piped_cr', 'w_imp','w_unimp_cr')) {
             message(region); message(indicator); 

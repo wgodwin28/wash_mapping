@@ -18,7 +18,7 @@ for (indi in indicators) {
 		uci <- apply(ad1[,3:252], 1, quantile, 0.975, na.rm = T)
 		median <- apply(ad1[,3:252], 1, median, na.rm = T)
 
-		ad1 <- cbind(ad1[,1:2], lci, median, uci)
+		ad1 <- cbind(ad1[,c(1:2,253)], lci, median, uci)
 		print(nrow(ad1))
 		ad1 <- left_join(ad1, distinct(select(geo, region, ADM0_CODE, ADM0_NAME, ADM1_NAME, ADM1_CODE)))
 		print(nrow(ad1))
@@ -26,9 +26,9 @@ for (indi in indicators) {
 	}
 
 	ad1 <- do.call(rbind, results)
-	names(ad1)[3] <- paste0(indi, '_lci')
-	names(ad1)[4] <- paste0(indi, '_uci')
+	names(ad1)[4] <- paste0(indi, '_lci')
 	names(ad1)[5] <- paste0(indi, '_median')
+	names(ad1)[6] <- paste0(indi, '_uci')
 	assign(indi, ad1)	
 
 }

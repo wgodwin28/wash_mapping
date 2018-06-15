@@ -15,17 +15,23 @@ if (nodes == 'geos') {
 # ihme username
 user <- "adesh"
 
+# Use hf_inla
+hf_inla_shell <- '/share/singularity-images/health_fin/forecasting/shells/health_fin_forecasting_shell_mkl_singularity.sh'
+
+r_shell <- hf_inla_shell
+mkl <- 1
+
 # run dates to be combind
-run_dates <- c('2018_03_25_17_10_43')
-holdout <- 2
-regions <- c('sssa_hi','wssa','name_hi')
+run_dates <- c('2018_06_05_10_31_32')
+holdout <- 0:5
+regions <- c('egy', 'cssa', 'sssa_hi', 'name_hi3', 'wssa', 'essa_hilo')
 for (reg in regions) {
   for (rd in run_dates) {
     for (ho in holdout) {
       jname <- paste0(paste0("cr_",rd))
       mycores <- 20
       sys.sub <- paste0("qsub ",proj,paste0(" -e /homes/adesh/cluster_errors"," -o /homes/adesh/cluster_output/ "),
-                        "-cwd -N ", jname, " ", "-pe multi_slot ", mycores, " ")
+                        "-cwd -N ", jname, " ", "-pe multi_slot ", mycores, " -hold_jid 189168011 ")
       # launch script name to qsub
       script <- "combine_cr_ordinal.R"
       indic <- 'both'
