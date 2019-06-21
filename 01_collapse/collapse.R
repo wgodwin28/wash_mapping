@@ -2,15 +2,6 @@
 # Clear environment
 rm(list = ls())
 
-# Define indicator family; can be water, sani, or hw
-indi_fam <- "water"
-
-# Define agg level; can be country or '' [use '' for default]
-agg_level <- ''
-
-# Define indicator era
-sdg <- F
-
 # Define if you are running code loally
 local <- F
 
@@ -53,144 +44,244 @@ new.packages <- packages[!(packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 lapply(packages, library, character.only = T)
 
-for (data_type in c("pt", "poly")){
-  message(data_type)
+#### Load functions ####
+for (file_type in c('poly', 'pt', 'ipums')){
+  message(paste("Loading",file_type, "data"))
   rm(pt_collapse)
   message('Loading Data...')
   # Load data
-  if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2017_09_06.Rdata'))
-    Encoding(pt_collapse$w_source_drink) <- "windows-1252"
-    Encoding(pt_collapse$w_source_other) <- "windows-1252"
-    Encoding(pt_collapse$t_type) <- "windows-1252"
-    pt_collapse <- get(name)
+  if (!("pt_collapse" %in% ls()) & file_type == 'pt') {
+    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2018_01_02.feather'))
+    Encoding(pt_collapse$w_source_drink) <- "UTF-8"
+    Encoding(pt_collapse$w_source_other) <- "UTF-8"
+    Encoding(pt_collapse$t_type) <- "UTF-8"
+    pt_collapse$w_source_drink <- tolower(pt_collapse$w_source_drink)
+    pt_collapse$w_source_other <- tolower(pt_collapse$w_source_other)
+    pt_collapse$t_type <- tolower(pt_collapse$t_type)
+    data_type <- 'pt'
   } 
     
-  if (!("poly_collapse" %in% ls()) & data_type == 'poly') {
-    name <- load(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2017_09_06.Rdata'))
-    Encoding(poly_collapse$w_source_drink) <- "windows-1252"
-    Encoding(poly_collapse$w_source_other) <- "windows-1252"
-    Encoding(poly_collapse$t_type) <- "windows-1252"
-    pt_collapse <- get(name)
-    rm(poly_collapse)
+  if (!("pt_collapse" %in% ls()) & file_type == 'poly') {
+    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2018_01_02.feather'))
+    Encoding(pt_collapse$w_source_drink) <- "UTF-8"
+    Encoding(pt_collapse$w_source_other) <- "UTF-8"
+    Encoding(pt_collapse$t_type) <- "UTF-8"
+    pt_collapse$w_source_drink <- tolower(pt_collapse$w_source_drink)
+    pt_collapse$w_source_other <- tolower(pt_collapse$w_source_other)
+    pt_collapse$t_type <- tolower(pt_collapse$t_type)
+    data_type <- 'poly'
   }
 
-  message('Loading Definitions...')
-  
-  if (!("definitions" %in% ls())) {
-    if (indi_fam == "sani") {
-      definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_updated_2017_09_07.csv'),
-                              encoding="windows-1252", stringsAsFactors = F)
-    } else {
-      definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_updated_2017_09_07.csv'),
-                              encoding="windows-1252", stringsAsFactors = F) 
-      definitions2 <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_other_defined_updated_2017_09_07.csv'),
-                               encoding="windows-1252", stringsAsFactors = F)
-      definitions2 <- rename(definitions2, sdg2 = sdg)
-    }
-  }
-
-  definitions <- distinct(definitions)
-  if (exists('definitions2')) {definitions2 <- distinct(definitions2)}
-
-  rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam','repo','data_type','root','agg_level', 'sdg')))
-
-  message("Importing functions...")
-  #### Load functions ####
-  setwd(repo)
-  source('functions/hh_cw.R')
-  source('functions/address_missing.R')
-  source('functions/cw_indi.R')
-  source('functions/agg_wash.R')
-  source('functions/define_wash.R')
-
-  #### Subset & Shape Data ####
-  message("Initial Cleaning...")
-  # Subset to relevant variables
-  ptdat_0 <- dplyr::select(pt_collapse, nid, iso3, lat, long, survey_series, hhweight, urban, w_source_drink, w_source_other,
-                           hh_size, year_start,hhweight,shapefile,location_code)
-
-  problem_list <- filter(ptdat_0, hh_size <= 0)
-  #setwd('C:/Users/adesh/Desktop')
-  #write.csv(problem_list %>% group_by(nid, iso3, survey_series, year_start) %>% summarize(obs = n(), min_hhs = min(hh_size)),
-  #          file = paste0(data_type,"_problems.csv"))
-  setwd(repo)
-
-  # Create a unique cluster id
-  if (data_type == 'pt') {
-    ptdat <- mutate(ptdat_0, cluster_id = paste(iso3, lat, long, nid, year_start, sep = "_"))
+  if (file_type == 'ipums') {
+    ipums_dir <- '/home/j/LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/IPUMS_feathers'
+    files <- list.files(ipums_dir, '.feather')
+    files_length <- length(files)
   } else {
-    ptdat <- mutate(ptdat_0, cluster_id = paste(iso3, shapefile, location_code, nid, year_start, sep = "_"))  
+    files <- list(pt_collapse)
+    files_length <- length(files)
   }
 
-  # Create a table which assigns numbers to unique IDs and merge it back to data to have shorter
-  # unique IDs
-  short_id <- data.frame(cluster_id = unique(ptdat$cluster_id), 
-                         id_short = seq(1:length(unique(ptdat$cluster_id))),
-                         stringsAsFactors = F)
-  ptdat <- left_join(ptdat, short_id, by = 'cluster_id')
-  rm(short_id)
+  for (index in 1:files_length) {
+    if (file_type == 'ipums') {
+      ipums <- T
+      setwd(ipums_dir)
+      pt_collapse <- read_feather(files[index])
+      pt_collapse$t_type <- as.character(pt_collapse$t_type)
+      pt_collapse$sewage <- as.character(pt_collapse$sewage)
+      Encoding(pt_collapse$t_type) <- "UTF-8"
+      Encoding(pt_collapse$sewage) <- "UTF-8"
+      pt_collapse$t_type <- tolower(pt_collapse$t_type)
+      pt_collapse$sewage <- tolower(pt_collapse$sewage)
 
-  # Remove longer cluster_ids
-  ptdat <- dplyr::select(ptdat, -cluster_id)
+      if (all(is.na(unique(pt_collapse$lat)))) {
+        data_type <- 'poly'
+      } else {
+        data_type <- 'pt'
+      }
 
-  # Change weight to 1 if collapsing point data
-  if (data_type == "pt" & agg_level != 'country') {ptdat$hhweight <- 1}
+      message('Skipping water for IPUMS due to non-standard data')
+      indicators <- 'sani'
 
-  # Change shapefile and location code to missing if collapsing point data
-  if (data_type == "pt") {ptdat$shapefile <- NA; ptdat$location_code <- NA}
-
-  #### Define Indicator ####
-  message("Defining Indicator...")
-  ptdat <- define_indi()
-
-  #### Address Missingness ####
-  message("Addressing Missingness...")
-  
-  # Remove clusters with more than 20% weighted missingness
-  ptdat <- rm_miss()
-
-  # Remove cluster_ids with missing hhweight or invalid hhs
-  miss_wts <- unique(ptdat$id_short[which(is.na(ptdat$hhweight))])
-  ptdat <- filter(ptdat, !(id_short %in% miss_wts))
-
-  invalid_hhs <- unique(ptdat$id_short[which(ptdat$hh_size <= 0)])
-  ptdat <- filter(ptdat, !(id_short %in% invalid_hhs))
-
-  # Crosswalk missing household size data
-  message("Crosswalking HH Sizes...")
-  ptdat <- hh_cw_reg(data = ptdat)
-
-  # Calculated household size weighted means for all clusters
-  # Assign observations with NA indicator value the weighted average for the cluster
-  message("Imputing indicator...")
-  ptdat <- impute_indi_reg_time(data = ptdat)
-
-  #### Aggregate Data ####
-  # Aggregate indicator to cluster level
-  message("Aggregating Data...")
-  ptdat <- agg_indi()
-
-  # Crosswalk indicator data
-  message("Crosswalking Indicators...")
-  ptdat <- cw_indi_reg_time(data = ptdat)
-
-  # create sdg improved for sdg era
-  if (sdg) {
-    ptdat$sdg_imp <- ptdat$piped + ptdat$imp
-  }
-
-  #save poly and point collapses
-  message("Saving Collapsed Data...")
-  today <- gsub("-", "_", Sys.Date())
+    } else {
+      pt_collapse <- files[[1]]
+      ipums <- F
+      indicators <- c('sani', 'water')
+      rm(files)
+    }
     
-  if (data_type == "poly") {
-    polydat <- ptdat
-    rm(ptdat)
-    write_feather(polydat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_", agg_level,
-                  today, ".feather"))
-  } else{
-    write_feather(ptdat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_", agg_level,
-                  today, ".feather"))
+    ### Standardize iso3s
+    pt_collapse$iso3 <- substr(pt_collapse$iso3, 1, 3)
+    
+    for (indi_fam in indicators) {
+    rm(definitions)
+    message(paste('Processing:', indi_fam))
+
+      for (agg_level in c('')) {
+        message(paste("Collapsing",indi_fam, "with", agg_level, "agg_level"))
+        message('Loading Definitions...')
+
+        if (ipums) {
+          if (indi_fam == 'sani') {
+            definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/IPUMS_sani_defs.csv'),
+                                    encoding="windows-1252", stringsAsFactors = F)
+            definitions <- select(definitions, nid, toilet, sewage, sani)
+
+            definitions$toilet <- tolower(definitions$toilet)
+            definitions$sewage <- tolower(definitions$sewage)
+            definitions$sani <- tolower(definitions$sani)
+
+            definitions$toilet <- ifelse(definitions$toilet == "" | is.na(definitions$toilet),
+                                      NA, definitions$toilet)
+            definitions$sewage <- ifelse(definitions$sewage == "" | is.na(definitions$sewage),
+                                         NA, definitions$sewage)
+            definitions$sani <- ifelse(definitions$sani == "" | is.na(definitions$sani),
+                                         NA, definitions$sani)
+          }
+        } else {
+          if (!("definitions" %in% ls())) {
+            if (indi_fam == "sani") {
+              definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/t_type_defined_2018_01_24.csv'),
+                                      encoding="windows-1252", stringsAsFactors = F)
+              definitions <- select(definitions, string, sdg)
+            } else {
+              definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_2018_01_24.csv'),
+                                      encoding="windows-1252", stringsAsFactors = F) 
+              definitions <- select(definitions, string, sdg, jmp)
+            }
+          }
+
+          # Prep definitions file for further processing
+          definitions$string <- iconv(definitions$string, 'windows-1252', 'UTF-8')
+          definitions$string <- tolower(definitions$string)
+          definitions$sdg <- ifelse(definitions$sdg == "" | is.na(definitions$sdg),
+                                    NA, definitions$sdg)
+          definitions$string <- ifelse(definitions$string == "" | is.na(definitions$string),
+                                       NA, definitions$string)
+          definitions <- distinct(definitions)
+        }
+        
+        rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam',
+          'repo','data_type','root','agg_level', 'sdg', 'ipums', 'files', 'index', 'files_length',
+          'file_type', 'ipums_dir')))
+
+        message("Importing functions...")
+        setwd(repo)
+        source('functions/initial_cleaning.R')
+        source('functions/hh_cw.R')
+        source('functions/address_missing.R')
+        source('functions/cw_indi.R')
+        source('functions/agg_wash.R')
+        source('functions/define_wash.R')
+        source('functions/write_cw.R')
+
+        #### Subset & Shape Data ####
+        message("Initial Cleaning...")
+        temp_list <- initial_cleaning(census = T)
+        ptdat <- temp_list[[1]]; ptdat_0 <- temp_list[[2]]
+        rm(temp_list)
+
+        #### Define Indicator ####
+        message("Defining Indicator...")
+        ptdat <- define_indi(sdg_indi = T, census = ipums)
+
+        #### Address Missingness ####
+        message("Addressing Missingness...")
+        
+        # Remove clusters with more than 20% weighted missingness
+        ptdat <- rm_miss()
+        if (nrow(ptdat) == 0) {
+          next
+        }
+
+        # Remove cluster_ids with missing hhweight or invalid hhs
+        miss_wts <- unique(ptdat$id_short[which(is.na(ptdat$hhweight))])
+        ptdat <- filter(ptdat, !(id_short %in% miss_wts))
+        ptdat <- filter(ptdat, hhweight != 0)
+
+        invalid_hhs <- unique(ptdat$id_short[which(ptdat$hh_size <= 0)])
+        ptdat <- filter(ptdat, !(id_short %in% invalid_hhs))
+
+        if (nrow(ptdat) == 0) {
+          next
+        }
+
+        # Crosswalk missing household size data
+        message("Crosswalking HH Sizes...")
+        if (!ipums) {
+          ptdat <- hh_cw_reg(data = ptdat)
+        } else {
+          ptdat <- assign_ipums_hh()
+        }
+        
+        # Remove missing observations
+        ptdat <- filter(ptdat, !is.na(imp))
+
+        if (nrow(ptdat) == 0) {
+          next
+        }
+
+        #### Aggregate Data ####
+        # Bookmarking dataset so it can be looped over for conditional switch
+        ptdat_preagg <- ptdat
+        
+        # Conditional switch is to switch collapsing for conditional vs unconditional indicators
+        conditional <- 'unconditional'
+
+        # Reseting the dataset to preagregate
+        ptdat <- ptdat_preagg
+        message(paste("Conditional variables status:",conditional))
+       
+        # Aggregate indicator to cluster level
+        message("Aggregating Data...")
+        ptdat <- agg_indi()
+
+        # Skip the rest of the process if no rows of data are left
+        if (nrow(ptdat) == 0) {
+          next
+        }
+
+        # Delete cw dictionary if ipums already added to it previously
+        if (index == 1 & ipums) {
+          message('Checking if IPUMS already added to CW data previously')
+          original <- try(read.csv('/home/j/WORK/11_geospatial/wash/definitions/cw_sani.csv', stringsAsFactors = F),
+                        silent = T)
+        
+          if (class(original) == 'try-error') {
+            rm(original)
+          }  else {
+            if ('ipums' %in% original$data_type) {
+             system('rm /home/j/WORK/11_geospatial/wash/definitions/cw_sani.csv')
+            } 
+            rm(original)
+          }  
+        }
+        
+        # Write crosswalking dictionary
+        message('Output CW files')    
+        write_cw_ratio(census = ipums)
+
+        #save poly and point collapses
+        message("Saving Collapsed Data...")
+        today <- gsub("-", "_", Sys.Date())
+        
+        if (!ipums) {
+          if (data_type == "poly") {
+            polydat <- ptdat
+            rm(ptdat)
+            write_feather(polydat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/polydat_",
+                          indi_fam, '_', conditional, '_', agg_level, '_', today, ".feather"))
+          } else{
+            write_feather(ptdat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/ptdat_",
+                          indi_fam, '_', conditional, '_', agg_level, '_', today, ".feather"))
+          }
+        }
+        
+        if (ipums) {
+          write_feather(ptdat, paste0(root,"LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/IPUMS/feather/",
+                          indi_fam, '_', conditional, '_', agg_level, '_', today, '_', files[index]))
+        }
+        
+      }
+    }
   }
 }

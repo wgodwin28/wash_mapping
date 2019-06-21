@@ -10,10 +10,10 @@ water_outliers <- c(30394, 151568, 22114, 32189, 19557,
 
 
 if (indi_fam == 'water' ) {
-  setwd(paste0('/home/j/WORK/11_geospatial/wash/data/resamp/water/imp/2018-03-09/'))
-  imp <- lapply(list.files(), read.csv, stringsAsFactors = F)
-  imp <- do.call(rbind, imp)
-  imp <- filter(imp, !(nid %in% water_outliers))
+  setwd(paste0('/home/j/WORK/11_geospatial/wash/data/resamp/water/surface/2018-03-09/'))
+  surface <- lapply(list.files(), read.csv, stringsAsFactors = F)
+  surface <- do.call(rbind, surface)
+  surface <- filter(surface, !(nid %in% water_outliers))
 
   setwd(paste0('/home/j/WORK/11_geospatial/wash/data/resamp/water/piped/2018-03-09/'))
   piped <- lapply(list.files(), read.csv, stringsAsFactors = F)
@@ -25,7 +25,7 @@ if (indi_fam == 'water' ) {
   unimp <- do.call(rbind, unimp)
   unimp <- filter(unimp, !(nid %in% water_outliers))
 
-  for (i in c('piped','imp', 'unimp')) {  
+  for (i in c('piped','surface', 'unimp')) {  
     mydat <- get(i)
     
     names(mydat)[which(names(mydat) == i)] <- 'indi'
@@ -44,44 +44,39 @@ if (indi_fam == 'water' ) {
     assign(i,mydat)
   }
   
-  imp_denom <- select(imp, w_imp, shapefile, location_code, nid, year)
-  imp_denom <- distinct(imp_denom)
-  
-  unimp <- left_join(unimp, imp_denom, by = c('shapefile','location_code','nid','year'))
-  unimp <- mutate(unimp, N = N - w_imp) %>% mutate(unimp_prop = w_unimp/N) %>%
-    rename(w_unimp_cr = w_unimp, prop = unimp_prop) %>%
-    select(-w_imp) %>%
+  unimp <- mutate(unimp, unimp_prop = w_unimp/N) %>%
+    rename(w_unimp_calc = w_unimp, prop = unimp_prop) %>%
     filter(N > 0)
   
-  piped <- left_join(piped, imp_denom, by = c('shapefile','location_code','nid','year'))
-  piped <- mutate(piped, N = w_imp) %>% mutate(piped_prop = w_piped/N) %>%
-             rename(w_piped_cr = w_piped, prop = piped_prop) %>%
-             select(-w_imp) %>%
+  surface <- mutate(surface, surface_prop = w_surface/N) %>%
+             rename(w_surface_calc = w_surface, prop = surface_prop) %>%
+             filter(N > 0)
+
+  piped <- mutate(piped, piped_prop = w_piped/N) %>%
+             rename(w_piped_calc = w_piped, prop = piped_prop) %>%
              filter(N > 0)
   
-  imp <- rename(imp, prop = imp_prop)
-  rm(mydat, imp_denom)
-  
-  piped_pt <- read.csv('/home/j/WORK/11_geospatial/10_mbg/input_data/w_piped_cr.csv',
+
+  piped_pt <- read.csv('/home/j/WORK/11_geospatial/10_mbg/input_data/w_piped_calc.csv',
                        stringsAsFactors = F)
   piped_pt <- select(piped_pt, -X)
   piped <- rbind(piped, piped_pt)
-  write.csv(piped, '/home/j/WORK/11_geospatial/10_mbg/input_data/w_piped_cr.csv')
+  write.csv(piped, '/home/j/WORK/11_geospatial/10_mbg/input_data/w_piped_calc.csv')
   rm(piped_pt)
   
-  unimp_pt <- read.csv('/home/j/WORK/11_geospatial/10_mbg/input_data/w_unimp_cr.csv',
+  surface_pt <- read.csv('/home/j/WORK/11_geospatial/10_mbg/input_data/w_surface_calc.csv',
+                       stringsAsFactors = F)
+  surface_pt <- select(surface_pt, -X)
+  surface <- rbind(surface, surface_pt)
+  write.csv(surface, '/home/j/WORK/11_geospatial/10_mbg/input_data/w_surface_calc.csv')
+  rm(surface_pt)
+  
+  unimp_pt <- read.csv('/home/j/WORK/11_geospatial/10_mbg/input_data/w_unimp_calc.csv',
                        stringsAsFactors = F)
   unimp_pt <- select(unimp_pt, -X)
   unimp <- rbind(unimp, unimp_pt)
-  write.csv(unimp, '/home/j/WORK/11_geospatial/10_mbg/input_data/w_unimp_cr.csv')
+  write.csv(unimp, '/home/j/WORK/11_geospatial/10_mbg/input_data/w_unimp_calc.csv')
   rm(unimp_pt)
-  
-  imp_pt <- read.csv('/home/j/WORK/11_geospatial/10_mbg/input_data/w_imp.csv',
-                     stringsAsFactors = F)
-  imp_pt <- select(imp_pt, -X)
-  imp <- rbind(imp, imp_pt)
-  write.csv(imp, '/home/j/WORK/11_geospatial/10_mbg/input_data/w_imp.csv')
-  rm(imp_pt)
 }
 
 rm(list = ls())
@@ -95,17 +90,17 @@ sani_outliers <- c(214640, 30394, 22114, 21970, 235215,
                     2039, 2063, 11516, 11540, 4818)
 
 if (indi_fam == 'sani' ) {
-  setwd(paste0('/home/j/WORK/11_geospatial/wash/data/resamp/sani/imp/2018-03-09/'))
-  imp <- lapply(list.files(), read.csv, stringsAsFactors = F)
-  imp <- do.call(rbind, imp)
-  imp <- filter(imp, !(nid %in% sani_outliers))
+  setwd(paste0('/home/j/WORK/11_geospatial/wash/data/resamp/sani/od/2018-03-09/'))
+  od <- lapply(list.files(), read.csv, stringsAsFactors = F)
+  od <- do.call(rbind, od)
+  od <- filter(od, !(nid %in% sani_outliers))
 
   setwd(paste0('/home/j/WORK/11_geospatial/wash/data/resamp/sani/unimp/2018-03-09/'))
   unimp <- lapply(list.files(), read.csv, stringsAsFactors = F)
   unimp <- do.call(rbind, unimp)
   unimp <- filter(unimp, !(nid %in% sani_outliers))
 
-  for (i in c('imp', 'unimp')) {  
+  for (i in c('od', 'unimp')) {  
     mydat <- get(i)
     
     names(mydat)[which(names(mydat) == i)] <- 'indi'
@@ -124,29 +119,25 @@ if (indi_fam == 'sani' ) {
     assign(i,mydat)
   }
   
-  imp_denom <- select(imp, s_imp, shapefile, location_code, nid, year)
-  imp_denom <- distinct(imp_denom)
-  
-  unimp <- left_join(unimp, imp_denom, by = c('shapefile','location_code','nid','year'))
-  unimp <- mutate(unimp, N = N - s_imp) %>% mutate(unimp_prop = s_unimp/N) %>%
-    rename(s_unimp_cr = s_unimp, prop = unimp_prop) %>%
-    select(-s_imp) %>%
+  unimp <- mutate(unimp, unimp_prop = s_unimp/N) %>%
+    rename(s_unimp_calc = s_unimp, prop = unimp_prop) %>%
     filter(N > 0)
   
-  imp <- rename(imp, prop = imp_prop)
-  rm(mydat, imp_denom)
+  od <- mutate(od, od_prop = s_od/N) %>%
+    rename(s_od_calc = s_od, prop = od_prop) %>%
+    filter(N > 0)
   
-  unimp_pt <- read.csv('/home/j/WORK/11_geospatial/10_mbg/input_data/s_unimp_cr.csv',
+  od_pt <- read.csv('/home/j/WORK/11_geospatial/10_mbg/input_data/s_od_calc.csv',
+                       stringsAsFactors = F)
+  od_pt <- select(od_pt, -X)
+  od <- rbind(od, od_pt)
+  write.csv(od, '/home/j/WORK/11_geospatial/10_mbg/input_data/s_od_calc.csv')
+  rm(od_pt)
+  
+  unimp_pt <- read.csv('/home/j/WORK/11_geospatial/10_mbg/input_data/s_unimp_calc.csv',
                        stringsAsFactors = F)
   unimp_pt <- select(unimp_pt, -X)
   unimp <- rbind(unimp, unimp_pt)
-  write.csv(unimp, '/home/j/WORK/11_geospatial/10_mbg/input_data/s_unimp_cr.csv')
+  write.csv(unimp, '/home/j/WORK/11_geospatial/10_mbg/input_data/s_unimp_calc.csv')
   rm(unimp_pt)
-  
-  imp_pt <- read.csv('/home/j/WORK/11_geospatial/10_mbg/input_data/s_imp.csv',
-                     stringsAsFactors = F)
-  imp_pt <- select(imp_pt, -X)
-  imp <- rbind(imp, imp_pt)
-  write.csv(imp, '/home/j/WORK/11_geospatial/10_mbg/input_data/s_imp.csv')
-  rm(imp_pt)
 }
